@@ -1,0 +1,20 @@
+{% raw %}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio
+  labels:
+    istio.io/rev: default
+    install.operator.istio.io/owning-resource: unknown
+    operator.istio.io/component: Pilot
+    release: istiod
+    app.kubernetes.io/name: istiod
+    app.kubernetes.io/instance: istiod
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.0.0
+data:
+  meshNetworks: 'networks: {}'
+  mesh: "defaultConfig:\n  discoveryAddress: istiod.istio-system.svc:15012\ndefaultProviders:\n\
+    \  metrics:\n  - prometheus\nenablePrometheusMerge: true\nrootNamespace: istio-system\n\
+    trustDomain: cluster.local"
+{% endraw %}

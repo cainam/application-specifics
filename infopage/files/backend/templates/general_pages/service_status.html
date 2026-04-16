@@ -1,0 +1,11 @@
+<hr/>{{ name }}<br/><hr/>
+<table class="iTable">
+
+<tr>{% for key, value in content.items() %} <th>{{key}}</th>{% endfor %}</tr>
+
+<tr>
+{% for key, value in content.items() %} <td><pre>{{value}}</pre></td>
+{% endfor %}
+</tr>
+
+</table>

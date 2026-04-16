@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ kustom.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ kustom.name }}
+      app.kubernetes.io/name: {{ kustom.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ kustom.name }}
+        app.kubernetes.io/name: {{ kustom.name }}
+    spec:
+      containers:
+      - name: {{ kustom.name }}
+        env:
+        - name: DEBUG
+          value: "zigbee-herdsman*" 
+        - name: ZIGBEE2MQTT_DATA
+          value: "/data"
+        args:
+        - sleep 5; rm -f /data/configuration.yaml; cp -vp /config/configuration.yaml /data/configuration.yaml; node index.js
+        command:
+        - /bin/sh
+        - -c
+        image: {{ kustom.image }}
+        workingDir: /app
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources: {}
+        securityContext:
+          privileged: true
+          readOnlyRootFilesystem: false
+          runAsUser: {{ kustom.security.runAsUser }}
+          runAsGroup: {{ kustom.security.runAsGroup }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - mountPath: /data
+          name: data
+        - mountPath: /dev/ttyUSB0
+          name: zigbeedongle
+      nodeSelector:
+        {{ kustom.name }}: {{ kustom.name }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ kustom.name }}
+      - hostPath:
+          path: /dev/ttyUSB0
+          type: CharDevice
+        name: zigbeedongle
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: {{ kustom.storage[0].type }}
+      resources:
+        requests:
+          storage: {{ kustom.storage[0].size }}
+

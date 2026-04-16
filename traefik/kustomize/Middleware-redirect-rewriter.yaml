@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-rewriter
+spec:
+  plugin:
+    rewriteResponse:
+      rewrites:
+      - header: location
+        regex: ^https?://[^/]+/(hydra|idp)(.*)$
+        replacement: https://{{ net.domain_external }}:44354/$1$2

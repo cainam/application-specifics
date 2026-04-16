@@ -1,0 +1,42 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: lua-filter
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.lua
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          inlineCode: |
+            -- this filter is to rewrite location header if an internal domain is provided for a request from external
+            function envoy_on_request(request_handle)
+              -- preserve authority from request for the response
+              local authority = request_handle:headers():get(":authority")
+              request_handle:logInfo("request: " .. authority)
+              request_handle:streamInfo():dynamicMetadata():set("context", "host_requested", authority)
+            end
+            function envoy_on_response(response_handle)
+                local host = response_handle:streamInfo():dynamicMetadata():get("context")["host_requested"]
+                local loc = response_handle:headers():get("location")
+                if not loc and false then
+                  response_handle:logDebug("no location header")
+                end
+                if loc and host == "{{ net.domain_external }}:{{ (net.routes | selectattr('gateway','equalto','istio')|first).endpointIP }}" then
+                  local pos_2slash = loc:find("//")
+                  local pos_domain_end = loc:find("/",pos_2slash+2)
+                  local new_url = loc:sub(1,pos_2slash+1) .. host .. loc:sub(pos_domain_end)
+
+                  response_handle:logInfo("response: host: " .. host .. " location: " .. loc .. " pos_2slash:" .. pos_2slash .. " pos_domain_end:" .. pos_domain_end .. " new_url: " .. new_url)
+                  response_handle:headers():replace("location", new_url)
+                end
+            end
+  workloadSelector:
+    labels:
+      gateway_type: istio
+

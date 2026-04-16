@@ -1,0 +1,10 @@
+namespace: {{ kustom.namespace }}
+resources:
+- deploy.yaml
+- service.yaml
+
+secretGenerator:
+- name: {{ kustom.name }}
+  literals:
+  - username={{ applicationSecurity[application.key].secret.username }}
+  - password={{ applicationSecurity[application.key].secret.password }}

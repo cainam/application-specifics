@@ -1,0 +1,12 @@
+resources:
+  - service.yaml
+  - statefulset.yaml
+  - configmap.yaml
+
+namespace: {{ kustom.namespace }}
+
+secretGenerator:
+  - name: postgres-secret
+    literals:
+      - user={{ kustom.user }}
+      - password={{ kustom.pass }}

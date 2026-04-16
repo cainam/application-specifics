@@ -1,0 +1,7 @@
+resources:
+- deploy.yaml
+- service.yaml
+- configmap.yaml
+- secret.yaml
+  
+namespace: {{ kustom.namespace }}

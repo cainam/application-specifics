@@ -1,0 +1,31 @@
+
+- name: test for major version update
+  ansible.builtin.shell: |
+    set -o pipefail
+    kubectl diff -k {{ kustomize_dir }} | grep -i "image:" | sort -u | awk '
+    /^-/ { match($0, /[0-9]+/); old = substr($0, RSTART, RLENGTH) }
+    /^\+/ { match($0, /[0-9]+/); new = substr($0, RSTART, RLENGTH) }
+    END { 
+      if (old != "" && new != "" && new > old) print "true"; 
+      else print "false" 
+    }'
+  register: major_upgrade_result
+  failed_when: major_upgrade_result.rc > 1
+  changed_when: false
+
+- name: set upgrade fact
+  ansible.builtin.set_fact:
+    is_major_upgrade: "{{ major_upgrade_result.stdout | bool }}"
+    pg_next: "{{ software.postgresql.version|string|split('.')|first|int }}"
+
+- name: "set var {{ var_additional_images }}"
+  set_fact:
+    "{{ var_additional_images }}": "{{ 
+      [{
+        'name': 'pgupgrade'~pg_next,
+        'tag': (pg_next-1),
+        'section': registry_path,
+        'type': 'gentoo-image-builder',
+        'requires': ['postgresql'],
+        'build': {'packages': '=dev-db/postgresql-'~(pg_next-1)~'*' }
+      }] if is_major_upgrade else [] }}"

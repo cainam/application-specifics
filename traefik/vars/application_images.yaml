@@ -1,0 +1,27 @@
+images:          
+- name: traefik
+  section: gateway 
+  type: gentoo-image-builder
+  requires:
+  - go 
+  build:
+    configure_builder: |
+      echo "net-libs/nodejs npm corepack" > /etc/portage/package.use/97nodejs.conf
+      mkdir -p /var/tmp/portage /var/db && chmod 755 /var/db
+      PORTAGE_TMPDIR="/var/tmp/portage" MAKEOPTS="-j3" emerge net-libs/nodejs dev-libs/icu 
+    configure_rootfs_build: |
+      git clone --depth 1 --single-branch -b "{{ software.traefik.version }}" https://github.com/traefik/traefik.git
+      set -x
+      cd traefik/webui
+      cat buildx.Dockerfile | grep -v -e ^FROM -e ^EXPOSE -e ^$ -e WEBUI_DIR -e COPY | sed -e 's/RUN //g'  -e 's/ENV /export /g' -e 's/WORKDIR/cd/g' | sed -e "s/^\(corepack.*\)$/\1\nyarn config set supportedArchitectures --json '{\"os\": [\"linux\"], \"cpu\": [\"arm64\"], \"libc\": [\"musl\"]}'/" > buildx.sh
+      bash -x buildx.sh
+      yarn build
+      cd ..
+      bash -x -c "$(make -n | grep -A 99999 CGO)"
+    finish_rootfs_build: |
+      mkdir -p "${ROOT}/bin" && cp -dp ./dist/linux/arm64/traefik "${ROOT}/bin" #&& mkdir -p  "${ROOT}/src" && cp -rdp /src/webui "${ROOT}/src/webui"
+      export PLUGIN_PATH=github.com/jamesmcroft/traefik-plugin-rewrite-response-headers
+      mkdir -p "${ROOT}/plugins-local/src/$(dirname $PLUGIN_PATH)"
+      cd "${ROOT}/plugins-local/src/$(dirname $PLUGIN_PATH)"
+      git clone --depth 1 --single-branch "https://${PLUGIN_PATH}.git"
+

@@ -1,0 +1,35 @@
+namespace: {{ kustom.namespace }}
+resources:
+- service.yaml
+- deployment.yaml
+- valhook.yaml
+- muthook.yaml
+- rolebinding.yaml
+- role.yaml
+- serviceaccount.yaml
+- configmap.yaml
+- configmap-mutate.yaml
+
+secretGenerator:
+- name: tls
+  files:
+  - tls.crt=tls.crt
+  - tls.key=tls.key
+  type: "kubernetes.io/tls"
+
+replacements:
+  - source:
+      kind: Secret
+      name: tls
+      fieldPath: metadata.name     # We want the *generated name* of the Secret (with hash)
+    targets:
+      - select:
+          kind: Deployment
+          name: {{ kustom.name }}
+        # Path to the secretName field in the volume definition
+        fieldPaths:
+        - spec.template.spec.volumes.[name=tls-certs-volume].secret.secretName
+        # The '.[name=webhook-tls-cert]' part is a Kustomize "list selector".
+        # It tells Kustomize to find the item in the 'volumes' list where 'name' is 'webhook-tls-cert'.
+        # This is essential when the target is a list.
+

@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: {{ kustom.namespace }}
+resources:
+  - https://github.com/flannel-io/flannel/releases/download/{{ software.flannel.version }}/kube-flannel.yml
+
+images:
+  - name: ghcr.io/flannel-io/flannel
+    newName: {{ kustom.namespace }}/flannel
+    newTag: {{ software.flannel.version }}
+  - name: ghcr.io/flannel-io/flannel-cni-plugin
+    newName: {{ kustom.namespace }}/flannel-cni-plugin
+    newTag: {{ software['flannel-cni-plugin'].version }}
+
+patches:
+  - target:
+      kind: DaemonSet
+      name: kube-flannel-ds
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: "--iface=end0"
+      - op: remove
+        path: /spec/selector/matchLabels/k8s-app
+      - op: remove
+        path: /spec/template/metadata/labels/k8s-app

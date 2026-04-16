@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ kustom.name }}
+  name: {{ kustom.name }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ kustom.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ kustom.name }}
+    spec:
+      containers:
+      - env:
+        - name: HYDRA_ADMIN_URL
+          value: http://hydra-admin.auth:4445
+        - name: HYDRA_PUBLIC_URL
+          value: http://hydra-public.auth:4444
+        - name: BASE_URL
+          value: /idp/
+        - name: MOCK_TLS_TERMINATION
+          value: noX
+        - name: mount_path
+          value: /x
+        image: {{ kustom.image }}
+        name: {{ kustom.name }}
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /x
+          name: {{ kustom.name }}
+          readOnly: true
+      volumes:
+      - name: {{ kustom.name }}
+        secret:
+          defaultMode: 420
+          secretName: {{ kustom.name }}

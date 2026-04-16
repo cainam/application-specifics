@@ -1,0 +1,14 @@
+<hr/>{{ name }}<br/><hr/>
+
+<table class="iTable">
+<tr><th>software</th><th>installed</th><th>configured</th><th>latest version(s)</th></tr>
+        {% for sw in content %}
+	<tr itemprop="inner_load" value="{{ sw }}">
+	  <td>=> {{ sw }}</td><td></td><td></td><td></td>
+	</tr>
+        {% endfor %}
+</table>
+
+<pre>
+{{ raw }}
+</pre>

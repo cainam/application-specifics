@@ -1,0 +1,194 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ kustom.name }}-mutate
+data:
+  mutate: |
+    deployment:
+      standards:
+        /spec/revisionHistoryLimit: 3
+    pods:
+        flannel:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - hostPath
+            - hostNetwork
+            - readOnlyRootFilesystem
+            - runAsNonRoot
+            set:
+              install-cni-plugin:
+                uid: 0
+                caps:
+                - DAC_OVERRIDE
+                - FOWNER
+                - SYS_ADMIN
+            install-cni:
+                uid: 0
+            kube-flannel:
+                uid: 0
+                caps:
+                - DAC_OVERRIDE
+                - FOWNER
+                - SYS_ADMIN
+                - NET_RAW
+                - NET_ADMIN
+        instance-manager:
+            identifiedBy: label
+            label: longhorn.io/component
+            exemptions:
+            - privileged
+            - hostPath
+            - runAsNonRoot
+            - readOnlyRootFilesystem
+            set:
+              instance-manager:
+                uid: 0
+        engine-image:
+            identifiedBy: label
+            label: longhorn.io/component
+            exemptions:
+            - hostPath
+            - runAsNonRoot
+            - privileged
+            set:
+              engine-image-ei-62d76070:
+                uid: 0
+        csi-resizer:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - hostPath
+            - runAsNonRoot
+            set:
+              csi-resizer:
+                uid: 0
+        csi-snapshotter:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - hostPath
+            - runAsNonRoot
+            set:
+              csi-snapshotter:
+                uid: 0
+        csi-provisioner:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - hostPath
+            - runAsNonRoot
+            set:
+              csi-provisioner:
+                uid: 0
+        csi-attacher:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - hostPath
+            - runAsNonRoot
+            set:
+              csi-attacher:
+                uid: 0
+        longhorn-csi-plugin:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - hostPath
+            - privileged
+            - caps_add
+            - runAsNonRoot
+            set:
+              longhorn-csi-plugin:
+                uid: 0
+              longhorn-liveness-probe:
+                uid: 0
+        longhorn-manager:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - hostPath
+            - privileged
+            - runAsNonRoot
+            - readOnlyRootFilesystem
+            set:
+              longhorn-manager:
+                uid: 0
+        longhorn-ui:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - caps_add
+            emptyDir:
+            - path: /var/log/nginx
+              container: longhorn-ui
+            - path: /var/lib/nginx
+              container: longhorn-ui
+            - path: /run
+              container: istio-init
+            set:
+              istio-init:
+                uid: 0
+        longhorn-driver-deployer:
+            label: app
+            pod2container:
+        longhorn-pre-upgrade:
+          identifiedBy: label
+          label: job-name
+          exemptions:
+          - hostPath
+        discover-proc-kubelet-cmdline:
+            identifiedBy: name
+            exemptions:
+            - privileged
+        postgres:
+            identifiedBy: label
+            label: app
+            exemptions:
+            - privileged
+            - readOnlyRootFilesystem
+        mosquitto:
+            identifiedBy: label
+            label: app.kubernetes.io/name
+        home-assistant:
+            identifiedBy: label
+            label: app.kubernetes.io/name
+        zigbee2mqtt:
+            identifiedBy: label
+            label: app.kubernetes.io/name
+            exemptions:
+            - hostPath
+            - privileged
+            - readOnlyRootFilesystem
+            - runAsNonRoot
+            set:
+              zigbee2mqtt:
+                gid: 20
+                uid: 0
+            caps:
+                - CAP_SYS_RAWIO
+                - CAP_SYS_ADMIN
+            emptyDir:
+            - path: /log
+              container: zigbee2mqtt
+        istiodxx:
+            identifiedBy: label
+            label: app
+            set:
+            discovery:
+                caps:
+                - CAP_NET_BIND_SERVICE
+        ha-gw:
+            identifiedBy: label
+            label: app
+            set:
+            istio-proxy:
+                caps:
+                - NET_BIND_SERVICE
+        gateway:
+            identifiedBy: label
+            label: app
+            set:
+            istio-proxy:
+                caps:
+                - NET_BIND_SERVICE

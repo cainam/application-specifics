@@ -1,0 +1,55 @@
+images:
+- name: ha-base
+  section: home
+  requires:
+  - python3
+  build:
+    packages: "app-misc/jq app-crypt/gnupg dev-python/jinja2 dev-python/idna dev-python/certifi dev-python/requests dev-python/python-dateutil"
+    run_with: python3 -m homeassistant --config /config --log-file /tmp/log --skip-pip
+    configure_builder: echo 'app-misc/jq -static-libs' > /etc/portage/package.use/jq
+
+- name: home-assistant
+  section: home
+  requires:
+  - ha-base
+  env:
+    LD_LIBRARY_PATH: /usr/lib/postgresql-18/lib/:/usr/local/lib
+  build:
+    packages: dev-db/postgresql
+    configure_builder: |
+      sed -i -e '/oniguruma/d' -e '/jq/d' /etc/portage/profile/package.provided
+      # echo 'dev-db/postgresql -server' > /etc/portage/package.use/postgresql
+      emerge app-misc/jq
+    configure_rootfs_build: |
+      set -x
+      HA_DIR=/ha && mkdir -p ${ROOT}/${HA_DIR} && ln -s ${ROOT}/${HA_DIR} ${HA_DIR}
+      ( cd ${ROOT}/${HA_DIR};
+          git clone --depth=1 -b "{{ software['home-assistant'].version }}" https://github.com/home-assistant/core.git
+          cd core
+          for package in file-read-backwards pyspeex-noise home-assistant-intents PyTurboJPEG home-assistant-frontend pyotp PyQRCode paho-mqtt hassil numpy mutagen ha-ffmpeg hass-nabucasa pymicro-vad; do # pyudev; do
+            grep -q "${package}==" requirements.txt  || grep "^${package}==" requirements_all.txt >> requirements.txt
+          done
+          sed -i -e "/hass_nabucasa/d" -e "s#remote.is_cloud_request.get()#False#" homeassistant/components/http/forwarded.py
+
+          # remove from default configuration
+          cp -dp homeassistant/components/default_config/manifest.json homeassistant/components/default_config/manifest.json.org
+          jq  -a 'del(.dependencies[] | select(. == ("assist_pipeline","stream","go2rtc","cloud","conversation","zeroconf","usb","ssdp","dhcp","mobile_app","bluetooth") ) )' homeassistant/components/default_config/manifest.json.org > homeassistant/components/default_config/manifest.json
+      )
+
+      VIRTUAL_ENV=/py_env
+      python -m venv --system-site-packages "$VIRTUAL_ENV" && . "$VIRTUAL_ENV"/bin/activate
+      pip install --no-cache-dir -r ${HA_DIR}/core/requirements.txt 2>&1 | tee ${ROOT}/py_env.log
+      rm -rf /py_env/lib/python3.13/site-packages/hass_frontend/frontend_es5 # remove this ancient version
+      set +x
+    finish_rootfs_build: |
+      set -x
+      VIRTUAL_ENV=/py_env
+      . "$VIRTUAL_ENV"/bin/activate
+      export PATH=$(stat --printf="%n" $ROOT/usr/lib/postgresql-*/bin):$PATH
+      pip --no-cache-dir install psycopg2
+      find /py_env -name '*.so*' -exec strip {} \;
+      pip uninstall --yes uv
+      mv "$VIRTUAL_ENV" ${ROOT}/"$VIRTUAL_ENV"
+      set +x
+
+

@@ -1,0 +1,69 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: deschedule-descheduler
+  labels:
+    app.kubernetes.io/name: descheduler
+    app.kubernetes.io/instance: deschedule
+    app.kubernetes.io/version: 0.33.0
+rules:
+  - apiGroups:
+      - events.k8s.io
+    resources:
+      - events
+    verbs:
+      - create
+      - update
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - get
+      - watch
+      - list
+  - apiGroups:
+      - ''
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - watch
+      - list
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+    verbs:
+      - get
+      - watch
+      - list
+      - delete
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["nodes", "pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups:
+      - ''
+    resources:
+      - pods/eviction
+    verbs:
+      - create
+  - apiGroups:
+      - scheduling.k8s.io
+    resources:
+      - priorityclasses
+    verbs:
+      - get
+      - watch
+      - list
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - get
+      - watch
+      - list

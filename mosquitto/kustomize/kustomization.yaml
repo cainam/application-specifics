@@ -1,0 +1,11 @@
+namespace: {{ kustom.namespace }}
+resources:
+  - configmap.yaml
+  - statefulset.yaml
+  - service.yaml
+
+secretGenerator:
+  - name: {{ kustom.name }}
+    literals:
+      - username={{ mosquitto.user }}
+      - password={{ mosquitto.pass }}

@@ -1,0 +1,7 @@
+namespace: {{ kustom.namespace }}
+resources:
+- ClusterRoleBinding.yaml
+- ClusterRole.yaml
+- ConfigMap.yaml
+- CronJob.yaml
+- ServiceAccount.yaml

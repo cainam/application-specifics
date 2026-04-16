@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ kustom.name }}
+spec:
+  selector:
+    app: {{ kustom.name }}
+  ports:
+  - name: mqtt
+    port: 1883
+    protocol: TCP
+    targetPort: mqtt
+  - name: websocket
+    port: 9090
+    protocol: TCP
+    targetPort: websocket

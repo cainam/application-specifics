@@ -1,0 +1,19 @@
+<hr/>{{ name }}<br/>
+<hr/>
+<table class="iTable">
+
+<tr><th>image</th><th>tag</th><th>action</th></tr>
+        {% for image in images_list %}
+	<tr>
+	  <td>{{ image[0] }}</td><td>{{ image[1] }}</td><td>
+          <form action="javascript:void(0);" method="post">
+    <input type="hidden" name="image" value="{{ image[0] }}" />
+    <input type="hidden" name="tag" value="{{ image[1] }}" />
+    <button type=submit onclick='trigger_backend("delete_image", {"image": "{{ image[0] }}","tag": "{{ image[1] }}"});return false;'>delete</button>
+</form>
+</td>
+
+	</tr>
+
+        {% endfor %}
+</table>

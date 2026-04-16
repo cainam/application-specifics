@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  valmut.conf: |
+    lookup:
+      labels:
+      - app
+      - app.kubernetes.io/name
+      - longhorn.io/component
+kind: ConfigMap
+metadata:
+  name: {{ kustom.name }}

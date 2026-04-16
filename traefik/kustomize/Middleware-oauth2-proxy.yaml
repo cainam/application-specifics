@@ -1,0 +1,21 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-proxy
+spec:
+  forwardAuth:
+    addAuthCookiesToResponse:
+    - _csrf
+    - _oauth2_proxy
+    address: http://oauth2-proxy.auth.svc.cluster.local:80/oauth2/auth
+    authRequestHeaders:
+    - X-Forwarded-Uri
+    - Origin
+    - Cookie
+    authResponseHeaders:
+    - X-Auth-Request-User
+    - X-Auth-Request-Email
+    - Set-Cookie
+    trustForwardHeader: true
+    maxResponseBodySize: 1048576  # Limit in bytes (e.g., 1MB)
+

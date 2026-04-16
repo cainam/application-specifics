@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: {{ kustom.name }}
+spec:
+  selector:
+    istio: {{ kustom.name|replace('.', '-') }}
+  servers:
+  - hosts:
+    {% for host in kustom.network.hosts %}
+    - {{ host }}
+    {% endfor -%}
+    port:
+      name: https
+      number: 443
+      protocol: HTTPS
+    tls:
+      credentialName: real-credential
+      mode: SIMPLE

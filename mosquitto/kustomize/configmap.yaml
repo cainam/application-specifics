@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  mosquitto.conf: |
+    persistence true
+    persistence_location /mosquitto/data/
+    log_dest stdout
+    log_type all
+    connection_messages false
+    #password_file /local/p
+    plugin /mosquitto/lib/mosquitto_password_file.so
+    plugin_opt_password_file /local/p
+    listener 1883
+    socket_domain ipv4
+    #listener 9090
+    #socket_domain ipv4
+    #protocol websockets
+kind: ConfigMap
+metadata:
+  name: mosquitto

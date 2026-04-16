@@ -1,0 +1,13 @@
+namespace: {{ kustom.namespace }}
+resources:
+- clusterrolebinding.yaml
+- clusterrole.yaml
+- deploy.yaml
+- service.yaml
+- serviceaccount.yaml
+
+patches:
+  - path: service-ports.yaml
+    target:
+      kind: Service
+      name: {{ kustom.name }}

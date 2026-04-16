@@ -1,0 +1,17 @@
+# kustomize/overlays/production/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base # Reference the base Traefik configuration
+  - your-app-ingressroute.yaml # Your application's routing
+
+# Optional: If you need to patch the base Traefik deployment for production specifics
+# patches:
+# - target:
+#     kind: Deployment
+#     name: traefik
+#   patch: |-
+#     - op: replace
+#       path: /spec/replicas
+#       value: 3 # More replicas for production

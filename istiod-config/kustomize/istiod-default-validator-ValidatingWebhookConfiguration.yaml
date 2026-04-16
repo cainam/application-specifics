@@ -1,0 +1,46 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  creationTimestamp: "2024-11-24T13:45:54Z"
+  generation: 2
+  labels:
+    app: istiod
+    app.kubernetes.io/name: istiod
+    app.kubernetes.io/part-of: istio
+    istio: istiod
+    istio.io/rev: default
+    release: base
+  name: istiod-default-validator
+  resourceVersion: "90155690"
+  uid: 9c0c0f9d-ee84-4836-aeaa-b71cfedefb2f
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvRENDQWVTZ0F3SUJBZ0lRZkZuVm1Pa2pMR1JmZG5ka0hSS2lqVEFOQmdrcWhraUc5dzBCQVFzRkFEQVkKTVJZd0ZBWURWUVFLRXcxamJIVnpkR1Z5TG14dlkyRnNNQjRYRFRJek1UQXhNakUyTkRRd01sb1hEVE16TVRBdwpPVEUyTkRRd01sb3dHREVXTUJRR0ExVUVDaE1OWTJ4MWMzUmxjaTVzYjJOaGJEQ0NBU0l3RFFZSktvWklodmNOCkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFOcStURnVsMWV3Q0hUa2pxQSttbWZTeFJzcVdRbk8vMWdOd1R3U20KSGNGUTVCYWhFQ043ZWxYblNueklCNE84V1pEU3lRV2FVNmZzbVpJNVFpaWdDcDJJQzJnNndPOXFrRzd0MmJiVAp5QXhBbDV6cFp1NFB3UWxGbDVGSU5ZN1hSeGhFd3NmVGFpcFNqYlgvZ3ZHNXNtSnJldnFnNVVwZDkzYmhHZ2ZPClpIYkk1dkZSdDVwTUNFeFA1VE1vWlN4R2JOSFJlUlY4TUZSZ1hRR1RQRkM0T1FMMHdMY1NKS095dVVDbmNDN1oKelZ0SmczdTlqNmw5Z2wyUDVQY0FjRFdaaHhGM3prNEZZOGJwcHU5OVBVd2FPT0l1cU9ydXRxdmJxZVZXbjVTTwpoK3YxYlQrRWkwY2tVQU1ZNEtIc2NGWmFQOWIyTFhFSWtuSDU5Yzh6bGx0b3c5VUNBd0VBQWFOQ01FQXdEZ1lEClZSMFBBUUgvQkFRREFnSUVNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGQVMxYzhQVS9HM1oKbkJHREJCSjdYMVhpRyt0Nk1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQ29BdkZqRFVLakU4eFdQV2hMSUdZQQpTcEpZVU1vbjJXNWFGMTJ5bWZwNzRoR3BpUElTU3BkbVBNYnZ5YUJjS2lRbGl5eFJkNlprL01lK29mMHlIMzVjCnZzRnJ4bDhsR1RYNFg0RkkxZnJrUGlOY1U0TWdaL1pVVm5kSlcwb2xPc201L08ydWcwV2ZKcmR0Wm82V0llNkoKbzI5VG5jT1pOSDFTRXNiT2Fzb0FxM3p0YTE3alhURkdEcFBWZXpyZEgrd25nUlAvUXF6VjNWcVJOU3lqSWdxZwpPRmVHYjdEaEdhcGpPb1NqMXFuVHE2ekcxOGRVSXk4ZjQ3RzUyNmZSZGk4QlNtYmphZFZXWElMbGJldFB5aWE5Clp0L2NTMFFPMDNSbjZlK05XMVhlU0JxTXY0c25Gd212VmRCeEdyNG82VlBwb3ZtWDloTTZiTjdWVWpZTTZEOU4KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    service:
+      name: istiod
+      namespace: istio-system
+      path: /validate
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: validation.istio.io
+  namespaceSelector: {}
+  objectSelector: {}
+  rules:
+  - apiGroups:
+    - security.istio.io
+    - networking.istio.io
+    - telemetry.istio.io
+    - extensions.istio.io
+    apiVersions:
+    - '*'
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - '*'
+    scope: '*'
+  sideEffects: None
+  timeoutSeconds: 10

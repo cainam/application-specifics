@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ kustom.name }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ kustom.name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ kustom.name }}
+    spec:
+      containers:
+      - args:
+        - run
+        - -n
+        - auth
+        - /app/{{ kustom.name }}.py
+        command:
+        - kopf
+        env:
+        - name: USER
+          value: kopf
+        - name: PYTHONPATH
+          value: /app/backend/:/py_env/lib/python3.12/site-packages/
+        - name: PATH
+          value: /py_env/bin:/bin:/usr/bin
+        - name: REDIRECT_URL
+          value: https://my-lb.adm13/oauth2-hydra/callback https://adm13.dnshome.de:44354/oauth2-hydra/callback
+        - name: NAMESPACE
+          value: auth
+        - name: OAUTH2_CONFIG_SECRET
+          value: oauth2-proxy-alpha
+        - name: OAUTH2_SECRET_FILE
+          value: oauth2_proxy.yml
+        - name: HYDRA_SERVICE
+          value: hydra-admin
+        - name: HYDRA_SERVICE_PORT
+          value: "4445"
+        - name: HYDRA_SEARCH_LABEL_KEY
+          value: app.kubernetes.io/instance
+        - name: HYDRA_SEARCH_LABEL_VALUE
+          value: hydra
+        image: {{ kustom.image }}
+        name: {{ kustom.name }}
+        volumeMounts:
+        - mountPath: /app/{{ kustom.name }}.py
+          name: {{ kustom.name }}
+          subPath: {{ kustom.name }}.py
+      serviceAccount: {{ kustom.name }}
+      serviceAccountName: {{ kustom.name }}
+      volumes:
+      - name: {{ kustom.name }}
+        configMap:
+          claimName: {{ kustom.name }}

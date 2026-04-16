@@ -1,0 +1,67 @@
+- block:
+  - name: stop service
+    shell: |
+      kubectl scale --replicas=0 -n {{ k8s_namespace.key }} statefulset postgres
+
+  - name: determine node where volume is attached (requires that postgres was running before and the volume is still attached)
+    shell: |
+      pvc=$(kubectl get pvc {{ pg_claim }} -n {{ k8s_namespace.key }} -o jsonpath='{.spec.volumeName}')
+      kubectl get volumeattachments -o json | jq -r '.items[] | select(.spec.source.persistentVolumeName=="'$pvc'" and .status.attached==true) | .spec.nodeName'
+    register: attachment_node
+
+  - name: run upgrade job
+    vars:
+      target_node: "{{ attachment_node.stdout }}"
+    shell: |
+      kubectl delete job -n {{ k8s_namespace.key }} {{ upgrade_job_name }} || true
+      kubectl apply -f - <<"EOF"
+      {{ postgres_upgrade_job }} 
+      EOF
+
+  - name: wait for pg_upgrade Job to complete
+    shell: |
+      kubectl wait --for=condition=complete --timeout=600s job/{{ upgrade_job_name }} -n {{ k8s_namespace.key }}
+
+  vars:
+   pg_claim: "data-postgres-0"
+   pg_dir: "/var/lib/postgresql"
+   upgrade_job_name: "postgres-upgrade"
+   postgres_upgrade_job: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: {{ upgrade_job_name }}
+      namespace: {{ k8s_namespace.key }}
+    spec:
+      ttlSecondsAfterFinished: 300 
+      backoffLimit: 0
+      template:
+        spec:
+          nodeSelector:
+              kubernetes.io/hostname: "{{ attachment_node.stdout }}"
+          restartPolicy: Never
+          containers:
+          - name: upgrade
+            image: {{ k8s_namespace.key }}/pgupgrade{{ pg_next }}:{{ pg_next - 1 }}
+            volumeMounts:
+            - name: pg-data
+              mountPath: {{ pg_dir }}
+            env:
+            - name: PGDATA
+              value: {{ pg_dir }}
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                cd /tmp/; rm -rf $PGDATA/data_new ;
+                /usr/lib/postgresql-{{ pg_next }}/bin/initdb -D $PGDATA/data_new;
+                UPGRADE_CMD="/usr/lib/postgresql-{{ pg_next }}/bin/pg_upgrade --old-datadir=$PGDATA/data --new-datadir=$PGDATA/data_new \
+                --old-bindir=/usr/lib/postgresql-{{ pg_next - 1 }}/bin --new-bindir=/usr/lib/postgresql-{{ pg_next }}/bin -U postgres --verbose --link"
+                echo "Running pg_upgrade --check..."
+                $UPGRADE_CMD --check && \
+                echo "Check successful! Running actual upgrade..." && \
+                $UPGRADE_CMD && mv $PGDATA/data $PGDATA/data_old && mv $PGDATA/data_new $PGDATA/data
+          volumes:
+          - name: pg-data
+            persistentVolumeClaim:
+              claimName: {{ pg_claim }}
+  when: is_major_upgrade

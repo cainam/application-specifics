@@ -1,0 +1,36 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: valhook
+webhooks:
+  - name: v.a.l.i.d.a.t.e
+    clientConfig:
+      service:
+        namespace: {{ kustom.namespace }} # The namespace where your FastAPI webhook service is running
+        name: {{ kustom.name }} # The name of the Kubernetes Service exposing your webhook
+        path: "/validate" # The path on your webhook server for validation requests (matching @app.post("/validate"))
+      caBundle: |
+        {{ caBundle }}
+    rules:
+      - operations: ["CREATE", "UPDATE"] # The operations this webhook applies to
+        apiGroups: [""] # "" indicates core API group (e.g., Pods, Services, Deployments)
+        apiVersions: ["v1"] 
+        resources: ["pods"] 
+      - operations: ["CREATE", "UPDATE"] # The operations this webhook applies to
+        apiGroups: ["apps"] # "" indicates core API group (e.g., Pods, Services, Deployments)
+        apiVersions: ["v1"] 
+        resources: ["deployments"] 
+    failurePolicy: Fail
+    sideEffects: None # Indicates that calling the webhook has no side effects on objects other than the AdmissionReview request.
+                      # Use 'NoneOnDryRun' if it has no side effects on dry run operations.
+    admissionReviewVersions: ["v1", "v1beta1"] # Supported AdmissionReview versions (v1 is preferred)
+    timeoutSeconds: 15 # Maximum time in seconds to wait for the webhook to respond
+    # exclude some .... 
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+        - kube-system
+        - kube-flannel
+        - kubext

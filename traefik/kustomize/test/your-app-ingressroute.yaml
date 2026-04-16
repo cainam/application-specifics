@@ -1,0 +1,33 @@
+# kustomize/overlays/production/your-app-ingressroute.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: your-app-route
+  namespace: your-app-namespace # The namespace where your app service lives
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`adm13.dnshome.de:44354`) # Match your specific host
+      kind: Rule
+      services:
+        - name: your-app-service # Your application's Kubernetes Service name
+          port: 80 # The port your application service listens on
+      middlewares:
+        # --- IMPORTANT: LOCATION HEADER REWRITE CHALLENGE ---
+        # Traefik's standard 'headers' middleware can add/set/remove headers.
+        # It DOES NOT support dynamic string manipulation or conditional logic
+        # based on the original request host AND the response's Location header
+        # to reconstruct a new URL like your Lua script does.
+        #
+        # Example of simple header modification (NOT your complex logic):
+        # - name: my-simple-header-middleware@kubernetescrd
+        #
+        # To achieve your specific Lua logic, you would need to:
+        # 1. Write a custom Traefik plugin in Go.
+        # 2. Deploy that plugin to your Traefik instance.
+        # 3. Reference it here:
+        #    - name: your-custom-location-rewrite-plugin@kubernetescrd
+  tls:
+    #certResolver: myresolver # Use the Let's Encrypt resolver defined in Traefik's args
+    secret: gateway

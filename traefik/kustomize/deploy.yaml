@@ -1,0 +1,67 @@
+{% set container_port = 65536|random(1024) -%}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  labels:
+    app: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      #volumes:
+      #- name: traefik-plugins
+      #  persistentVolumeClaim:
+      #    claimName: traefik-plugins
+      containers:
+        - name: traefik
+          image: {{ kustom.image }}
+          command: ['/bin/traefik']
+          args:
+            - --api.dashboard=true
+            - --api.basepath=/traefik-board
+            - --ping=true
+            - --ping.entrypoint=traefik
+            - --providers.kubernetesingress
+            - --providers.kubernetesingress.ingressclass=traefik
+            - --experimental.localPlugins.rewriteResponse.moduleName=github.com/jamesmcroft/traefik-plugin-rewrite-response-headers
+            - --providers.kubernetescrd
+            - --providers.kubernetescrd.allowCrossNamespace=true
+            - --entrypoints.web.address=:9980
+            - --entrypoints.websecure.address=:9443
+            - --entrypoints.traefik.address=:{{ container_port }}
+            - --log.level=INFO
+            - --global.checknewversion=false
+            - --global.sendanonymoususage=false
+          ports:
+            - name: web
+              containerPort: 9980
+            - name: websecure
+              containerPort: 9443
+            - name: traefik
+              containerPort: {{ container_port }}
+            - name: metrics
+              containerPort: 8082 # For Prometheus metrics
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+            limits:
+              cpu: "500m"
+              memory: "500Mi"
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: {{ container_port }}
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: {{ container_port }}
+

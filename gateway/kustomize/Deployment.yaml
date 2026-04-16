@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ kustom.name }}
+    istio: {{ kustom.name }}
+  name: {{ kustom.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ kustom.name }}
+      istio: {{ kustom.name }}
+  template:
+    metadata:
+      annotations:
+        inject.istio.io/templates: gateway
+        prometheus.io/path: /stats/prometheus
+        prometheus.io/port: "15020"
+        prometheus.io/scrape: "true"
+        sidecar.istio.io/componentLogLevel: misc:error,lua:info
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: {{ kustom.name }}
+        istio: {{ kustom.name }}
+        sidecar.istio.io/inject: "true"
+        gateway_type: "istio"
+    spec:
+      containers:
+      - image: auto
+        name: istio-proxy
+        ports:
+        - containerPort: 15090
+          name: http-envoy-prom
+          protocol: TCP
+        - containerPort: 33443
+          name: https
+          protocol: TCP
+      securityContext:
+        sysctls:
+        - name: net.ipv4.ip_unprivileged_port_start
+          value: "0"
+      serviceAccount: {{ kustom.name }}
+      serviceAccountName: {{ kustom.name }}

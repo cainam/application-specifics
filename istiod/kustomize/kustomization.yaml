@@ -1,0 +1,19 @@
+namespace: {{ kustom.namespace }}
+resources:
+- ClusterRoleBinding_istiod-clusterrole-istio-system.yaml
+- ClusterRoleBinding_istiod-gateway-controller-istio-system.yaml
+- ClusterRoleBinding_istio-reader-clusterrole-istio-system.yaml
+- ClusterRole_istiod-clusterrole-istio-system.yaml
+- ClusterRole_istiod-gateway-controller-istio-system.yaml
+- ClusterRole_istio-reader-clusterrole-istio-system.yaml
+- ConfigMap_istio-sidecar-injector.yaml
+- ConfigMap_istio.yaml
+- Deployment_istiod.yaml
+- HorizontalPodAutoscaler_istiod.yaml
+- MutatingWebhookConfiguration_istio-sidecar-injector.yaml
+- PodDisruptionBudget_istiod.yaml
+- RoleBinding_istiod.yaml
+- Role_istiod.yaml
+- ServiceAccount_istiod.yaml
+- Service_istiod.yaml
+- ValidatingWebhookConfiguration_istio-validator-istio-system.yaml

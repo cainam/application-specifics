@@ -1,0 +1,10 @@
+namespace: {{ kustom.namespace }}
+resources:
+- ConfigMap_hydra.yaml
+- Deployment_hydra.yaml
+- Secret_hydra.yaml
+- ServiceAccount_hydra-cronjob-janitor.yaml
+- ServiceAccount_hydra-job.yaml
+- ServiceAccount_hydra.yaml
+- Service_hydra-admin.yaml
+- Service_hydra-public.yaml

@@ -1,0 +1,25 @@
+{%- set domains=[] %}
+{%- for r in net.routes -%}
+{%- set d = domains.append ('"'~ r.domain ~'"') %}
+{%- if r.external_port is defined -%}
+{%- set d = domains.append ('"'~ net.domain_external ~ ':' ~ r.external_port ~'"') %}
+{%- endif -%}
+{%- endfor -%}apiVersion: v1
+data:
+  oauth2_proxy.cfg: |-
+    email_domains = [ "*" ]        # Restrict to these E-Mail Domains, a wildcard "*" allows any email
+    cookie_secret = "{{ cookie_secret }}"
+    ssl_insecure_skip_verify = true
+    redirect_url = "https://{{net.base_domain }}{{ oauth2_path }}/callback"
+    cookie_domains = {{ '[' ~ domains | join(',') ~ ']' }}
+    cookie_csrf_per_request = true
+    whitelist_domains = {{ '[' ~ domains | join(',') ~ ']' }}
+    errors_to_info_log = true
+    proxy_prefix = "/oauth2-hydra"
+    reverse_proxy = true
+    cookie_secure = true
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ kustom.name }}
+  name: {{ kustom.name }}

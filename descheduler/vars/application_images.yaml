@@ -1,0 +1,14 @@
+images:
+- name: descheduler
+  section: kube-system
+  type: gentoo-image-builder
+  requires:
+  - go
+  build:
+    configure_rootfs_build: |
+      git clone --branch "{{ software.descheduler.version }}" --depth 1 --filter=blob:none https://github.com/kubernetes-sigs/descheduler.git
+      cd descheduler
+      make
+      strip ./_output/bin/descheduler
+      mkdir -p "${ROOT}/bin"
+      mv  ./_output/bin/descheduler "${ROOT}/bin/"

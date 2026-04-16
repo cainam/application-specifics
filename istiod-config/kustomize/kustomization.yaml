@@ -1,0 +1,6 @@
+namespace: {{ kustom.namespace }}
+resources:
+- AuthorizationPolicy.yaml
+- lua-filter.yaml
+- istio-reader-service-account.yaml
+- https://raw.githubusercontent.com/istio/api/refs/heads/release-{{ software['istio'].version.split('.')[:2] | join('.') }}/kubernetes/customresourcedefinitions.gen.yaml

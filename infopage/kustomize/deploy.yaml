@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+{% set internal_port = 65536|random(1024) -%}
+metadata:
+  name: {{ kustom.name }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ kustom.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ kustom.name }}
+    spec:
+      containers:
+      - args:
+        - main:app
+        - --host
+        - 0.0.0.0
+        - --port
+        - "{{ internal_port }}"
+        - --reload
+        command:
+        - uvicorn
+        env:
+        - name: PYTHONPATH
+          value: /app/backend/:/py_env/lib/python3.13/site-packages/
+        image: {{ kustom.image }}
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /check
+            port: infopage
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: infopage
+        ports:
+        - containerPort: {{ internal_port }}
+          name: infopage
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /check
+            port: infopage
+            scheme: HTTP
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        securityContext:
+          runAsUser: {{ kustom.security.runAsUser }}
+        volumeMounts:
+        - mountPath: /app
+          name: infopage
+        workingDir: /app/backend
+      serviceAccountName: {{ kustom.name }}
+      volumes:
+      - name: infopage
+        persistentVolumeClaim:
+          claimName: infopage

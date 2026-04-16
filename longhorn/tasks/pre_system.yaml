@@ -1,0 +1,24 @@
+- name: create sparse disk image file
+  command:
+    cmd: "truncate -s {{ longhorn_size }} {{ longhorn_disk }}"
+    creates: "{{ longhorn_disk }}" # Only runs if file doesn't exist
+
+- name: format the disk image with ext4
+  community.general.filesystem:
+    fstype: ext4
+    dev: "{{ longhorn_disk }}"
+
+- name: create auto.longhorn map file
+  copy:
+    dest: /etc/autofs/auto.longhorn
+    content: |
+      /var/lib/longhorn -fstype=auto,loop,shared,noatime :{{ longhorn_disk }}
+  notify: restart autofs
+
+- name: ensure longhorn direct map is in auto.master
+  lineinfile:
+    path: /etc/autofs/auto.master
+    regexp: '^/-\s+/etc/autofs/auto\.longhorn'
+    line: "/- /etc/autofs/auto.longhorn --timeout=0"
+    state: present
+

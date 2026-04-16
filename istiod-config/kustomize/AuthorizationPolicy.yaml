@@ -1,0 +1,22 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: ext-authz
+spec:
+  action: CUSTOM
+  provider:
+    name: oauth2-proxy
+  rules:
+  - to:
+    - operation:
+        hosts:
+        - my-lb.adm13
+        - '*.my-lb.adm13'
+        - adm13.dnshome.de:*
+        notPaths:
+        - /oauth2-hydra/callback
+        - /hydra/*
+        - /idp/*
+  selector:
+    matchLabels:
+      istio: my-lb-adm13

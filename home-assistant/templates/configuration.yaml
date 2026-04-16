@@ -1,0 +1,46 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - 127.0.0.6
+    - ::1
+    - {{ k8s.podSubnet }}
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+recorder:
+    auto_purge: true
+    purge_keep_days: 5
+    db_url: postgresql://{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='config') | map(attribute='username') | first}}:{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='config') | map(attribute='password') | first}}@{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='name') | first}}.{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='namespace') | first}}.svc.cluster.local/{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='config') | map(attribute='database') | first}}
+    #db_url: !secret psql_string
+    db_retry_wait: 15
+    commit_interval: 20
+    include: # get a list of all entities via HA Developer Tools=>Templates and execute the template {# "{% for state in states %}- {{ state.entity_id -}}{% endfor %}   #}
+
+      entities:
+        - sensor.power_meter_wirkleistung
+        - switch.teich
+        - switch.pool
+        - sensor.buro_ausgang_power
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+lovelace:
+  mode: storage
+  dashboards:
+    adm-13:
+      mode: yaml
+      #mode: storage
+      title: An der Marsch 13
+      icon: mdi:script
+      show_in_sidebar: true
+      filename: adm13.yaml

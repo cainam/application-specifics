@@ -1,0 +1,18 @@
+views:
+  - title: An der Marsch 13
+    cards:
+      - type: history-graph
+        entities:
+          - entity: switch.pool
+        title: Pool
+        hours_to_show: 48
+      - type: history-graph
+        entities:
+          - entity: switch.teich
+        title: Teich
+        hours_to_show: 48
+      - type: history-graph
+        entities:
+          - entity: sensor.power_meter_wirkleistung
+        hours_to_show: 48
+        title: Wirkleistung

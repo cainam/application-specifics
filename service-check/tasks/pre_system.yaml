@@ -1,0 +1,10 @@
+- name: read certificate
+  vars:
+    ca_bundle: |
+      {% for file in local_ca_files %}
+      {{ lookup('file', cert_path ~'/'~ file) }}
+      {% endfor %}
+  set_fact:
+    application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'ca_bundle':ca_bundle}} }, recursive=True) }}"
+ 
+

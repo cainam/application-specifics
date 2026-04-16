@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`my-lb.adm13`) && PathPrefix(`/traefik-board`)
+      kind: Rule
+      services:
+        - name: api@internal # Traefik's internal API service for the dashboard
+          kind: TraefikService
+      #middlewares:
+        # Optional: Add basic authentication for the dashboard
+        # - name: dashboard-auth@kubernetescrd # Define this middleware separately
+      #  - name: traefik-stripprefix
+  tls:
+    secretName: certs

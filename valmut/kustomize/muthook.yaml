@@ -1,0 +1,35 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: muthook
+webhooks:
+  - name: m.u.t.a.t.e
+    clientConfig:
+      service:
+        namespace: kubext
+        name: valmut
+        path: "/mutate" # The path on your webhook server for mutation requests (matching @app.post("/mutate"))
+      caBundle: |
+        {{ caBundle | indent(width=8, first=False) }}
+    rules:
+      - operations: ["CREATE", "UPDATE"] # The operations this webhook applies to
+        apiGroups: [""] # "" indicates core API group (e.g., Pods, Services, Deployments)
+        apiVersions: ["v1"] # The API versions this webhook applies to
+        resources: ["pods"]
+      - operations: ["CREATE", "UPDATE"] # The operations this webhook applies to
+        apiGroups: ["apps"] # "" indicates core API group (e.g., Pods, Services, Deployments)
+        apiVersions: ["v1"]
+        resources: ["deployments"]
+    failurePolicy: Fail
+    sideEffects: None # Indicates that calling the webhook has no side effects on objects other than the AdmissionReview request.
+                      # Use 'NoneOnDryRun' if it has no side effects on dry run operations.
+    admissionReviewVersions: ["v1", "v1beta1"] # Supported AdmissionReview versions (v1 is preferred)
+    timeoutSeconds: 15 # Maximum time in seconds to wait for the webhook to respond
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+        - kube-system
+        - kubext
+        - kube-flannel

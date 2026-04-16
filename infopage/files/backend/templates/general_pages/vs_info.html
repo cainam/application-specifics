@@ -1,0 +1,17 @@
+<hr/>{{ name }}<br/>
+<hr/>
+<table class="iTable">
+
+<tr><th>namespace</th><th>host</th><th>virtual service</th><th>service</th><th>prefix</th><th>URL</th></tr>
+        {% if vss %}
+        {% for vs in vss %}
+	<tr>
+	{% for i in vs %}
+	  <td>{{ i }}</td>
+	{% endfor %}
+	  <td><a href="https://{{ vs[1] }}{{ vs[4] }}">link</a></td>
+	</tr>
+
+        {% endfor %}
+        {% endif %}
+</table>

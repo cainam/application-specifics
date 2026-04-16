@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: valmut
+subjects:
+- kind: ServiceAccount
+  name: {{ kustom.name }}
+  namespace: {{ kustom.namespace }}
+roleRef:
+  kind: Role
+  name: configmap-reader
+  apiGroup: rbac.authorization.k8s.io

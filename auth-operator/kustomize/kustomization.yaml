@@ -1,0 +1,9 @@
+namespace: {{ kustom.namespace }}
+resources:
+- deployment.yaml
+- resources.yaml
+
+configMapGenerator:
+  - name: {{ kustom.name }}
+    files:
+      - {{ kustom.name }}.py

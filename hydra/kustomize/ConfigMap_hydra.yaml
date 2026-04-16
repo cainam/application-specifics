@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hydra
+  labels:
+    app.kubernetes.io/name: hydra
+    app.kubernetes.io/instance: hydra
+data:
+  hydra.yaml: "log:\n  leak_sensitive_values: true\n  level: debug\noauth2:\n  allowed_top_level_claims:\n\
+    \  - email\nserve:\n  admin:\n    port: 4445\n  cookies:\n    same_site_mode:\
+    \ None\n    secure: false\n  public:\n    cors:\n      allowed_origins:\n    \
+    \  - '*'\n      debug: true\n      enabled: true\n    port: 4444\n    request_log:\n\
+    \      disable_for_health: true\n  tls:\n    allow_termination_from:\n    - 10.0.0.0/8\n\
+    \    - 172.16.0.0/12\n    - 192.168.0.0/16\nurls:\n  consent: https://my-lb.adm13/idp/consent\n\
+    \  login: https://my-lb.adm13/idp/login\n  self:\n    admin: http://hydra-admin.auth:4445\n\
+    \    issuer: https://my-lb.adm13/hydra\nwebfinger:\n  oidc_discovery:\n    supported_claims:\n\
+    \    - email\n    supported_scope:\n    - email\n"

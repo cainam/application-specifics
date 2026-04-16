@@ -1,0 +1,67 @@
+{% set container_port = 65536|random(1024) -%}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ kustom.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ kustom.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ kustom.name }}
+      annotations:
+        redeploy-timestamp: "{{ lookup('pipe', 'date +%s') }}"
+    spec:
+      containers:
+      - name: {{ kustom.name }}
+        image: {{ kustom.image }}
+        #args:
+        #- valmut-webhook:app
+        #- --host
+        #- 0.0.0.0
+        #- --port
+        #- "{{ container_port }}"
+        #- --ssl-certfile
+        #- /certs/tls.crt
+        #- --ssl-keyfile
+        #- /certs/tls.key
+        #- --reload
+        command:
+        - kopf
+        - run
+        - /app/curator.py
+        - --all-namespaces
+        env:
+        - name: PYTHONPATH
+          value: /app/backend/:/py_env/lib/python3.13/site-packages/
+        - name: USER
+          value: kopf
+        ports:
+        - containerPort: {{ container_port }}
+        volumeMounts:
+        #- mountPath: /config
+        #  name: config
+        - mountPath: /app
+          name: {{ kustom.name }}
+        #- name: tls-certs-volume
+        #  mountPath: /certs
+          # readOnly: true
+        workingDir: /app/
+      serviceAccountName: {{ kustom.name }}
+      volumes:
+      #- configMap:
+      #    defaultMode: 420
+      #    name: {{ kustom.name }}
+      #  name: config
+      - name: {{ kustom.name }}
+        persistentVolumeClaim:
+          claimName: {{ kustom.name }}
+      #- name: tls-certs-volume
+      #  secret:
+      #    secretName: my-tls-secret
+      #    defaultMode: 0400
+
+

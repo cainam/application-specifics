@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ kustom.name }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ kustom.name }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - watch
+  - list
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - pods/status
+  verbs:
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ kustom.name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ kustom.name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ kustom.name }}
+---
+kind: ConfigMap
+apiVersion: v1
+data:
+  client_id.sh: "#!/bin/bash\ncurl -f -L -X GET 'http://hydra-admin.auth:4445/clients/undefined'
+    \ -H 'Content-Type: application/json' \nif [ $? -ne 0 ]; then\n  curl -v -L -X
+    POST 'http://hydra-admin.auth:4445/clients' -H 'Content-Type: application/json'
+    \ --data-raw \"$(cat /request.json)\"\nelse\n  echo \"client_id is already configured\"\nfi\n#sleep
+    1800"
+  request.json: |-
+    {
+      "client_id": "undefined",
+      "client_name": "",
+      "client_secret": "",
+      "grant_types": null,
+      "redirect_uris": null,
+      "response_types": null,
+      "scope": "",
+      "token_endpoint_auth_method": ""
+    }
+metadata:
+  name: {{ kustom.name }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ kustom.name }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Mi
+  storageClassName: local
+  volumeMode: Filesystem
+  volumeName: {{ kustom.name }}

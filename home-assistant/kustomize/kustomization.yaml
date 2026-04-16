@@ -1,0 +1,12 @@
+namespace: {{ kustom.namespace }}
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - pvc.yaml
+
+patches:
+  - path: service-ports.yaml
+    target:
+      kind: Service
+      name: {{ kustom.name }}

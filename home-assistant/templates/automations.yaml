@@ -1,0 +1,154 @@
+- id: '1706637332761'
+  alias: Warmwasserpumpe ON
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.warmwasserpumpe
+    from:
+    to: 'on'
+  condition: []
+  action:
+  - delay:
+      hours: 0
+      minutes: 15
+      seconds: 0
+      milliseconds: 0
+  - service: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.warmwasserpumpe
+  mode: single
+- id: '1708883845408'
+  alias: Licht einschalten nach 2min
+  description: wieder einschalten
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.wegbeleuchtung
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - type: turn_on
+    device_id: 434f60fb5e854625ac045ffdf0ba3aae
+    entity_id: 818385a76ca7a6f0526c123e9177982d
+    domain: switch
+  mode: single
+- id: '1710074182742'
+  alias: Stromertrag Teich
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+    seconds: '1'
+    enabled: true
+  condition: []
+  action:
+  - condition: numeric_state
+    entity_id: sensor.power_meter_wirkleistung
+    above: 101
+  - repeat:
+      while:
+      - condition: state
+        entity_id: switch.teich
+        state: 'off'
+      sequence:
+      - type: turn_on
+        device_id: fc605fb5e61935d7cb03c713a225affc
+        entity_id: 57a3dae81792fbdde1eb989e6e7ea238
+        domain: switch
+      - metadata: {}
+        data:
+          message: Stromertrag
+          title: Stromertrag
+        enabled: false
+        action: notify.persistent_notification
+      - delay: 00:00:15
+  mode: single
+- id: '1710074233128'
+  alias: Stromverlust Teich
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+    seconds: '30'
+  condition: []
+  action:
+  - service: notify.persistent_notification
+    metadata: {}
+    data:
+      message: Stromverlust
+      title: Stromverlust
+    enabled: false
+  - condition: numeric_state
+    entity_id: sensor.power_meter_wirkleistung
+    below: 0
+  - type: turn_off
+    device_id: fc605fb5e61935d7cb03c713a225affc
+    entity_id: 57a3dae81792fbdde1eb989e6e7ea238
+    domain: switch
+  mode: single
+- id: '1716202078969'
+  alias: Stromertrag Pool
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id:
+    - sensor.power_meter_wirkleistung
+    above: 100
+  - platform: time_pattern
+    seconds: '1'
+    minutes: /5
+  condition: []
+  action:
+  - condition: numeric_state
+    entity_id: sensor.power_meter_wirkleistung
+    above: 100
+  - repeat:
+      while:
+      - condition: state
+        state: 'off'
+        entity_id: switch.pool
+      sequence:
+      - type: turn_on
+        device_id: 19230fc9ff185c3707d1d8a1625f5b83
+        entity_id: 3a087fe13640dc833d07ef98da0fbfc1
+        domain: switch
+      - service: notify.persistent_notification
+        metadata: {}
+        data:
+          message: Stromertrag
+          title: Stromertrag
+        enabled: false
+      - delay: 00:00:15
+  mode: single
+- id: '1716202427354'
+  alias: Stromverlust Pool
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+    seconds: '30'
+  condition: []
+  action:
+  - condition: numeric_state
+    entity_id: sensor.power_meter_wirkleistung
+    below: 0
+  - type: turn_off
+    device_id: 19230fc9ff185c3707d1d8a1625f5b83
+    entity_id: 3a087fe13640dc833d07ef98da0fbfc1
+    domain: switch
+  - service: notify.persistent_notification
+    metadata: {}
+    data:
+      message: Stromverlust
+      title: Stromverlust
+    enabled: false
+  mode: single

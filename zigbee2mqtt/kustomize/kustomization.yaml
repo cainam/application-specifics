@@ -1,0 +1,11 @@
+namespace: {{ kustom.namespace }}
+resources:
+  - statefulset.yaml
+  - service.yaml
+  - persistentvolumeclaim.yaml
+
+configMapGenerator:
+  - name: {{ kustom.name }}
+    files:
+      - configuration.yaml
+

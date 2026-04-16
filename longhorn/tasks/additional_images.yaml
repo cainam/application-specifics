@@ -1,0 +1,57 @@
+- name: write declaration locally
+  ansible.builtin.shell: |
+    set -o pipefail
+    cd "{{ kustomize_dir }}"
+    curl -O $(yq -r '.resources[0]' kustomization.yaml)
+    I=$(
+    cat longhorn.yaml |yq -r 'select(.metadata.name == "longhorn-manager")|select(.kind == "DaemonSet")|.spec.template.spec.containers[] |select(.name == "longhorn-manager") |.command[] ' |grep "/" |grep :
+    cat longhorn.yaml |yq -r 'select(.metadata.name == "longhorn-driver-deployer")|.spec.template.spec.containers[]|select(.name == "longhorn-driver-deployer") |.env[] |select(.name|endswith("IMAGE")) |.value'
+    cat longhorn.yaml |yq -r 'select(.metadata.name == "longhorn-ui")|select(.kind == "Deployment")|.spec.template.spec.containers[] |select(.name == "longhorn-ui") |.image'
+    )
+    for i in ${I}; do
+      sed -i -e "s#$i#{{ registry_path }}/"$(basename "$i")"#g" longhorn.yaml
+    done
+    yq -iy '.resources=["longhorn.yaml"]' kustomization.yaml
+    echo "$I"
+  register: source_images
+  failed_when: source_images.rc > 1
+  changed_when: false
+
+- name: "set var {{ var_additional_images }}"
+  set_fact:
+    "{{ var_additional_images }}": >-
+      {% set results = [] %}
+      {% for img in source_images.stdout_lines %}
+        {% set _ = results.append({
+          'name': img.split('/')[-1].split(':')[0],
+          'tag': img.split(':')[-1],
+          'section': registry_path,
+          'type': 'fetch',
+          'source': img
+        }) %}
+      {% endfor %}
+      {{ results }}
+  when: false
+
+- name: "set var {{ var_additional_images }}"
+  when: false
+  set_fact:
+    "{{ var_additional_images }}": >-
+      {{ source_images.stdout_lines | map('regex_replace', '^(.*)/(.*):(.*)$', '{"name": "\\2", "tag": "\\3", "section": "' ~ registry_path ~ '", "type": "fetch", "source": "\\0"}') | map('from_json') | list }}
+
+
+
+- name: "Build image list for {{ var_additional_images }}"
+  set_fact:
+    temp_img_list: "{{ temp_img_list|default([])  + [ {
+        'name': (item.split('/')[-1]).split(':') | first,
+        'tag': item.split(':') | last,
+        'section': registry_path,
+        'type': 'fetch',
+        'source': (item.rsplit(':', 1) | first)
+      } ] }}"
+  loop: "{{ source_images.stdout_lines }}"
+
+- name: "set var {{ var_additional_images }}"
+  set_fact:
+    "{{ var_additional_images }}": "{{ temp_img_list }}"

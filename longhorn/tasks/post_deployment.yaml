@@ -1,0 +1,49 @@
+- name: Force the use of the virtualenv python
+  set_fact:
+    ansible_python_interpreter: "{{ local_pyenv }}/bin/python"
+- name: get current default Engine image version from Longhorn settings
+  shell: kubectl get settings  -n {{ k8s_namespace.key }}  default-engine-image -o yaml | yq -r .value
+  register: default_engine_image_out
+
+- name: set target_engine_image
+  set_fact:
+    target_engine_image: "{{ default_engine_image_out.stdout }}"
+
+- name: get longhorn volumes
+  shell: kubectl get volume  -n {{ k8s_namespace.key }} -o yaml | yq -r '.items[].metadata.name'
+  register: vols_out
+
+- name: upgrade volume engines to current default version
+  shell: |
+    kubectl patch volume {{ item }} -n {{ k8s_namespace.key }} --type='json' -p='[{"op": "replace", "path": "/spec/image", "value":"{{ target_engine_image }}"}]'
+  when: item != target_engine_image
+  loop: "{{ vols_out.stdout_lines }}"
+
+- name: wait for all volumes to complete the engine upgrade
+  kubernetes.core.k8s_info:
+    api_version: longhorn.io/v1beta2
+    kind: Volume
+    namespace: longhorn-system
+  register: volume_status
+  until: >
+    volume_status.resources|default([]) | map(attribute='status.currentImage') | unique | list == [target_engine_image]
+  retries: 999999
+  delay: 10
+
+- name: Get all EngineImage resources
+  kubernetes.core.k8s_info:
+    api_version: longhorn.io/v1beta2
+    kind: EngineImage
+    namespace: longhorn-system
+  register: installed_engine_images
+
+- name: Remove old EngineImages now that they are unused
+  kubernetes.core.k8s:
+    state: absent
+    api_version: longhorn.io/v1beta2
+    kind: EngineImage
+    namespace: longhorn-system
+    name: "{{ item.metadata.name }}"
+  loop: "{{ installed_engine_images.resources }}"
+  when: item.spec.image != target_engine_image
+

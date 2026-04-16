@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: {{ kustom.name }}
+  name: traefik-plugins
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Mi
+  storageClassName: local
+  volumeMode: Filesystem
+  volumeName: traefik-plugins

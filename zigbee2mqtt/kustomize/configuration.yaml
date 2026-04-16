@@ -1,0 +1,60 @@
+homeassistant:
+  enabled: true
+frontend:
+  enabled: true
+  port: 8080
+  host: 0.0.0.0
+  base_url: /{{ kustom.name }}
+mqtt:
+  base_topic: {{ kustom.name }}
+  server: mqtt://mosquitto.home:1883
+  user: {{ mosquitto.user }}
+  password: {{ mosquitto.pass }}
+serial:
+  port: /dev/ttyUSB0
+  adapter: deconz
+  baudrate: 115200
+advanced:
+  adapter_delay: 200
+  last_seen: ISO_8601
+  timestamp_format: YYYY-MM-DD HH:mm:ss
+  log_directory: /log/%TIMESTAMP%
+  log_level: info
+  log_rotation: true
+  log_syslog:
+    app_name: Zigbee2MQTT
+    eol: /n
+    host: localhost
+    localhost: localhost
+    path: /dev/log
+    pid: process.pid
+    port: 514
+    protocol: udp4
+    type: '5424'
+  channel: 15
+availability:
+  enabled: true
+  active:
+    timeout: 10
+  passive:
+    timeout: 30
+device_options:
+  homeassistant:
+    last_seen:
+      enabled_by_default: true
+devices:
+  '0x7cb94c76e5d50000':
+    friendly_name: Warmwasserpumpe
+  '0x842e14fffef15323':
+    friendly_name: Werkstatt
+  '0x94deb8fffe41e447':
+    friendly_name: Wegbeleuchtung
+  '0x00158d0007bde782':
+    friendly_name: Temperatur
+  '0xa4c1383fcaf256b0':
+    friendly_name: Terrasse
+  '0x70b3d52b60024287':
+    friendly_name: Büro-Ausgang
+  '0x70b3d52b60076b69':
+    friendly_name: Fritz
+version: 5

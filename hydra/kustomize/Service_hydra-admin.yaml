@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hydra-admin
+  labels:
+    app.kubernetes.io/name: hydra
+    app.kubernetes.io/instance: hydra
+    app.kubernetes.io/component: admin
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4445
+      targetPort: http-admin
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: hydra
+    app.kubernetes.io/instance: hydra

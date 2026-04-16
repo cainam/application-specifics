@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: "postgres"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+      annotations:
+        redeploy-timestamp: "{{ lookup('pipe', 'date +%s') }}"
+    spec:
+      initContainers:
+      - name: init-chmod-data
+        image: {{ kustom.image }}
+        command:
+          - sh
+          - -c
+          - |
+            set -x
+            mkdir -p {{ kustom.dataPath }}/data;
+            chmod 700 {{ kustom.dataPath }}/data;
+            chown -R postgres:postgres  {{ kustom.dataPath }};
+            su $(getent passwd {{ kustom.runAs }} | cut -d : -f 1) -c initdb || true
+            su $(getent passwd {{ kustom.runAs }} | cut -d : -f 1) -c "pg_ctl start" || true
+            su $(getent passwd {{ kustom.runAs }} | cut -d : -f 1) -c "psql -U postgres -c \"CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';\"" || true
+            su $(getent passwd {{ kustom.runAs }} | cut -d : -f 1) -c "psql -U postgres -c \"ALTER USER ${POSTGRES_USER} WITH SUPERUSER;\"" || true
+            su $(getent passwd {{ kustom.runAs }} | cut -d : -f 1) -c "pg_ctl stop" || true
+        securityContext:
+          runAsUser: 0
+        env:
+        - name: PGDATA
+          value: {{ kustom.dataPath }}/data
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        volumeMounts:
+        - name: data
+          mountPath: {{ kustom.dataPath }}
+      containers:
+      - name: postgres
+        image: {{ kustom.image }}
+        args:
+        - -c
+        - config_file={{ kustom.confPath }}/postgresql.conf
+        - -c
+        - hba_file={{ kustom.confPath }}/pg_hba.conf
+        ports:
+        - containerPort: 5432
+        securityContext:
+          runAsUser: {{ kustom.runAs }}
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - pg_ctl stop -m fast -D /var/lib/postgresql/data
+        env:
+        - name: PGDATA
+          value: {{ kustom.dataPath }}/data
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        volumeMounts:
+        - name: data
+          mountPath: {{ kustom.dataPath }}
+        - name: config
+          mountPath: {{ kustom.confPath }}
+          readOnly: false
+      volumes:
+      - name: config
+        configMap:
+          name: postgres
+          items:
+          - key: pg_hba.conf
+            path: pg_hba.conf
+          - key: postgresql.conf
+            path: postgresql.conf
+
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: {{ kustom.storage[0].type }}
+      resources:
+        requests:
+          storage: {{ kustom.storage[0].size }}
+

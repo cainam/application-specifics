@@ -1,0 +1,66 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: {{ kustom.namespace }}
+resources:
+  - https://raw.githubusercontent.com/longhorn/longhorn/{{ software.longhorn.version }}/deploy/longhorn.yaml
+
+configMapGenerator:
+  - name: registry-source
+    literals:
+      - registry={{ kustom.namespace }}
+    options:
+     annotations:
+      config.kubernetes.io/local-config: "true"
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: registry-source
+      fieldPath: data.registry
+    targets:
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - spec.template.spec.containers.*.image
+        options:
+          delimiter: "/"
+          index: 0
+      - select:
+          kind: DaemonSet
+        fieldPaths:
+          - spec.template.spec.containers.*.image
+        options:
+          delimiter: "/"
+          index: 0
+  - source:
+      kind: ConfigMap
+      name: registry-source
+      fieldPath: data.registry
+    targets:
+      - select:
+          kind: Deployment
+          name: longhorn-driver-deployer # This one specifically uses initContainers
+        fieldPaths:
+          - spec.template.spec.initContainers.*.image
+        options:
+          delimiter: "/"
+          index: 0
+patches:
+  - target:
+      kind: ConfigMap
+      name: longhorn-default-setting
+    patch: |-
+      - op: replace
+        path: /data/default-setting.yaml
+        value: |
+          log-level: info
+  - target:
+      kind: Deployment
+      name: longhorn-driver-deployer
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: KUBELET_ROOT_DIR
+          value: /var/lib/kubelet/

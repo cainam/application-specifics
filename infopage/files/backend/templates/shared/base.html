@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <base href="https://my-lb.adm13/infopage" target="_blank">
+    <script>
+    const currentUrl = window.location.href;
+document.addEventListener('DOMContentLoaded', ()=> {
+    ItemElems = document.querySelectorAll("[itemprop='load']");
+    for (let i = 0; i < ItemElems.length; i++) {
+      fetch(currentUrl+ItemElems[i].getAttribute('value'))
+      .then(response => response.text())
+      .then(html => {ItemElems[i].innerHTML = html;})
+      .catch(error => {console.log(error);})
+      .then(function(){if(ItemElems[i].getAttribute('value')=="/software"){load_sw_details(ItemElems[i]);} })
+      ;
+    }
+});
+function load_sw_details(element){
+  console.log("sw details"+element);
+  inner_elems = element.querySelectorAll("[itemprop='inner_load']");
+  for (let i = 0; i < inner_elems.length; i++) {
+    console.log("load: "+inner_elems[i].getAttribute('value'));
+    // eval(inner_elems[i].innerHTML);
+    fetch(currentUrl+"/software"+"?software="+inner_elems[i].getAttribute('value'))
+    .then(response => response.text())
+      .then(html => {inner_elems[i].innerHTML = html;})
+      .catch(error => {console.log(error);})
+
+  }
+}
+
+function trigger_backend(action, data){
+  // alert("backend!"+"\n action"+action+"\ndata: "+data);
+  // alert("image:"+data.image+"\ntag: "+data.tag);
+  extend_url = currentUrl.endsWith("/") ? "" : "/";
+  fetch(currentUrl+extend_url+action, { method: 'post',
+    body: JSON.stringify({ image: data.image, tag: data.tag }),
+    headers: { 'Content-type': 'application/json; charset=UTF-8', }
+  })
+
+}
+    </script>
+    {% block style %}
+    {% endblock %}
+
+    {% block title %}
+    {% endblock %}
+</head>
+
+<body>
+    {% block content %}
+    {% endblock %}
+
+<script>
+const dContainer = document.querySelector('#TabsSystem')
+
+dContainer
+.querySelectorAll('.TabButton')
+.forEach( tab =>
+  tab.onclick =_=>
+    {
+    dContainer.dataset.tab = tab.dataset.tab
+    }
+  )
+</script>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+</html>

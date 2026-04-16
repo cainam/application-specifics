@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/instance: {{ kustom.name }}
+    app.kubernetes.io/name: {{ kustom.name }}
+  name: {{ kustom.name }}
+spec:
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+      maxUnavailable: 1 # replaces even unhealthy pods
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ kustom.name }}
+      app.kubernetes.io/name: {{ kustom.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ kustom.name }}
+        app.kubernetes.io/name: {{ kustom.name }}
+        app: {{ kustom.name }}
+    spec:
+      securityContext:
+        fsGroup: {{ kustom.security.fsGroup }}
+      initContainers:
+      - name: setup-passwd
+        image: {{ kustom.image }}
+        command: ["sh", "-c"]
+        args: 
+            - |
+              set -x
+              echo "mosquitto:x:{{ kustom.security.runAsUser }}:{{ kustom.security.fsGroup }}:mosquitto:/var/empty:/sbin/nologin" > /mnt/passwd
+              echo "mosquitto:x:{{ kustom.security.fsGroup }}:" > /mnt/group
+              chown -R {{ kustom.security.runAsUser }}:{{ kustom.security.fsGroup }} /{{ kustom.name }}/data/
+        volumeMounts:
+        - name: data
+          mountPath: /{{ kustom.name }}/data
+        - name: writable
+          mountPath: /mnt
+      containers:
+      - image: {{ kustom.image }}
+        command: 
+        - sh
+        - -c
+        args:
+        - |
+          id
+          rm -f /local/p
+          /mosquitto/bin/mosquitto_passwd -b -c /local/p "$MQTT_USER" "$MQTT_PASS"
+          /mosquitto/sbin/mosquitto -c /mosquitto/config/mosquitto.conf 
+        env:
+        - name: MQTT_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ kustom.name }}
+              key: username
+        - name: MQTT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ kustom.name }}
+              key: password
+        livenessProbe:
+          initialDelaySeconds: 10 # Increased slightly to give the broker time to init
+          periodSeconds: 10       # Changed to a more standard interval
+          timeoutSeconds: 5
+          tcpSocket:
+            port: mqtt            # Matches the name in your ports list
+        name: {{ kustom.name }}
+        securityContext:
+          runAsUser: {{ kustom.security.runAsUser }}
+          runAsGroup: {{ kustom.security.fsGroup }}
+        ports:
+        - containerPort: 1883
+          name: mqtt
+          protocol: TCP
+        - containerPort: 9090
+          name: websocket
+          protocol: TCP
+        readinessProbe:
+          initialDelaySeconds: 10 # Increased slightly to give the broker time to init
+          periodSeconds: 10       # Changed to a more standard interval
+          timeoutSeconds: 5
+          tcpSocket:
+            port: mqtt            # Matches the name in your ports list
+        volumeMounts:
+        - mountPath: /{{ kustom.name }}/config
+          name: config
+        - mountPath: /{{ kustom.name }}/data
+          name: data
+        - mountPath: /local
+          name: writable
+        - name: writable
+          mountPath: /etc/passwd
+          subPath: passwd
+        - name: writable
+          mountPath: /etc/group
+          subPath: group
+      restartPolicy: Always
+      volumes:
+      - name: writable
+        emptyDir: {}
+      - name: config
+        projected:
+          sources:
+          - configMap:
+              name: {{ kustom.name }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: {{ kustom.storage[0].type }}
+      resources:
+        requests:
+          storage: {{ kustom.storage[0].size }}

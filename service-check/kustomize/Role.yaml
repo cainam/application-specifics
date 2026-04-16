@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ kustom.name }}
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["{{ kustom.name }}"] # Replace with your CM name
+  verbs: ["get", "patch"]
