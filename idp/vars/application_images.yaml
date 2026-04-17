@@ -1,0 +1,20 @@
+images:
+- name: idp
+  section: auth
+  type: gentoo-image-builder
+  requires:
+  - nodejs
+  workdir: /app
+  build:
+    entrypoint: ["/bin/sh", "-c", "npm run serve"]
+    configure_rootfs_build: |
+      git_url="https://github.com/cainam/sufficient_idp.git"
+      git=$(basename "{{ own_git_url }}" | sed -e 's/\.git$//g')
+      git clone --single-branch --branch main --depth 1 --filter=blob:none "${git_url}"
+      mkdir -p "${ROOT}/app" && mv sufficient_idp/idp/* "${ROOT}/app/"
+      rm -rf "${git}"
+    finish_rootfs_build: |
+      cd "${ROOT}/app/"
+      npm ci && npm run build
+      npm prune --omit=dev
+
