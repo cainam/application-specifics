@@ -1,0 +1,8 @@
+namespace: {{ kustom.namespace }}
+
+resources:
+- CronJob.yaml
+- RoleBinding.yaml
+- Role.yaml
+- ServiceAccount.yaml
+

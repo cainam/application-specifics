@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ kustom.name }}
+spec:
+  schedule: "*/5 * * * *" # Runs every 5 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ kustom.name }}
+          containers:
+          - name: checker
+            image: {{ kustom.image }}
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # run molecule
+              set -x
+              TEST_NAME="foo"
+              STATUS="bar"
+              TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+              VALUE="{\"status\":\"$STATUS\",\"time\":\"$TIMESTAMP\"}"
+
+              APISERVER="https://kubernetes.default.svc"
+              SERVICEACCOUNT="/var/run/secrets/kubernetes.io/serviceaccount"
+              NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
+              TOKEN=$(cat ${SERVICEACCOUNT}/token)
+              CACERT=${SERVICEACCOUNT}/ca.crt
+
+              DATA="{\"metadata\":{\"annotations\":{\"results.$TEST_NAME\":\"$VALUE\"}}}"
+              # patch the configmap
+              curl --cacert "${CACERT}" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
+                   --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
