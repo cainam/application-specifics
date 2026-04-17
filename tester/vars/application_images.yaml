@@ -1,0 +1,38 @@
+images:
+- name: molecule
+  section: local
+  requires:
+  - python3
+  type: gentoo-image-builder
+  build:
+    packages: app-admin/ansible-molecule app-containers/podman app-shells/bash net-misc/curl #sys-apps/shadow sys-apps/acl sys-apps/attr
+    configure_builder: |
+      for p in app-admin/ansible-molecule dev-python/ansible-compat dev-python/click-help-colors dev-python/enrich dev-python/subprocess-tee app-admin/ansible-lint app-misc/check-jsonschema dev-python/regress; do
+        echo "$p ~arm64" > /etc/portage/package.accept_keywords/$(basename $p)
+      done
+      echo "net-firewall/iptables nftables" >> /etc/portage/package.use/iptables
+      ## delete the following line:
+      echo -e "[{{ builder.local_overlay_name }}]\nlocation = {{ builder.local_overlay_dir }}\npriority = 9999" > /etc/portage/repos.conf/local.conf
+      emerge dev-libs/glib app-admin/ansible-core
+    configure_rootfs_build: |
+      VIRTUAL_ENV=/py_env
+      python -m venv --system-site-packages "$VIRTUAL_ENV" && . "$VIRTUAL_ENV"/bin/activate
+      pip install --no-cache-dir molecule-plugins[podman]
+      mv "$VIRTUAL_ENV" ${ROOT}/"$VIRTUAL_ENV"
+      find ${ROOT}/etc
+      export LD_LIBRARY_PATH=$ROOT/usr/lib
+      export USER=root
+      ansible-galaxy collection install containers.podman -p ${ROOT}/usr/share/ansible/collections
+    finish_rootfs_build: cp /usr/lib/gcc/aarch64-unknown-linux-musl/15/libgomp.so.1 /usr/lib/gcc/aarch64-unknown-linux-musl/15/libgcc_s.so.1 ${ROOT}/usr/lib
+
+- name: molecule-tester
+  section: local
+  requires:
+  - python3
+  type: gentoo-image-builder
+  build:
+    packages: app-shells/bash dev-python/pytest-bdd
+    configure_rootfs_build: |
+      echo 'root:x:0:0:root:/root:/bin/bash' > "${ROOT}/etc/passwd"
+      echo 'root:x:0:root' > "${ROOT}/etc/group"
+
