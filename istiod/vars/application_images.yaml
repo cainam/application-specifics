@@ -92,7 +92,7 @@ images:
       # Call the real linker with the filtered arguments
       exec "$REAL_LD" $(echo "${ARGS[@]}" | sed -e 's/--gdb-index//g' -e 's/--no-gdb-index//g' )
       EOF
-
+      chmod a+x "${ld}"
       done
       # remove the following line again, it is in bazel7
       cp -dp /bazel/output/bazel /usr/local/bin/
