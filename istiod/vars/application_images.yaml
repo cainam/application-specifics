@@ -38,9 +38,6 @@ images:
   type: gentoo-image-builder
   build:
     packages: app-arch/zip
-    xadd:
-    - git: git@github.com:cainam/cainam.github.io.git#:compile-bazel-with-gentoo-musl-on-aarch64/bazel
-      dest: /bazel-build-for-envoy
     configure_builder: |
       emerge llvm-core/clang llvm-runtimes/libcxx llvm-core/lld
       printf "%s static-libs\n" dev-libs/icu net-dns/c-ares app-arch/zstd net-libs/nghttp2 sys-libs/zlib >> /etc/portage/package.use/static-libs
@@ -68,14 +65,37 @@ images:
       for a in /usr/local/include/luajit-2.1/*; do ln -s $a /usr/local/include; done
       cd /var/tmp
       #
-      git clone https://github.com/cainam/cainam.github.io.git /bazel-build-for-envoy
+      # xgit clone https://github.com/cainam/cainam.github.io.git /bazel-build-for-envoy
       for ld in /usr/bin/aarch64-unknown-linux-musl-ld.bfd /usr/sbin/ld.bfd; do
       mv ${ld} ${ld}.org
-      cp -dp /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/bin/ld.bfd-wrapper "${ld}"
+      cat > "${ld}" <<'EOF'
+      #!/bin/bash
+      # Wrapper for ld.bfd to remove --gdb-index before invoking the real linker
+      REAL_LD=$0.org
+
+      # Filter out --gdb-index from the arguments
+      ARGS=()
+      for arg in "$@"; do
+          if [[ "$arg" != "--gdb-index" ]]; then
+              ARGS+=("$arg")
+          fi
+      done
+      echo "ld called: $0" >> /tmp/ld.calls
+      echo "args: ${ARGS[@]}" > /tmp/ld.args
+      
+      f=$(echo "${ARGS[@]}" | sed -e 's/@//g')
+      if [ -f "${f}" ]; then
+        sed -i -e 's/"--end-lib"//g' -e  's/"--start-lib"//g' -e 's/"--no-gdb-index"//g' -e 's/--gdb-index//g' -e 's/--no-gdb-index/-z notext/g' ${f}
+        cp $f /tmp/ld.file
+      fi
+
+      # Call the real linker with the filtered arguments
+      exec "$REAL_LD" $(echo "${ARGS[@]}" | sed -e 's/--gdb-index//g' -e 's/--no-gdb-index//g' )
+      EOF
+
       done
       # remove the following line again, it is in bazel7
       cp -dp /bazel/output/bazel /usr/local/bin/
-
 
 - name: envoy
   section: local
@@ -91,8 +111,91 @@ images:
       export CC=$(which clang)
       git clone --depth 1 --single-branch -b {{ software.istio.version }} https://github.com/istio/proxy.git; cd proxy
       echo "build --define tcmalloc=disabled # in .bazelrc" >> .bazelrc
-      cp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/tools/jdk/ tools
-      cp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/add* .
+      # xcp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/tools/jdk/ tools
+      # xcp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/add* .
+      mkdir -p tools/jdk/
+      echo 'workspace(name = "local_jdk")' > tools/jdk/WORKSPACE
+      cat > tools/jdk/BUILD.bazel <<'EOF'
+      java_runtime(
+          name = "local_jdk_runtime",
+          java_home = "/opt/zulu",
+          visibility = ["//visibility:public"],
+      )
+      
+      toolchain(
+          name = "bootstrap_runtime_toolchain_definition",
+          toolchain = ":local_jdk_runtime",
+          toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
+          visibility = ["//visibility:public"],
+      )
+      
+      toolchain(
+          name = "runtime_toolchain_definition",
+          toolchain = ":local_jdk_runtime",
+          toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
+          visibility = ["//visibility:public"],
+      )
+      EOF
+      cat > add-pt1.txt <<'EOF'
+            # Define the actual content once
+      http_archive(
+          name = "com_google_cel_spec",
+          sha256 = "13583c5a312861648449845b709722676a3c9b43396b6b8e9cbe4538feb74ad2",
+          strip_prefix = "cel-spec-0.25.1",
+          urls = ["https://github.com/google/cel-spec/archive/v0.25.1.tar.gz"],
+      )
+
+      http_archive(
+          name = "com_github_cncf_xds",
+          sha256 = "82363065ca2c978398d2307fe960c301a0b6655d55981fac017783bba22771d9",
+          strip_prefix = "xds-8bfbf64dc13ee1a570be4fbdcfccbdd8532463f0",
+          urls = [ "https://storage.googleapis.com/grpc-bazel-mirror/github.com/cncf/xds/archive/8bfbf64dc13ee1a570be4fbdcfccbdd8532463f0.tar.gz",
+                   "https://github.com/cncf/xds/archive/8bfbf64dc13ee1a570be4fbdcfccbdd8532463f0.tar.gz"],
+          patch_cmds = [
+              "sed -i 's/\"dev_cel\"/\"com_google_cel_spec\"/g' bazel/repository_locations.bzl",
+              "sed -i 's/name = \"dev_cel\"/name = \"com_google_cel_spec\"/g' bazel/repositories.bzl",
+              "find . -type f -name 'BUILD' -exec sed -i 's/@dev_cel/@com_google_cel_spec/g' {} +",
+              "find . -type f -name '*.bzl' -exec sed -i 's/@dev_cel/@com_google_cel_spec/g' {} +",
+              "find . -type f -name 'MODULE.bazel' -exec sed -i 's/@dev_cel/@com_google_cel_spec/g' {} +",
+              "sed -i '/cel-spec/d' MODULE.bazel",
+          ],
+      )
+
+      http_archive(
+          name = "rules_python",
+          sha256 = "f609f341d6e9090b981b3f45324d05a819fd7a5a56434f849c761971ce2c47da",
+          strip_prefix = "rules_python-1.7.0",
+          url = "https://github.com/bazel-contrib/rules_python/releases/download/1.7.0/rules_python-1.7.0.tar.gz",
+          patch_cmds = [
+          "sed -i '/\"3.12.12\": {/,/\"strip_prefix\"/ s/\"sha256\": {/&\\\n            \"aarch64-unknown-linux-musl\": \"1ea93c2ec158c3ede85e7123a2492a5d04e403ef2d924245f3e0e38276274779\",/' python/versions.bzl",
+                  "sed -i '/platforms = {/a\\\n        \"aarch64-unknown-linux-musl\": platform_info(\\\n            compatible_with = [\\\n                \"@platforms//os:linux\",\\\n                \"@platforms//cpu:aarch64\",\\\n            ],\\\n            os_name = LINUX_NAME,\\\n            arch = \"aarch64\",\\\n        ),' python/versions.bzl",
+                  ]
+      )
+
+      local_repository(
+          name = "local_jdk",
+          path = "tools/jdk",
+      )
+
+      register_toolchains(
+          "@local_jdk//:bootstrap_runtime_toolchain_definition",
+          "@local_jdk//:runtime_toolchain_definition",
+      )
+
+      register_toolchains("@toolchains_llvm//toolchain:all")
+      EOF
+      cat > add-pt2.txt <<'EOF'
+          patch_cmds = [
+      "sed -i 's/name = \"event\"/name = \"unused_event\"/' bazel/foreign_cc/BUILD",
+              """printf '\ncc_library(
+          name = "event",
+          includes = ["/usr/local/include"],
+          linkopts = ["-L/usr/local/lib", "-levent", "-levent_pthreads" ],
+          visibility = ["//visibility:public"],
+      )\n' >> bazel/foreign_cc/BUILD""",
+          "sed -i 's/PYTHON_VERSION = \"[^\"]*\"/PYTHON_VERSION = \"3.12.12\"/' bazel/repositories_extra.bzl",
+          ],
+      EOF
       sed  -e '/repo:http/r add-pt1.txt' -e '/sha256 = ENVOY_SHA256,/r add-pt2.txt' -e '/llvm/d' -i WORKSPACE
       sed -i '/PATH/d' .bazelrc
       sed -e '/googleurl/d' -i envoy.bazelrc
