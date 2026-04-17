@@ -1,0 +1,164 @@
+images:
+- name: bazel7
+  section: local
+  requires:
+  - base
+  type: gentoo-image-builder
+  env:
+    JAVA_HOME: /opt/zulu
+    USER: root
+  build:
+    packages: app-arch/zip
+    configure_builder: emerge app-arch/zip
+    finish_rootfs_build: |
+      # https://cdn.azul.com/zulu/bin/zulu25.32.17-ca-jdk25.0.2-linux_musl_aarch64.tar.gz
+      zulu=zulu21.48.15-ca-jdk21.0.10-linux_musl_aarch64.tar.gz
+      ZULU_DIR=/opt/zulu
+      curl -O https://cdn.azul.com/zulu/bin/$zulu
+      mkdir -p "${ZULU_DIR}" && tar --directory "${ZULU_DIR}" --extract --strip-components=1 --file $zulu
+      export JAVA_HOME=$ZULU_DIR
+      export PATH=$JAVA_HOME/bin:$PATH
+
+      bazel_version=7.7.1
+      bazel_dist=bazel-$bazel_version-dist.zip
+      mkdir /bazel && cd bazel
+      curl -L -O https://github.com/bazelbuild/bazel/releases/download/$bazel_version/$bazel_dist
+      unzip -q $bazel_dist
+      curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel7/0001-off64t-fix.patch?ref_type=heads -O
+      patch -p1 < 0001-off64t-fix.patch || true
+
+      BAZEL_DEV_VERSION_OVERRIDE="${bazel_version}"  EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh
+      mkdir -p $ROOT/usr/local/bin
+      cp -dp /bazel/output/bazel /usr/local/bin/
+
+- name: envoy-base
+  section: local
+  requires:
+  - bazel7
+  type: gentoo-image-builder
+  build:
+    packages: app-arch/zip
+    xadd:
+    - git: git@github.com:cainam/cainam.github.io.git#:compile-bazel-with-gentoo-musl-on-aarch64/bazel
+      dest: /bazel-build-for-envoy
+    configure_builder: |
+      emerge llvm-core/clang llvm-runtimes/libcxx llvm-core/lld
+      printf "%s static-libs\n" dev-libs/icu net-dns/c-ares app-arch/zstd net-libs/nghttp2 sys-libs/zlib >> /etc/portage/package.use/static-libs
+      emerge -1v net-dns/c-ares app-arch/zstd sys-libs/zlib
+      EXTRA_ECONF="--enable-static" emerge -v1 --usepkg=n net-libs/nghttp2
+      export PATH=$(stat --printf="%n" /usr/lib/llvm/*/bin):$PATH
+      export CC=clang
+      export CXX=clang++
+      export CONFIGURE="--prefix=/usr/local"
+      export CXXFLAGS="-stdlib=libc++ -fPIC"
+      export LDFLAGS="-stdlib=libc++"
+      export LIBS="-lc++ -lc++abi"
+      cd /var/tmp
+      git clone --single-branch --depth 1 -b release-77-1 https://github.com/unicode-org/icu.git
+      cd icu/icu4c/source/
+      ./configure $CONFIGURE --enable-static --disable-shared --with-library-bits=64 --disable-samples --disable-tests # --disable-renaming
+      make -j 3 && make install
+      cd /var/tmp
+      curl -OL https://github.com/libevent/libevent/releases/download/release-2.2.1-alpha/libevent-2.2.1-alpha-dev.tar.gz
+      tar xfz libevent-2.2.1-alpha-dev.tar.gz
+      cd libevent-2.2.1-alpha-dev; ./configure $CONFIGURE && make && make install
+      cd /var/tmp
+      git clone --single-branch --branch v2.1.ROLLING  --filter=blob:none https://luajit.org/git/luajit.git
+      cd luajit/; make && make install
+      for a in /usr/local/include/luajit-2.1/*; do ln -s $a /usr/local/include; done
+      cd /var/tmp
+      #
+      git clone https://github.com/cainam/cainam.github.io.git /bazel-build-for-envoy
+      for ld in /usr/bin/aarch64-unknown-linux-musl-ld.bfd /usr/sbin/ld.bfd; do
+      mv ${ld} ${ld}.org
+      cp -dp /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/bin/ld.bfd-wrapper "${ld}"
+      done
+      # remove the following line again, it is in bazel7
+      cp -dp /bazel/output/bazel /usr/local/bin/
+
+
+- name: envoy
+  section: local
+  tag: "{{ software.istio.version }}"
+  requires:
+  - envoy-base
+  type: gentoo-image-builder
+  build:
+    configure_builder: |
+      cd /var/tmp; rm -rf * /root/.cache
+      export JAVA_HOME=/opt/zulu
+      export PATH=$(stat --printf="%n" /usr/lib/llvm/*/bin):${JAVA_HOME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      export CC=$(which clang)
+      git clone --depth 1 --single-branch -b {{ software.istio.version }} https://github.com/istio/proxy.git; cd proxy
+      echo "build --define tcmalloc=disabled # in .bazelrc" >> .bazelrc
+      cp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/tools/jdk/ tools
+      cp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/add* .
+      sed  -e '/repo:http/r add-pt1.txt' -e '/sha256 = ENVOY_SHA256,/r add-pt2.txt' -e '/llvm/d' -i WORKSPACE
+      sed -i '/PATH/d' .bazelrc
+      sed -e '/googleurl/d' -i envoy.bazelrc
+      sed -e '/BAZEL_DO_NOT_DETECT_CPP_TOOLCH/d' -i envoy.bazelrc
+      mkdir tools/cmake
+      echo -e 'load("@rules_foreign_cc//toolchains/native_tools:native_tools_toolchain.bzl", "native_tool_toolchain")\nnative_tool_toolchain(
+        name = "gentoo_cmake_resource",
+        path = "/usr/bin/cmake",
+        visibility = ["//visibility:public"],
+      )
+      \ntoolchain(
+        name = "my_cmake_toolchain",
+        exec_compatible_with = [
+          "@platforms//os:linux",
+          "@platforms//cpu:aarch64",  # Changed from x86_64 to aarch64
+        ],
+        toolchain = ":gentoo_cmake_resource",
+        toolchain_type = "@rules_foreign_cc//toolchains:cmake_toolchain",
+      )' > tools/cmake/BUILD
+      bazel_options='--verbose_failures --strip=always --config=release --toolchain_resolution_debug=1 --copt=-Wno-error --java_runtime_version=local_jdk --tool_java_runtime_version=local_jdk --action_env=PATH='$PATH' --copt=-I/usr/local/include --copt=-Wno-sign-compare --copt=-Wno-error=deprecated-literal-operator --copt=-Wno-error=sign-compare --copt=-Wno-error=nullability-completeness --copt=-Wno-error --linkopt=-Wl,--no-gdb-index --host_linkopt=-static --linkopt=-static --host_linkopt=-Wl,--no-gdb-index --host_linkopt=-fuse-ld=lld --linkopt=-fuse-ld=bfd --copt=-Wno-error --cxxopt=-Wno-error=unused-parameter --define=musl=true --host_linkopt=/usr/lib/libc.a  --linkopt=/usr/local/lib/libicui18n.a   --linkopt=/usr/local/lib/libicuuc.a --linkopt=/usr/local/lib/libicudata.a   --action_env=CMAKE=/usr/bin/cmake --repo_env=CMAKE=/usr/bin/cmake --define=lua=enabled --define=luajit=system --action_env=LUAJIT_LIB=/usr/local/lib   --action_env=LUAJIT_INCLUDE=/usr/local/include  --extra_toolchains=//tools/cmake:my_cmake_toolchain  --copt=-DFLATBUFFERS_LOCALE_INDEPENDENT=0 --copt=-Wno-error=nontrivial-memcall --stamp --subcommands --announce_rc --incompatible_enable_cc_toolchain_resolution=true    --cxxopt=--stdlib=libc++ --host_cxxopt=--stdlib=libc++ --linkopt=-lc++ --linkopt=-lc++abi --host_cxxopt=--stdlib=libc++ --host_linkopt=-lc++ --host_linkopt=-lc++abi '
+      until bazel --output_user_root=$PWD/../cache fetch ${bazel_options}   -- //:envoy; do echo "retry in some seconds..."; sleep 5; done
+      bazel  --output_user_root=$PWD/../cache build ${bazel_options} -- //:envoy
+    finish_rootfs_build: |
+      strip bazel-bin/envoy
+      cp -dp bazel-bin/envoy  ${ROOT}/usr/local/bin/
+
+- name: proxyv2
+  section: istio-system
+  tag: "{{ software.istio.version }}"
+  requires:
+  - envoy
+  type: gentoo-image-builder
+  build:
+    entrypoint: ["/usr/local/bin/pilot-agent"]
+    user: 1337
+    configure_builder: |
+      emerge dev-lang/go
+    configure_rootfs_build: |
+      cd /var/tmp
+      [ -d "istio" ] && rm -rf istio; git clone --depth 1 --single-branch -b release-1.27 https://github.com/istio/istio.git
+      cd istio/pilot/cmd/pilot-agent
+      CGO_ENABLED=0 go build -ldflags '-extldflags "-static" -s -w'
+    finish_rootfs_build: |
+      echo 'istio-proxy:x:1337:istio-proxy' > "${ROOT}/etc/group"
+      echo 'istio-proxy:x:1337:1337:Linux User,,,:/home/istio-proxy:/bin/sh' > "${ROOT}/etc/passwd"
+      mkdir -p "${ROOT}/usr/local/bin" && cp -dp pilot-agent "${ROOT}/usr/local/bin"
+      mkdir -p "${ROOT}/var/lib/istio/envoy/" && cp -dp ../../../tools/packaging/common/envoy_bootstrap.json "${ROOT}/var/lib/istio/envoy/envoy_bootstrap_tmpl.json"
+      rm -rf /root/go /root/.cache
+
+- name: pilot
+  tag: "{{ software.istio.version }}"
+  section: istio-system
+  type: gentoo-image-builder
+  requires:
+  - go
+  build:
+    entrypoint: ["/usr/local/bin/pilot-discovery"]
+    user: 1337
+    configure_rootfs_build: |
+      cd /var/tmp
+      git clone --depth 1 --single-branch -b {{ software.istio.version }} https://github.com/istio/istio.git
+      cd istio/pilot/cmd/pilot-discovery
+      CGO_ENABLED=0 go build -ldflags '-extldflags "-static" -s -w'
+    finish_rootfs_build: |
+      echo 'istio-proxy:x:1337:istio-proxy' > "${ROOT}/etc/group"
+      echo 'istio-proxy:x:1337:1337:Linux User,,,:/home/istio-proxy:/bin/sh' > "${ROOT}/etc/passwd"
+      mkdir -p "${ROOT}/usr/local/bin" && cp -dp pilot-discovery "${ROOT}/usr/local/bin"
+      rm -rf /root/go /root/.cache
+
