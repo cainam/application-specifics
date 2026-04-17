@@ -9,6 +9,7 @@ spec:
       template:
         spec:
           serviceAccountName: {{ kustom.name }}
+          restartPolicy: OnFailure
           containers:
           - name: checker
             image: {{ kustom.image }}
