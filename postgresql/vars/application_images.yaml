@@ -1,0 +1,24 @@
+images:
+- name: postgresql
+  section: db
+  type: gentoo-image-builder
+  requires:
+  - base
+  env:
+    PATH: /usr/lib/postgresql-{{ software.postgresql.version|string|split('.')|first }}/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  build:
+    entrypoint: ["/usr/bin/postgres"]
+    user: postgres
+    packages: ="{{ software.postgresql.latest.params.repo }}"-"{{ software.postgresql.version }}"
+    configure_builder: |
+      mkdir -p /etc/portage/env /etc/portage/package.use
+      echo "EXTRA_ECONF=\"LDFLAGS='-Wl,-Bstatic -latomic -Wl,-Bdynamic'\"" > /etc/portage/env/postgres-static-atomic
+      echo "dev-db/postgresql postgres-static-atomic" >> /etc/portage/package.env
+      echo "dev-db/postgresql -numa" >> /etc/portage/package.use/postgresql
+    finish_rootfs_build: |
+      ln -s usr/lib "${ROOT}/lib" # && copy_gcc_libs
+      (cd ${ROOT}/usr/bin; for f in usr/lib/postgresql*/bin/*; do b=$(basename $f); if [ -e "${b}" ]; then echo "usr/bin/$b exists"; else ln -s /$f; fi; done)
+      mkdir -p -m 3777 ${ROOT}/run/postgresql && chown 70 ${ROOT}/run/postgresql
+      echo 'postgres:x:70:70:PostgreSQL program user:/var/lib/postgresql:/bin/sh' > "${ROOT}/etc/passwd"
+      echo 'postgres:x:70:' > "${ROOT}/etc/group"
+     

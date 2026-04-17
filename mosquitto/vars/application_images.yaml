@@ -1,0 +1,22 @@
+images:
+- name: mosquitto
+  section: home
+  requires:
+  - base
+  type: gentoo-image-builder
+  build:
+    Xentrypoint: ["/mosquitto/sbin/mosquitto", "-c", "/mosquitto/config/mosquitto.conf" ]
+    packages: dev-libs/cJSON dev-libs/openssl dev-libs/libedit net-libs/libmicrohttpd dev-debug/strace # net-libs/libwebsockets
+    finish_rootfs_build: |
+      git clone --depth=1 -b "{{ software.mosquitto.version }}" https://github.com/eclipse-mosquitto/mosquitto.git
+      mv mosquitto src && cd src
+      sed -i -e 's#/usr/local#/mosquitto#g' config.mk
+      export CFLAGS="-I${ROOT}/usr/include"
+      export CXXFLAGS="-I${ROOT}/usr/include"
+      export LDFLAGS="-L${ROOT}/usr/lib"
+      make install WITH_DOCS=no # WITH_WEBSOCKETS=yes
+      mv /mosquitto ${ROOT}/mosquitto
+      echo "mosquitto:x:1883:" >> ${ROOT}/etc/group
+      echo "mosquitto:x:1883:1883:mosquitto:/var/empty:/sbin/nologin" >> ${ROOT}/etc/passwd
+      strip ${ROOT}/usr/lib/* ${ROOT}/usr/bin/* ${ROOT}/usr/sbin/* || true
+

@@ -1,0 +1,14 @@
+images:
+- name: hydra
+  section: auth
+  type: gentoo-image-builder
+  requires:
+  - go
+  build:
+    configure_rootfs_build: |
+      git clone --branch "{{ software.hydra.version }}" --depth 1 --filter=blob:none  https://github.com/ory/hydra.git
+      cd hydra
+      go build -tags sqlite,sqlite_omit_load_extension .
+      strip hydra
+      mv hydra "${ROOT}/bin/"
+

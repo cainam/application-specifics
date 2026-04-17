@@ -1,0 +1,11 @@
+images:
+- name: flannel
+  section: kube-flannel
+  type: fetch
+  source: ghcr.io/flannel-io/flannel
+
+- name: flannel-cni-plugin
+  section: kube-flannel
+  type: fetch
+  source: ghcr.io/flannel-io/flannel-cni-plugin
+

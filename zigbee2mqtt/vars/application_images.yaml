@@ -1,0 +1,23 @@
+images:
+- name: zigbee2mqtt
+  section: home
+  type: gentoo-image-builder
+  requires:
+  - nodejs
+  workdir: /app
+  env:
+    HOME: /app
+    PATH: /app/bin:/bin:/usr/bin
+  build:
+    entrypoint: ["/bin/sh", "-c", "node index.js"]
+    configure_rootfs_build: |
+      git clone --branch {{ software.zigbee2mqtt.version }} --depth 1 https://github.com/Koenkk/zigbee2mqtt.git "${ROOT}/app"
+    finish_rootfs_build: |
+      cd "${ROOT}/app/"
+      mkdir log
+      npm install
+      npm run build
+      npm rebuild --build-from-source # otherwise segfault- to be tested: cannot it be merge with previous commands?
+      npm prune --omit=dev --omit=optional
+
+
