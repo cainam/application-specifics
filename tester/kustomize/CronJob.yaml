@@ -24,6 +24,8 @@ spec:
               TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
               VALUE="{\"status\":\"$STATUS\",\"time\":\"$TIMESTAMP\"}"
 
+              /py_env/bin/python -m molecule  --base-config /home/test_user/home-cluster-deployment/molecule.yaml test --scenario-name test_directory_sync
+
               APISERVER="https://kubernetes.default.svc"
               SERVICEACCOUNT="/var/run/secrets/kubernetes.io/serviceaccount"
               NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
@@ -38,6 +40,11 @@ spec:
             volumeMounts:
             - name: varlibcontainers
               mountPath: /var/lib/containers
+            - name: tun
+              mountPath: /dev/net/tun
           volumes:
+            - name: tun
+              hostPath:
+                path: /dev/net/tun
           - name: varlibcontainers
             emptyDir: {}
