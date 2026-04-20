@@ -3,13 +3,13 @@ images:
   requires:
   - molecule
   type: gentoo-image-builder
-  user: test_user
   build:
+    user: test_user
     finish_rootfs_build: |
       echo 'test_user:x:4523:4523:User performing the tests,,,:/home/test_user:/bin/sh' > "${ROOT}/etc/passwd"
       echo 'test_user:x:4523:test_user' > "${ROOT}/etc/group"
-      mkdir -p /home/test_user
-      chown -R 4523:4523 /home/test_user
+      mkdir -p "${ROOT}/home/test_user"
+      chown -R 4523:4523 "${ROOT}/home/test_user"
 
 - name: molecule
   section: local
