@@ -38,8 +38,8 @@ spec:
 
               DATA="{\"metadata\":{\"annotations\":{\"$TEST_NAME\":\"${VALUE//\"/\\\"}\"}}}"
               # patch the configmap
-              curl --cacert "${CACERT}" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
-                   --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
+              #curl --cacert "${CACERT}" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
+              #     --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
               podman run -it --rm myregistry.adm13:443/local/base busybox echo 'yaih!'
             volumeMounts:
             - name: varlibcontainers
