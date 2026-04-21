@@ -1,5 +1,5 @@
 images:
-- name: bazel7
+- name: bazel
   section: local
   requires:
   - base
@@ -12,19 +12,20 @@ images:
     configure_builder: emerge app-arch/zip
     finish_rootfs_build: |
       # https://cdn.azul.com/zulu/bin/zulu25.32.17-ca-jdk25.0.2-linux_musl_aarch64.tar.gz
-      zulu=zulu21.48.15-ca-jdk21.0.10-linux_musl_aarch64.tar.gz
+      zulu=zulu21.48.17-ca-jdk21.0.10-linux_musl_aarch64.tar.gz
       ZULU_DIR=/opt/zulu
       curl -O https://cdn.azul.com/zulu/bin/$zulu
       mkdir -p "${ZULU_DIR}" && tar --directory "${ZULU_DIR}" --extract --strip-components=1 --file $zulu
       export JAVA_HOME=$ZULU_DIR
       export PATH=$JAVA_HOME/bin:$PATH
 
-      bazel_version=7.7.1
+      bazel_version=8.6.0
       bazel_dist=bazel-$bazel_version-dist.zip
       mkdir /bazel && cd bazel
       curl -L -O https://github.com/bazelbuild/bazel/releases/download/$bazel_version/$bazel_dist
       unzip -q $bazel_dist
-      curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel7/0001-off64t-fix.patch?ref_type=heads -O
+      # bazel 7: curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel7/0001-off64t-fix.patch?ref_type=heads -O
+      curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel8/0001-off64t-fix.patch?ref_type=heads -O
       patch -p1 < 0001-off64t-fix.patch || true
 
       BAZEL_DEV_VERSION_OVERRIDE="${bazel_version}"  EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh
@@ -34,7 +35,7 @@ images:
 - name: envoy-base
   section: local
   requires:
-  - bazel7
+  - bazel
   type: gentoo-image-builder
   build:
     packages: app-arch/zip
@@ -77,9 +78,7 @@ images:
       export PATH=$(stat --printf="%n" /usr/lib/llvm/*/bin):${JAVA_HOME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       export CC=$(which clang)
       git clone --depth 1 --single-branch -b {{ software.istio.version }} https://github.com/istio/proxy.git; cd proxy
-      echo "build --define tcmalloc=disabled # in .bazelrc" >> .bazelrc
-      # xcp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/tools/jdk/ tools
-      # xcp -rv /bazel-build-for-envoy/compile-bazel-with-gentoo-musl-on-aarch64/bazel/add* .
+      echo "build --define tcmalloc=disabled" >> .bazelrc
       mkdir -p tools/jdk/
       echo 'workspace(name = "local_jdk")' > tools/jdk/WORKSPACE
       cat > tools/jdk/BUILD.bazel <<'EOF'
