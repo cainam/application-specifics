@@ -51,7 +51,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
-def get_a_name_from_request(req_object):
+def get_a_name_from_request(req):
     metadata = req.object.get("metadata", {}) if req.object else {}
     return (req.name or metadata.get("name") or metadata.get("generateName") or "unknown-name")
 
