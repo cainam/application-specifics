@@ -54,7 +54,6 @@ app = FastAPI(
 def get_a_name_from_request(req_object):
     metadata = req.object.get("metadata", {}) if req.object else {}
     return (req.name or metadata.get("name") or metadata.get("generateName") or "unknown-name")
-)
 
 # one function for validation and mutation as the same items are addressed
 def process_pod_object(req_object, mutate, exemptions=None):
