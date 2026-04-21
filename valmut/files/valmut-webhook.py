@@ -51,6 +51,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
+def get_a_name_from_request(req_object):
+    metadata = req.object.get("metadata", {}) if req.object else {}
+    return (req.name or metadata.get("name") or metadata.get("generateName") or "unknown-name")
+)
+
 # one function for validation and mutation as the same items are addressed
 def process_pod_object(req_object, mutate, exemptions=None):
     import copy, random, re
@@ -305,10 +310,11 @@ async def mutate_webhook(request: Request): # preferred over mutate_webhook(admi
         return admission_review
     
     req = admission_review.request
+    item_name = get_a_name_from_request(req)
     if req.kind.get("kind") == "Pod":
-        logger.info(f"Mutating Pod: {req.name} in namespace: {req.namespace}")
+        logger.info(f"Mutating Pod {item_name} in namespace: {req.namespace}")
         if not req.object or not req.object.get('spec'):
-            logger.warning(f"Pod {req.name} has no spec. Skipping mutation.")
+            logger.warning(f"Pod {item_name} has no spec. Skipping mutation.")
             return JSONResponse(content=AdmissionReview(response=AdmissionResponse(uid=req.uid, allowed=True)).model_dump(by_alias=True, exclude_none=True))
 
         patches, messages = process_pod_object(req.object, True, mutating_config)
@@ -320,7 +326,7 @@ async def mutate_webhook(request: Request): # preferred over mutate_webhook(admi
         annotations = req.object.get("metadata", {}).get("annotations", {})
         if "mutated" not in annotations: patches.append({"op": "add", "path": "/metadata/annotations/admission-webhook-example.com~1mutated-by", "value": "yepp"})
     elif req.kind.get("kind") in ["Deployment", "StatefulSet", "CronJob", "DaemonSet"]:
-        logger.info(f"Mutating Deployment: {req.name} in namespace: {req.namespace}")
+        logger.info(f"Mutating Deployment: {item_name} in namespace: {req.namespace}")
         patches, messages = process_controller_object(req.object, True, mutating_config)
     else: # non-Pod resources, just allow without modification
         logger.info(f"Allowing non-Pod resource of kind: {req.kind.get('kind')} without mutation.")
@@ -333,7 +339,7 @@ async def mutate_webhook(request: Request): # preferred over mutate_webhook(admi
         patch_type=PatchType.type  # Important: Specify the patch type
     )
     
-    logger.info(f"Generated patch for {req.name}:\n{json.dumps(patches, indent=2)}")
+    logger.info(f"Generated patch for {item_name}:\n{json.dumps(patches, indent=2)}")
     logger.info(f"json response: "+str(JSONResponse(content=AdmissionReview(response=response).model_dump(by_alias=True, exclude_none=True)) ))
 
     final_response_content = AdmissionReview(response=response).model_dump(by_alias=True, exclude_none=True)
@@ -356,8 +362,9 @@ async def validate_webhook(request: Request):
     req = admission_review.request
     logger.debug("req.object\n"+str(req.object))
 
+    item_name = get_a_name_from_request(req)
     if req.kind.get("kind") == "Pod":
-        logger.info(f"Validating Pod: {req.name} in namespace: {req.namespace}")
+        logger.info(f"Validating Pod: {item_name} in namespace: {req.namespace}")
 
         pod_dict = valmut_helper.convert_keys_to_snake_case(req.object)
         pod = k8s.V1Pod(**pod_dict)
@@ -368,9 +375,9 @@ async def validate_webhook(request: Request):
         namespace = pod_metadata.get('namespace', "unknown")
         
         allowed, messages = process_pod_object(req.object, False, mutating_config)
-        full_message = f"Pod {pod_name} in namespace {namespace} violates restricted security policy: {'\n'.join(messages)}"
+        full_message = f"Pod {item_name} in namespace {namespace} violates restricted security policy: {'\n'.join(messages)}"
         if allowed:
-            logger.info(f"Pod {pod_name} in namespace {namespace} conforms to restricted security policy. Allowing: {'\n'.join(messages)}")
+            logger.info(f"Pod {item_name} in namespace {namespace} conforms to restricted security policy. Allowing: {'\n'.join(messages)}")
         else:
             logger.warning(full_message)
     else:
