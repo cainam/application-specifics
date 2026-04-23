@@ -14,6 +14,9 @@ spec:
         spec:
           serviceAccountName: {{ kustom.name }}
           restartPolicy: OnFailure
+          env:
+          - name: STORAGE_DRIVER
+            value: vfs
           containers:
           - name: checker
             image: {{ kustom.image }}
