@@ -318,7 +318,7 @@ async def mutate_webhook(request: Request): # preferred over mutate_webhook(admi
             return JSONResponse(content=AdmissionReview(response=AdmissionResponse(uid=req.uid, allowed=True)).model_dump(by_alias=True, exclude_none=True))
 
         patches, messages = process_pod_object(req.object, True, mutating_config)
-        full_message = f"Pod {req.object.get('metadata').get('name')} in namespace {req.object.get('metadata').get('namespace')} mutation: {'\n'.join(messages)}"
+        full_message = f"Pod {item_name} in namespace {req.object.get('metadata').get('namespace')} mutation: {'\n'.join(messages)}"
         logger.info(full_message)
         
         if "metadata" not in req.object: patches.append({"op": "add", "path": "/metadata", "value": {}})
