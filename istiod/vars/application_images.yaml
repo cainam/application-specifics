@@ -24,8 +24,9 @@ images:
       mkdir /bazel && cd bazel
       curl -L -O https://github.com/bazelbuild/bazel/releases/download/$bazel_version/$bazel_dist
       unzip -q $bazel_dist
+      curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel7/0001-off64t-fix.patch?ref_type=heads -O
       # bazel 7: curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel7/0001-off64t-fix.patch?ref_type=heads -O
-      curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel8/0001-off64t-fix.patch?ref_type=heads -O
+      # bazel 8: curl https://gitlab.alpinelinux.org/alpine/aports/-/raw/master/testing/bazel8/0001-off64t-fix.patch?ref_type=heads -O
       patch -p1 < 0001-off64t-fix.patch || true
 
       BAZEL_DEV_VERSION_OVERRIDE="${bazel_version}"  EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh
