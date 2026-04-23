@@ -39,6 +39,8 @@ spec:
         env:
         - name: PYTHONPATH
           value: /app/backend/:/py_env/lib/python3.13/site-packages/
+        - name: PYTHONUNBUFFERED
+          value: "1"
         ports:
         - name: https
           containerPort: {{ container_port }}
