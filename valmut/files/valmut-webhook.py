@@ -353,6 +353,8 @@ async def validate_webhook(request: Request):
     """
     
     logger.info("/validate called")
+    for handler in logger.handlers:
+        handler.flush()
     admission_review = await valmut_helper.parse_request(request)
     if isinstance(admission_review, JSONResponse): 
         logger.error(admission_review.body)
