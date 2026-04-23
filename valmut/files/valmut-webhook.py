@@ -352,6 +352,7 @@ async def validate_webhook(request: Request):
     Handles validating admission requests from Kubernetes.
     """
     
+    print("DEBUG: /validate endpoint reached via PRINT", flush=True)
     logger.info("/validate called")
     for handler in logger.handlers:
         handler.flush()
