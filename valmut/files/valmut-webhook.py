@@ -178,7 +178,7 @@ def process_pod_object(req_object, mutate, exemptions=None):
           allowed = False
 
         sc = container.get('securityContext')
-        logger.info(f"securityContext of {container_type} {i}: {sc}")
+        messages.append(f"securityContext of {container_type} {i}: {sc}")
         sc_path = f"{container_path}/securityContext"
         if not sc:
             sc = {}
@@ -351,11 +351,6 @@ async def validate_webhook(request: Request):
     """
     Handles validating admission requests from Kubernetes.
     """
-    sys.stdout.write("!!! VALIDATE TRIGGERED !!!\n")
-    sys.stderr.write("!!! VALIDATE TRIGGERED ON STDERR !!!\n")
-    sys.stdout.flush()
-    sys.stderr.flush()
-    print("DEBUG: /validate endpoint reached via PRINT", flush=True)
     logger.info("/validate called")
     for handler in logger.handlers:
         handler.flush()
