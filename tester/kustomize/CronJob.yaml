@@ -45,11 +45,15 @@ spec:
                    --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
               podman run -it --rm myregistry.adm13:443/local/base busybox echo 'yaih!'
             volumeMounts:
+            - name: tmp
+              mountPath: /tmp
             - name: varlibcontainers
               mountPath: /var/lib/containers
             - name: tun
               mountPath: /dev/net/tun
           volumes:
+          - name: tmp
+            emptyDir: {}
           - name: tun
             hostPath:
               path: /dev/net/tun
