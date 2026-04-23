@@ -20,6 +20,8 @@ images:
       export PATH=$JAVA_HOME/bin:$PATH
 
       bazel_version=8.6.0
+      bazel_version=7.7.1
+
       bazel_dist=bazel-$bazel_version-dist.zip
       mkdir /bazel && cd bazel
       curl -L -O https://github.com/bazelbuild/bazel/releases/download/$bazel_version/$bazel_dist
