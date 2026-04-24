@@ -13,6 +13,7 @@ data:
             label: app.kubernetes.io/name
             exemptions:
             - hostPath
+            - allowPrivilegeEscalation
         flannel:
             identifiedBy: label
             label: app
