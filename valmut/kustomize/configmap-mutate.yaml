@@ -14,7 +14,8 @@ data:
             exemptions:
             - hostPath
             - allowPrivilegeEscalation
-            caps:
+            - caps_add
+            kljsdfcaps:
             - SETUID
             - SETGID
         flannel:
