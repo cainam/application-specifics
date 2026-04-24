@@ -54,11 +54,11 @@ images:
       export CXXFLAGS="-stdlib=libc++ -fPIC"
       export LDFLAGS="-stdlib=libc++"
       export LIBS="-lc++ -lc++abi"
-      cd /var/tmp
-      git clone --single-branch --depth 1 -b release-77-1 https://github.com/unicode-org/icu.git
-      cd icu/icu4c/source/
-      ./configure $CONFIGURE --enable-static --disable-shared --with-library-bits=64 --disable-samples --disable-tests # --disable-renaming
-      make -j 3 && make install
+      #cd /var/tmp
+      #git clone --single-branch --depth 1 -b release-77-1 https://github.com/unicode-org/icu.git
+      #cd icu/icu4c/source/
+      #./configure $CONFIGURE --enable-static --disable-shared --with-library-bits=64 --disable-samples --disable-tests # --disable-renaming
+      #make -j 3 && make install
       cd /var/tmp
       curl -OL https://github.com/libevent/libevent/releases/download/release-2.2.1-alpha/libevent-2.2.1-alpha-dev.tar.gz
       tar xfz libevent-2.2.1-alpha-dev.tar.gz

@@ -59,11 +59,17 @@ spec:
               mountPath: /var/lib/containers
             - name: tun
               mountPath: /dev/net/tun
+            - name: {{ kustom.name }}-certs
+              mountPath: /etc/certs
+              readOnly: true
           volumes:
           - name: tmp
+            emptyDir: {}
+          - name: varlibcontainers
             emptyDir: {}
           - name: tun
             hostPath:
               path: /dev/net/tun
-          - name: varlibcontainers
-            emptyDir: {}
+          - name: {{ kustom.name }}-certs
+            configMap:
+              name: {{ kustom.name }}-certs
