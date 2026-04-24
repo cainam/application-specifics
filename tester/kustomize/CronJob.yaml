@@ -47,9 +47,12 @@ spec:
               #podman run -it --rm myregistry.adm13:443/local/base busybox echo 'yaih!'
             securityContext:
               allowPrivilegeEscalation: true
+              runAsUser: {{ kustom.security.runAsUser }}
+              runAsGroup: {{ kustom.security.fsGroup }}
               seccompProfile:
-                type: Localhost
-                localhostProfile: podman.json
+                type: RuntimeDefault
+              #  type: Localhost
+              #  localhostProfile: podman.json
               capabilities:
                 add: ["SETUID","SETGID","SYS_ADMIN"]
             volumeMounts:
