@@ -216,13 +216,14 @@ def process_pod_object(req_object, mutate, exemptions=None):
 
         # Container-level SeccompProfile - default from Pod Security Context, so can be empty (could also be dropped here)
         scp = sc.get('seccompProfile')
-        if not scp or scp.get('type') not in ["RuntimeDefault"]:
+        if not scp or scp.get('type') not in ["RuntimeDefault",'Localhost']:
             if mutate:
                 patch_ops.append({"op": "replace", "path": sc_path+'/seccompProfile', "value": {"type": "RuntimeDefault"} })
             else:
                 allowed = False
                 messages.append(f"- Container '{c_name}' 'seccompProfile.type' must be 'RuntimeDefault' or 'Localhost' => violated, creation forbidden")
-        
+        else:
+            messages.append(f"- Container '{c_name}' 'seccompProfile.type' is compliant: {scp.get('type')}")
         # capabilities
         caps_path = f"{sc_path}/capabilities"
         caps = sc.get('capabilities')  
