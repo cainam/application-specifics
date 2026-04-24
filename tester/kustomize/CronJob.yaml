@@ -45,6 +45,8 @@ spec:
                    --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
               while sleep 99; do true; done
               #podman run -it --rm myregistry.adm13:443/local/base busybox echo 'yaih!'
+            securityContext:
+              allowPrivilegeEscalation: true 
             volumeMounts:
             - name: tmp
               mountPath: /tmp
@@ -52,8 +54,6 @@ spec:
               mountPath: /var/lib/containers
             - name: tun
               mountPath: /dev/net/tun
-          securityContext:
-            allowPrivilegeEscalation: true 
           volumes:
           - name: tmp
             emptyDir: {}
