@@ -46,7 +46,9 @@ spec:
               while sleep 99; do true; done
               #podman run -it --rm myregistry.adm13:443/local/base busybox echo 'yaih!'
             securityContext:
-              allowPrivilegeEscalation: true 
+              allowPrivilegeEscalation: true
+              capabilities:
+                add: ["SETUID","SETGID"]
             volumeMounts:
             - name: tmp
               mountPath: /tmp
