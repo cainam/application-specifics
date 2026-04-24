@@ -48,7 +48,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: true
               runAsUser: {{ kustom.security.runAsUser }}
-              runAsGroup: {{ kustom.security.fsGroup }}
+              runAsGroup: {{ kustom.security.runAsGroup }}
               seccompProfile:
                 type: RuntimeDefault
               #  type: Localhost
