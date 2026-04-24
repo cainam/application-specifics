@@ -12,6 +12,18 @@ configMapGenerator:
   - |
     service-ca-bundle.crt={{ application_playbooks[application.key].vars.ca_bundle | indent(4) }}
 
+- name: {{ kustom.name }}
+  literals:
+  - etc-passwd=|
+      {{ kustom.name }}:x:{{ application_playbooks[application.key].vars.uid }}:{{ application_playbooks[application.key].vars.gid }}:,,,:/home/myuser:/bin/bash
+  - etc-group=|
+      root:x:0:
+      {{ kustom.name }}:x:{{ application_playbooks[application.key].vars.gid }}:
+  - etc-subuid=|
+      {{ kustom.name }}:100000:65536
+  - etc-subgid=|
+      {{ kustom.name }}:100000:65536
+
 generatorOptions:
   disableNameSuffixHash: true
 

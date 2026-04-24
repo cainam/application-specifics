@@ -1,0 +1,10 @@
+- name: read certificate and set uid and gid for kustomize
+  vars:
+    ca_bundle: |
+      {% for file in local_ca_files %}
+      {{ lookup('file', cert_path ~'/'~ file) }}
+      {% endfor %}
+  set_fact:
+    application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'ca_bundle': ca_bundle, 'uid': (2**31-1)|random(65536), 'gid': (2**31-1)|random(65536)  }} }, recursive=True) }}"
+    
+ 

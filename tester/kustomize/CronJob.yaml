@@ -62,6 +62,18 @@ spec:
             - name: {{ kustom.name }}-certs
               mountPath: /etc/certs
               readOnly: true
+            - name: etc
+              mountPath: /etc/passwd
+              subPath: etc-passwd
+            - name: etc
+              mountPath: /etc/group
+              subPath: etc-group
+            - name: etc
+              mountPath: /etc/subuid
+              subPath: etc-subuid
+            - name: etc
+              mountPath: /etc/subgid
+              subPath: etc-subgid
           volumes:
           - name: tmp
             emptyDir: {}
@@ -73,3 +85,6 @@ spec:
           - name: {{ kustom.name }}-certs
             configMap:
               name: {{ kustom.name }}-certs
+          - name: etc
+            configMap:
+              name: {{ kustom.name }}
