@@ -203,8 +203,7 @@ images:
     configure_builder: |
       emerge dev-lang/go
     configure_rootfs_build: |
-      cd /var/tmp
-      [ -d "istio" ] && rm -rf istio; git clone --depth 1 --single-branch -b release-1.27 https://github.com/istio/istio.git
+      git clone --depth 1 --single-branch -b {{ software.istio.version }}  https://github.com/istio/istio.git
       cd istio/pilot/cmd/pilot-agent
       CGO_ENABLED=0 go build -ldflags '-extldflags "-static" -s -w'
     finish_rootfs_build: |
