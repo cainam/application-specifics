@@ -51,7 +51,7 @@ spec:
                 type: Localhost
                 localhostProfile: podman.json
               capabilities:
-                add: ["SETUID","SETGID"]
+                add: ["SETUID","SETGID","SYS_ADMIN"]
             volumeMounts:
             - name: tmp
               mountPath: /tmp

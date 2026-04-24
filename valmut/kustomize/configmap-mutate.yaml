@@ -18,6 +18,7 @@ data:
             kljsdfcaps:
             - SETUID
             - SETGID
+            - SYS_ADMIN
         flannel:
             identifiedBy: label
             label: app
