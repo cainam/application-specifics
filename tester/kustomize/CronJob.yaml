@@ -24,7 +24,11 @@ spec:
             - name: APISERVER
               value: https://kubernetes.default.svc
             - name: CONTAINER_SSHKEY
-              value: /tmp/.ssh/key
+              value: /tmp/home/.ssh/key
+            - name: HOME
+              value: /tmp/home
+            - name: PODMAN_SSH_OPTS
+              value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
             image: {{ kustom.image }}
             command:
             - /bin/sh
@@ -32,6 +36,10 @@ spec:
             - |
               # run molecule
               set -x
+              mkdir $HOME/.ssh
+              cp /tmp/.ssh/* $HOME/.ssh
+              chmod 400 $HOME/.ssh/key
+
               TEST_NAME="foo"
               STATUS="bar"
               TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
