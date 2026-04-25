@@ -41,6 +41,7 @@ spec:
               mkdir -p $HOME/.ssh
               cp /tmp/.ssh/* $HOME/.ssh
               chmod 400 $HOME/.ssh/*
+              rm $HOME/.ssh/known_hosts
 
               TEST_NAME="foo"
               STATUS="bar"
