@@ -24,8 +24,8 @@ secretGenerator:
 - name: {{ kustom.name }}
   literals:
   - |
-    key="{{ ssh_keys.podman.key | indent(4) }}"
-    known_hosts="      {% for i in ssh_keys.hosts %}
+    key={{ ssh_keys.podman.key | indent(4) }}
+    known_hosts={% for i in ssh_keys.hosts %}
       {{i~' ssh-'~ssh_keys.hosts[i].type~' '~ssh_keys.hosts[i].public}}
       {{(i| split('.') | first)~' ssh-'~ssh_keys.hosts[i].type~' '~ssh_keys.hosts[i].public}}
       {% if hostvars[i].alt_names is defined %}
@@ -34,7 +34,7 @@ secretGenerator:
       {{j~' ssh-'~ssh_keys.hosts[i].type~' '~ssh_keys.hosts[i].public}}
       {% endfor %}
       {% endif %}
-      {% endfor %}"
+      {% endfor %}
 
 generatorOptions:
   disableNameSuffixHash: true
