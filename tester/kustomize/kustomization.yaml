@@ -38,4 +38,3 @@ secretGenerator:
 
 generatorOptions:
   disableNameSuffixHash: true
-  defaultMode: 0400

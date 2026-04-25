@@ -101,3 +101,4 @@ spec:
           - name: ssh-auth
             secret:
               secretName: {{ kustom.name }}
+              defaultMode: 0400
