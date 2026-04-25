@@ -14,6 +14,8 @@ spec:
         spec:
           serviceAccountName: {{ kustom.name }}
           restartPolicy: OnFailure
+          securityContext:
+            fsGroup: {{ kustom.security.runAsGroup }}
           containers:
           - name: checker
             env:
@@ -53,7 +55,6 @@ spec:
               allowPrivilegeEscalation: true
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}
-              fsGroup: {{ kustom.security.runAsGroup }}
               seccompProfile:
                 type: RuntimeDefault
               #  type: Localhost
