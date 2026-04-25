@@ -98,7 +98,6 @@ def process_pod_object(req_object, mutate, exemptions=None):
         patch_ops.append({"op": "add", "path": "/spec/volumes/-", "value": {'name': vol_name, 'emptyDir': {} } })
         config['emptyDir'][i]['name'] = vol_name
 
-
     # Host Namespaces (Network, PID, IPC)
     for host_namespace in ['hostNetwork', 'hostPid', 'hostIpc']:
       if req_object['spec'].get(host_namespace):
@@ -123,7 +122,10 @@ def process_pod_object(req_object, mutate, exemptions=None):
     if mutate:
         messages.append('- enforcing /spec/securityContext')
         sc_val = {"runAsNonRoot": True}
+        fsGroup = pod_sc.get('fsGroup')
         sc_val.update({"seccompProfile": {"type": "RuntimeDefault"}})
+        if fsGroup:
+            sc_val.update({'fsGroup': fsGroup})
         patch_ops.append({"op": "replace", "path": "/spec/securityContext", "value": sc_val })
     else:
         if pod_sc:
