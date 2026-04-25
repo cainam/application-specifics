@@ -19,6 +19,10 @@ spec:
             env:
             - name: STORAGE_DRIVER
               value: vfs
+            - name: APISERVER
+              value: https://kubernetes.default.svc
+            - name: CONTAINER_SSHKEY
+              value: /tmp/.ssh/key
             image: {{ kustom.image }}
             command:
             - /bin/sh
@@ -33,7 +37,7 @@ spec:
 
               /py_env/bin/python -m molecule  --base-config /home/test_user/home-cluster-deployment/molecule.yaml test --scenario-name test_directory_sync
 
-              APISERVER="https://kubernetes.default.svc"
+              #APISERVER="https://kubernetes.default.svc"
               SERVICEACCOUNT="/var/run/secrets/kubernetes.io/serviceaccount"
               NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
               TOKEN=$(cat ${SERVICEACCOUNT}/token)
@@ -77,6 +81,9 @@ spec:
             - name: etc
               mountPath: /etc/subgid
               subPath: etc-subgid
+            - name: ssh-auth
+              mountPath: /tmp/.ssh
+              readOnly: true
           volumes:
           - name: tmp
             emptyDir: {}
@@ -91,3 +98,6 @@ spec:
           - name: etc
             configMap:
               name: {{ kustom.name }}
+          - name: ssh-auth
+            secret:
+              secretName: {{ kustom.name }}
