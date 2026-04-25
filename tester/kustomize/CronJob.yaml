@@ -40,7 +40,7 @@ spec:
               set -x
               mkdir -p $HOME/.ssh
               cp /tmp/.ssh/* $HOME/.ssh
-              chmod 400 $HOME/.ssh/key
+              chmod 400 $HOME/.ssh/*
 
               TEST_NAME="foo"
               STATUS="bar"
