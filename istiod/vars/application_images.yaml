@@ -54,19 +54,19 @@ images:
       export CXXFLAGS="-stdlib=libc++ -fPIC"
       export LDFLAGS="-stdlib=libc++"
       export LIBS="-lc++ -lc++abi"
-      #cd /var/tmp
-      #git clone --single-branch --depth 1 -b release-77-1 https://github.com/unicode-org/icu.git
-      #cd icu/icu4c/source/
-      #./configure $CONFIGURE --enable-static --disable-shared --with-library-bits=64 --disable-samples --disable-tests # --disable-renaming
-      #make -j 3 && make install
+      cd /var/tmp
+      git clone --single-branch --depth 1 -b release-77-1 https://github.com/unicode-org/icu.git
+      cd icu/icu4c/source/
+      ./configure $CONFIGURE --enable-static --disable-shared --with-library-bits=64 --disable-samples --disable-tests # --disable-renaming
+      make -j 3 && make install
       cd /var/tmp
       curl -OL https://github.com/libevent/libevent/releases/download/release-2.2.1-alpha/libevent-2.2.1-alpha-dev.tar.gz
       tar xfz libevent-2.2.1-alpha-dev.tar.gz
       cd libevent-2.2.1-alpha-dev; ./configure $CONFIGURE && make && make install
       cd /var/tmp
-      git clone --single-branch --branch v2.1.ROLLING  --filter=blob:none https://luajit.org/git/luajit.git
-      cd luajit/; make && make install
-      for a in /usr/local/include/luajit-2.1/*; do ln -s $a /usr/local/include; done
+      #git clone --single-branch --branch v2.1.ROLLING  --filter=blob:none https://luajit.org/git/luajit.git
+      #cd luajit/; make && make install
+      #for a in /usr/local/include/luajit-2.1/*; do ln -s $a /usr/local/include; done
 
 - name: envoy
   section: local

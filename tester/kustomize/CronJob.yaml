@@ -29,6 +29,8 @@ spec:
               value: /tmp/home
             - name: PODMAN_SSH_OPTS
               value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+            - name: CONTAINER_HOST
+              value: ssh://podman@10.10.10.10/run/podman/podman.sock
             image: {{ kustom.image }}
             command:
             - /bin/sh
@@ -36,7 +38,7 @@ spec:
             - |
               # run molecule
               set -x
-              mkdir $HOME/.ssh
+              mkdir -p $HOME/.ssh
               cp /tmp/.ssh/* $HOME/.ssh
               chmod 400 $HOME/.ssh/key
 
