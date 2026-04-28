@@ -46,7 +46,7 @@ images:
       emerge llvm-core/clang llvm-runtimes/libcxx llvm-core/lld
       printf "%s static-libs\n" dev-libs/icu net-dns/c-ares app-arch/zstd net-libs/nghttp2 sys-libs/zlib >> /etc/portage/package.use/static-libs
       emerge -1v net-dns/c-ares app-arch/zstd sys-libs/zlib
-      EXTRA_ECONF="--enable-static" emerge -v1 --usepkg=n net-libs/nghttp2
+      # EXTRA_ECONF="--enable-static" emerge -v1 --usepkg=n net-libs/nghttp2
       export PATH=$(stat --printf="%n" /usr/lib/llvm/*/bin):$PATH
       export CC=clang
       export CXX=clang++
@@ -181,7 +181,6 @@ images:
         toolchain = ":gentoo_cmake_resource",
         toolchain_type = "@rules_foreign_cc//toolchains:cmake_toolchain",
       )' > tools/cmake/BUILD
-      # bazel_options='--verbose_failures --strip=always --config=release --toolchain_resolution_debug=1 --java_runtime_version=local_jdk --tool_java_runtime_version=local_jdk --action_env=PATH='$PATH' --copt=-I/usr/local/include --copt=-Wno-sign-compare --copt=-Wno-error=deprecated-literal-operator --copt=-Wno-error=sign-compare --copt=-Wno-error=nullability-completeness --linkopt=-Wl,--no-gdb-index --host_linkopt=-static --linkopt=-static --host_linkopt=-Wl,--no-gdb-index --host_linkopt=-fuse-ld=lld --linkopt=-fuse-ld=lld --copt=-Wno-error --cxxopt=-Wno-error=unused-parameter --define=musl=true --host_linkopt=/usr/lib/libc.a  --linkopt=/usr/local/lib/libicui18n.a   --linkopt=/usr/local/lib/libicuuc.a --linkopt=/usr/local/lib/libicudata.a   --action_env=CMAKE=/usr/bin/cmake --repo_env=CMAKE=/usr/bin/cmake --extra_toolchains=//tools/cmake:my_cmake_toolchain  --copt=-DFLATBUFFERS_LOCALE_INDEPENDENT=0 --copt=-Wno-error=nontrivial-memcall --stamp --subcommands --announce_rc --incompatible_enable_cc_toolchain_resolution=true    --cxxopt=--stdlib=libc++ --host_cxxopt=--stdlib=libc++ --linkopt=-lc++ --linkopt=-lc++abi --host_cxxopt=--stdlib=libc++ --host_linkopt=-lc++ --host_linkopt=-lc++abi '
       bazel_options='--verbose_failures --strip=always --config=release --toolchain_resolution_debug=1 --java_runtime_version=local_jdk --tool_java_runtime_version=local_jdk --action_env=PATH='$PATH' --copt=-I/usr/local/include --copt=-Wno-sign-compare --copt=-Wno-error=deprecated-literal-operator --copt=-Wno-error=sign-compare --copt=-Wno-error=nullability-completeness --host_linkopt=-static --linkopt=-static --host_linkopt=-fuse-ld=lld --linkopt=-fuse-ld=lld --copt=-Wno-error --cxxopt=-Wno-error=unused-parameter --define=musl=true --host_linkopt=/usr/lib/libc.a  --linkopt=/usr/local/lib/libicui18n.a --linkopt=/usr/local/lib/libicuuc.a --linkopt=/usr/local/lib/libicudata.a --action_env=CMAKE=/usr/bin/cmake --repo_env=CMAKE=/usr/bin/cmake --extra_toolchains=//tools/cmake:my_cmake_toolchain --copt=-DFLATBUFFERS_LOCALE_INDEPENDENT=0 --copt=-Wno-error=nontrivial-memcall --stamp --subcommands --announce_rc --incompatible_enable_cc_toolchain_resolution=true --cxxopt=--stdlib=libc++ --host_cxxopt=--stdlib=libc++ --linkopt=-lc++ --linkopt=-lc++abi --host_cxxopt=--stdlib=libc++ --host_linkopt=-lc++ --host_linkopt=-lc++abi'
       until bazel --output_user_root=$PWD/../cache fetch ${bazel_options}   -- //:envoy; do echo "retry in some seconds..."; sleep 5; done
       bazel  --output_user_root=$PWD/../cache build ${bazel_options} -- //:envoy
