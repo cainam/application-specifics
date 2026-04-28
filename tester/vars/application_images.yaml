@@ -7,13 +7,14 @@ images:
     user: test_user
     packages: dev-vcs/git
     finish_rootfs_build: |
-      echo 'test_user:x:4523:4523:User performing the tests,,,:/home/test_user:/bin/sh' > "${ROOT}/etc/passwd"
-      echo 'test_user:x:4523:test_user' > "${ROOT}/etc/group"
-      mkdir -p "${ROOT}/home/test_user/.config/containers"
-      echo -e '[storage]\ndriver = "vfs"' > "${ROOT}/home/test_user/.config/containers/storage.conf"
-      chown -R 4523:4523 "${ROOT}/home/test_user"
-      echo "test_user:100000:65536" > "${ROOT}/etc/subuid"
-      echo "test_user:100000:65536" > "${ROOT}/etc/subgid"
+      true
+      #echo 'test_user:x:4523:4523:User performing the tests,,,:/home/test_user:/bin/sh' > "${ROOT}/etc/passwd"
+      #echo 'test_user:x:4523:test_user' > "${ROOT}/etc/group"
+      #mkdir -p "${ROOT}/home/test_user/.config/containers"
+      #echo -e '[storage]\ndriver = "vfs"' > "${ROOT}/home/test_user/.config/containers/storage.conf"
+      #chown -R 4523:4523 "${ROOT}/home/test_user"
+      #echo "test_user:100000:65536" > "${ROOT}/etc/subuid"
+      #echo "test_user:100000:65536" > "${ROOT}/etc/subgid"
 
 - name: molecule
   section: local
