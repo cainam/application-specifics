@@ -17,7 +17,7 @@ spec:
           securityContext:
             fsGroup: {{ kustom.security.runAsGroup }}
           containers:
-          - name: checker
+          - name: tester
             env:
             - name: STORAGE_DRIVER
               value: vfs
@@ -31,6 +31,8 @@ spec:
               value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
             - name: CONTAINER_HOST
               value: ssh://podman@10.10.10.10/run/podman/podman.sock
+            - name: SERVICEACCOUNT
+              name: /var/run/secrets/kubernetes.io/serviceaccount
             image: {{ kustom.image }}
             command:
             - /bin/sh
@@ -53,18 +55,15 @@ spec:
 
               /py_env/bin/python -m molecule  --base-config /home/test_user/home-cluster-deployment/molecule.yaml test --scenario-name test_directory_sync
 
-              #APISERVER="https://kubernetes.default.svc"
-              SERVICEACCOUNT="/var/run/secrets/kubernetes.io/serviceaccount"
               NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
               TOKEN=$(cat ${SERVICEACCOUNT}/token)
-              CACERT=${SERVICEACCOUNT}/ca.crt
 
-              DATA="{\"metadata\":{\"annotations\":{\"$TEST_NAME\":\"${VALUE//\"/\\\"}\"}}}"
+              #DATA="{\"metadata\":{\"annotations\":{\"$TEST_NAME\":\"${VALUE//\"/\\\"}\"}}}"
+              DATA=$(cat /tmp/molecule/results.yaml)
               # patch the configmap
-              curl --cacert "${CACERT}" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
+              curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
                    --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
               while sleep 99; do true; done
-              #podman run -it --rm myregistry.adm13:443/local/base busybox echo 'yaih!'
             securityContext:
               allowPrivilegeEscalation: true
               runAsUser: {{ kustom.security.runAsUser }}

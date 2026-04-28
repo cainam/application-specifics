@@ -1,5 +1,5 @@
 images:
-- name: tester
+- name: XXtester
   requires:
   - molecule
   type: gentoo-image-builder
@@ -22,7 +22,7 @@ images:
   - python3
   type: gentoo-image-builder
   build:
-    packages: app-admin/ansible-molecule app-containers/podman app-shells/bash net-misc/curl #sys-apps/shadow sys-apps/acl sys-apps/attr
+    packages: dev-vcs/git app-admin/ansible-molecule app-containers/podman app-shells/bash net-misc/curl #sys-apps/shadow sys-apps/acl sys-apps/attr
     configure_builder: |
       for p in app-admin/ansible-molecule dev-python/ansible-compat dev-python/click-help-colors dev-python/enrich dev-python/subprocess-tee app-admin/ansible-lint app-misc/check-jsonschema dev-python/regress; do
         echo "$p ~arm64" > /etc/portage/package.accept_keywords/$(basename $p)
