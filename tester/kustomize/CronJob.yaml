@@ -33,6 +33,20 @@ spec:
               value: ssh://podman@10.10.10.10/run/podman/podman.sock
             - name: SERVICEACCOUNT
               value: /var/run/secrets/kubernetes.io/serviceaccount
+            - name: ANSIBLE_STDOUT_CALLBACK
+              value: default
+            - name: ANSIBLE_CALLBACK_ENABLED
+              value: simple_junit
+            - name: ANSIBLE_RESULT_FORMAT
+              value: yaml
+            - name: JUNIT_OUTPUT_DIR
+              value: /tmp/molecule
+            - name: ANSIBLE_REMOTE_TMP
+              value: /tmp/ansible
+            - name: ANSIBLE_ASYNC_DIR
+              value: /tmp/.ansible_async
+            - name: ANSIBLE_CALLBACK_PLUGINS
+              value: /tmp/home/home-cluster-deployment/callback_plugins
             image: {{ kustom.image }}
             command:
             - /bin/sh
@@ -46,6 +60,38 @@ spec:
               rm $HOME/.ssh/known_hosts
               cd $HOME
               git clone --depth 1 --single-branch --recursive https://github.com/cainam/home-cluster-deployment.git
+              cat molecule.yaml <<EOF
+              ---
+              dependency:
+                name: galaxy
+                enabled: false
+              
+              driver:
+                name: podman
+                options:
+                  managed: true
+              platforms:
+                - name: instance
+                  image: myregistry.adm13:443/local/molecule-tester:20260416
+                  etc_hosts:
+                    "molecule-instance": "127.0.0.1"
+                  pre_build_image: true
+                  network: host
+                  security_opts:
+                    - seccomp=unconfined
+              provisioner:
+                name: ansible
+                env:
+                config_options:
+                  defaults:
+                    fact_caching: jsonfile
+                    fact_caching_connection: /tmp/ansible_cache
+                    gather_facts: true
+                    # Ensures the engine knows to load the junit plugin
+                    callbacks_enabled: junit
+              verifier:
+                name: ansible
+              EOF
               cd home-cluster-deployment/roles/shared_helper/
 
               TEST_NAME="foo"
@@ -53,7 +99,9 @@ spec:
               TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
               VALUE="{\"status\":\"$STATUS\",\"time\":\"$TIMESTAMP\"}"
 
-              ANSIBLE_CALLBACK_PLUGINS="${HOME}/home-cluster-deployment/callback_plugins" /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml test --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml create --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml converge --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml verify --scenario-name test_directory_sync
 
               NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
               TOKEN=$(cat ${SERVICEACCOUNT}/token)
