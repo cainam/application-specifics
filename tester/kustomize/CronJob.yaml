@@ -32,7 +32,7 @@ spec:
             - name: CONTAINER_HOST
               value: ssh://podman@10.10.10.10/run/podman/podman.sock
             - name: SERVICEACCOUNT
-              name: /var/run/secrets/kubernetes.io/serviceaccount
+              value: /var/run/secrets/kubernetes.io/serviceaccount
             image: {{ kustom.image }}
             command:
             - /bin/sh
