@@ -40,7 +40,7 @@ images:
       export LD_LIBRARY_PATH=$ROOT/usr/lib
       export USER=root
       ansible-galaxy collection install containers.podman -p ${ROOT}/usr/share/ansible/collections
-    finish_rootfs_build: cp /usr/lib/gcc/aarch64-unknown-linux-musl/15/libgomp.so.1 /usr/lib/gcc/aarch64-unknown-linux-musl/15/libgcc_s.so.1 ${ROOT}/usr/lib
+    Xfinish_rootfs_build: cp /usr/lib/gcc/aarch64-unknown-linux-musl/15/libgomp.so.1 /usr/lib/gcc/aarch64-unknown-linux-musl/15/libgcc_s.so.1 ${ROOT}/usr/lib
 
 - name: molecule-tester
   section: local
