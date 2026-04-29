@@ -60,7 +60,7 @@ spec:
               rm $HOME/.ssh/known_hosts
               cd $HOME
               git clone --depth 1 --single-branch --recursive https://github.com/cainam/home-cluster-deployment.git
-              cat molecule.yaml <<EOF
+              cat >> molecule.yaml <<EOF
               ---
               dependency:
                 name: galaxy
