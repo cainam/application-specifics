@@ -53,7 +53,7 @@ spec:
               TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
               VALUE="{\"status\":\"$STATUS\",\"time\":\"$TIMESTAMP\"}"
 
-              /py_env/bin/python -m molecule  --base-config /home/test_user/home-cluster-deployment/molecule.yaml test --scenario-name test_directory_sync
+              ANSIBLE_CALLBACK_PLUGINS="${HOME}/home-cluster-deployment/callback_plugins" /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml test --scenario-name test_directory_sync
 
               NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
               TOKEN=$(cat ${SERVICEACCOUNT}/token)

@@ -45,7 +45,7 @@ images:
     configure_builder: |
       emerge llvm-core/clang llvm-runtimes/libcxx llvm-core/lld
       printf "%s static-libs\n" dev-libs/icu net-dns/c-ares app-arch/zstd net-libs/nghttp2 sys-libs/zlib >> /etc/portage/package.use/static-libs
-      emerge -1v net-dns/c-ares app-arch/zstd sys-libs/zlib
+      #emerge -1v net-dns/c-ares app-arch/zstd sys-libs/zlib
       # EXTRA_ECONF="--enable-static" emerge -v1 --usepkg=n net-libs/nghttp2
       export PATH=$(stat --printf="%n" /usr/lib/llvm/*/bin):$PATH
       export CC=clang
