@@ -81,7 +81,6 @@ spec:
                     - seccomp=unconfined
               provisioner:
                 name: ansible
-                env:
                 config_options:
                   defaults:
                     fact_caching: jsonfile
@@ -97,17 +96,17 @@ spec:
               TEST_NAME="foo"
               STATUS="bar"
               TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-              VALUE="{\"status\":\"$STATUS\",\"time\":\"$TIMESTAMP\"}"
+              #VALUE="{\"status\":\"$STATUS\",\"time\":\"$TIMESTAMP\"}"
 
-              /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml create --scenario-name test_directory_sync
-              /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml converge --scenario-name test_directory_sync
-              /py_env/bin/python -m molecule  --base-config ${HOME}/home-cluster-deployment/molecule.yaml verify --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml create --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml converge --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml verify --scenario-name test_directory_sync
 
               NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
               TOKEN=$(cat ${SERVICEACCOUNT}/token)
 
-              #DATA="{\"metadata\":{\"annotations\":{\"$TEST_NAME\":\"${VALUE//\"/\\\"}\"}}}"
-              DATA=$(cat /tmp/molecule/results.yaml)
+              VALUE=$(cat /tmp/molecule/results.yaml)
+              DATA="{\"metadata\":{\"annotations\":{\"$TEST_NAME\":\"${VALUE//\"/\\\"}\"}}}"
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
                    --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
