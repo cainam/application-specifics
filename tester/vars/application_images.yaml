@@ -1,5 +1,5 @@
 images:
-- name: XXtester
+- name: xxtester
   requires:
   - molecule
   type: gentoo-image-builder
@@ -17,7 +17,7 @@ images:
       #echo "test_user:100000:65536" > "${ROOT}/etc/subgid"
 
 - name: molecule
-  section: local
+  XXsection: local
   requires:
   - python3
   type: gentoo-image-builder
