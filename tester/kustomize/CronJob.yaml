@@ -116,7 +116,7 @@ spec:
               )
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
-                   --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
+                   --data "${PAYLOAD}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
               #while sleep 99; do true; done
             securityContext:
               runAsUser: {{ kustom.security.runAsUser }}
