@@ -92,6 +92,7 @@ spec:
                     # Ensures the engine knows to load the junit plugin
                     callbacks_enabled: junit
                     local_tmp: ${PWD}/tmp
+                    remote_tmp: ${PWD}/tmp
               verifier:
                 name: ansible
               EOF
