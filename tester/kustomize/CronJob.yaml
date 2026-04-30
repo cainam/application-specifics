@@ -103,6 +103,17 @@ spec:
 
               VALUE=$(cat /tmp/molecule/results.yaml)
               DATA="{\"metadata\":{\"annotations\":{"last_start":"${TIMESTAMP}","${VALUE//\"/\\\"}"}}}"
+              PAYLOAD=$(cat <<EOF
+              {
+                "metadata": {
+                  "annotations": {
+                    "last_start": "${TIMESTAMP}",
+                    "tests": "$(echo $VALUE | sed 's/"/\\"/g')"
+                  }
+                }
+              }
+              EOF
+              )
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
                    --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
