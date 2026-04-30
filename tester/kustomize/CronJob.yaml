@@ -55,11 +55,13 @@ spec:
               # run molecule
               set -x
               env 
-              mkdir -p ~/.ssh
+              cd 
+              mkdir -p ~/.ssh ansible_cache tmp/cp tmp/ansible_cache
+              export TMPDIR="${PWD}/tmp
+              export ANSIBLE_CONTROL_PATH_DIR="${PWD}/tmp/cp"
               cp /tmp/.ssh/* ~/.ssh
               chmod 400 ~/.ssh/*
               rm ~/.ssh/known_hosts
-              cd 
               git clone --depth 1 --single-branch --recursive https://github.com/cainam/home-cluster-deployment.git
               cat >> molecule.yaml <<EOF
               ---
@@ -85,10 +87,11 @@ spec:
                 config_options:
                   defaults:
                     fact_caching: jsonfile
-                    fact_caching_connection: ${PWD}/ansible_cache
+                    fact_caching_connection: ${PWD}/tmp/ansible_cache
                     gather_facts: true
                     # Ensures the engine knows to load the junit plugin
                     callbacks_enabled: junit
+                    local_tmp: ${PWD}/tmp
               verifier:
                 name: ansible
               EOF
@@ -118,7 +121,7 @@ spec:
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
                    --data "${PAYLOAD}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
-              #while sleep 99; do true; done
+              while sleep 99; do true; done
             securityContext:
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}
