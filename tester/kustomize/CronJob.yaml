@@ -111,6 +111,8 @@ spec:
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}
             volumeMounts:
+            - name: tmp
+              mountPath: /tmp
             - name: etc
               mountPath: /etc/passwd
               subPath: etc-passwd
@@ -124,6 +126,8 @@ spec:
               mountPath: /etc/subgid
               subPath: etc-subgid
           volumes:
+          - name: tmp
+            emptyDir: {}
           - name: etc
             configMap:
               name: {{ kustom.name }}
