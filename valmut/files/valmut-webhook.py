@@ -207,15 +207,15 @@ def process_pod_object(req_object, mutate, exemptions=None):
         if sc.get('runAsGroup'):
           messages.append(f"- Container '{c_name}': 'runAsGroup' is set to {sc.get('runAsGroup')}")
           pass # to be implemented if needed
-        elif mutate:
+        elif mutate and if 'user' not in exemption_list:
             patch_ops.append({"op": "replace", "path": sc_path+'/runAsGroup', "value": gid})
         if sc.get('runAsUser'):
           messages.append(f"- Container '{c_name}': 'runAsUser' is set to {sc.get('runAsUser')}")
           pass # to be implemented if needed
-        elif mutate:
+        elif mutate and if 'user' not in exemption_list::
             patch_ops.append({"op": "replace", "path": sc_path+'/runAsUser', "value": uid})
         if mutate:
-            if uid == 0 and 'runAsNonRoot' in exemption_list:
+            if 'runAsNonRoot' in exemption_list and uid == 0:
                 patch_ops.append({"op": "replace", "path": sc_path+'/runAsNonRoot', "value": False })
             else: # enforce runAsNonRoot setting: although normally inherited from Pod, PSA restricted requires this to be set again
                 patch_ops.append({"op": "replace", "path": sc_path+'/runAsNonRoot', "value": True })
