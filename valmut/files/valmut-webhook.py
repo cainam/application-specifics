@@ -207,12 +207,12 @@ def process_pod_object(req_object, mutate, exemptions=None):
         if sc.get('runAsGroup'):
           messages.append(f"- Container '{c_name}': 'runAsGroup' is set to {sc.get('runAsGroup')}")
           pass # to be implemented if needed
-        elif mutate and if 'user' not in exemption_list:
+        elif mutate and 'user' not in exemption_list:
             patch_ops.append({"op": "replace", "path": sc_path+'/runAsGroup', "value": gid})
         if sc.get('runAsUser'):
           messages.append(f"- Container '{c_name}': 'runAsUser' is set to {sc.get('runAsUser')}")
           pass # to be implemented if needed
-        elif mutate and if 'user' not in exemption_list::
+        elif mutate and 'user' not in exemption_list::
             patch_ops.append({"op": "replace", "path": sc_path+'/runAsUser', "value": uid})
         if mutate:
             if 'runAsNonRoot' in exemption_list and uid == 0:
