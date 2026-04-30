@@ -4,7 +4,7 @@ metadata:
   name: {{ kustom.name }}
 spec:
   schedule: "*/5 * * * *" # Runs every 5 minutes
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Replace
   jobTemplate:
     spec:
       template:
@@ -35,10 +35,6 @@ spec:
               value: simple_junit
             - name: ANSIBLE_RESULT_FORMAT
               value: yaml
-            - name: JUNIT_OUTPUT_DIR
-              value: ~/molecule
-            - name: ANSIBLE_REMOTE_TMP
-              value: ~/ansible
             - name: ANSIBLE_ASYNC_DIR
               value: ~/.ansible_async
             - name: ANSIBLE_CALLBACK_PLUGINS
@@ -56,6 +52,7 @@ spec:
               export TMPDIR="${PWD}/tmp"
               export CONTAINER_SSHKEY="${PWD}/.ssh/key"
               export ANSIBLE_CONTROL_PATH_DIR="${PWD}/tmp/cp"
+              export JUNIT_OUTPUT_DIR="${PWD}/molecule"
               cp /tmp/.ssh/* ~/.ssh
               chmod 400 ~/.ssh/*
               rm ~/.ssh/known_hosts
@@ -65,7 +62,6 @@ spec:
               dependency:
                 name: galaxy
                 enabled: false
-              
               driver:
                 name: podman
                 options:
@@ -119,7 +115,7 @@ spec:
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
                    --data "${PAYLOAD}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
-              while sleep 99; do true; done
+              #while sleep 99; do true; done
             securityContext:
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}
