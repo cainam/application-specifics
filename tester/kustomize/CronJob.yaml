@@ -123,7 +123,7 @@ spec:
             - name: etc
               mountPath: /etc/subgid
               subPath: etc-subgid
-                    - name: etc
           volumes:
+          - name: etc
             configMap:
               name: {{ kustom.name }}
