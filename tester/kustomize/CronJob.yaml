@@ -55,7 +55,7 @@ spec:
               export JUNIT_OUTPUT_DIR="${PWD}/molecule"
               cp /tmp/.ssh/* ~/.ssh
               chmod 400 ~/.ssh/*
-              rm ~/.ssh/known_hosts
+              # rm ~/.ssh/known_hosts
               git clone --depth 1 --single-branch --recursive https://github.com/cainam/home-cluster-deployment.git
               cat >> molecule.yaml <<EOF
               ---
