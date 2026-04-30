@@ -23,10 +23,6 @@ spec:
               value: vfs
             - name: APISERVER
               value: https://kubernetes.default.svc
-            - name: CONTAINER_SSHKEY
-              value: ~/.ssh/key
-            - name: XHOME
-              value: /tmp/home
             - name: PODMAN_SSH_OPTS
               value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
             - name: CONTAINER_HOST
@@ -58,6 +54,7 @@ spec:
               cd 
               mkdir -p ~/.ssh ansible_cache tmp/cp tmp/ansible_cache
               export TMPDIR="${PWD}/tmp"
+              export CONTAINER_SSHKEY="${PWD}/.ssh/key"
               export ANSIBLE_CONTROL_PATH_DIR="${PWD}/tmp/cp"
               cp /tmp/.ssh/* ~/.ssh
               chmod 400 ~/.ssh/*
