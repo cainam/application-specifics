@@ -57,7 +57,7 @@ spec:
               env 
               cd 
               mkdir -p ~/.ssh ansible_cache tmp/cp tmp/ansible_cache
-              export TMPDIR="${PWD}/tmp
+              export TMPDIR="${PWD}/tmp"
               export ANSIBLE_CONTROL_PATH_DIR="${PWD}/tmp/cp"
               cp /tmp/.ssh/* ~/.ssh
               chmod 400 ~/.ssh/*
