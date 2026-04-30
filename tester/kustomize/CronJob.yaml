@@ -24,8 +24,8 @@ spec:
             - name: APISERVER
               value: https://kubernetes.default.svc
             - name: CONTAINER_SSHKEY
-              value: /tmp/home/.ssh/key
-            - name: HOME
+              value: ~/.ssh/key
+            - name: XHOME
               value: /tmp/home
             - name: PODMAN_SSH_OPTS
               value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
@@ -40,13 +40,13 @@ spec:
             - name: ANSIBLE_RESULT_FORMAT
               value: yaml
             - name: JUNIT_OUTPUT_DIR
-              value: /tmp/molecule
+              value: ~/molecule
             - name: ANSIBLE_REMOTE_TMP
-              value: /tmp/ansible
+              value: ~/ansible
             - name: ANSIBLE_ASYNC_DIR
-              value: /tmp/.ansible_async
+              value: ~/.ansible_async
             - name: ANSIBLE_CALLBACK_PLUGINS
-              value: /tmp/home/home-cluster-deployment/callback_plugins
+              value: ~/home-cluster-deployment/callback_plugins
             image: {{ kustom.image }}
             command:
             - /bin/sh
@@ -54,11 +54,11 @@ spec:
             - |
               # run molecule
               set -x
-              mkdir -p $HOME/.ssh
-              cp /tmp/.ssh/* $HOME/.ssh
-              chmod 400 $HOME/.ssh/*
-              rm $HOME/.ssh/known_hosts
-              cd $HOME
+              mkdir -p ~/.ssh
+              cp /tmp/.ssh/* ~/.ssh
+              chmod 400 ~/.ssh/*
+              rm ~/.ssh/known_hosts
+              cd 
               git clone --depth 1 --single-branch --recursive https://github.com/cainam/home-cluster-deployment.git
               cat >> molecule.yaml <<EOF
               ---
@@ -101,7 +101,7 @@ spec:
               /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml converge --scenario-name test_directory_sync
               /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml verify --scenario-name test_directory_sync
 
-              VALUE=$(cat /tmp/molecule/results.yaml)
+              VALUE=$(cat "${JUNIT_OUTPUT_DIR}/results.yaml")
               DATA="{\"metadata\":{\"annotations\":{"last_start":"${TIMESTAMP}","${VALUE//\"/\\\"}"}}}"
               PAYLOAD=$(cat <<EOF
               {
@@ -122,8 +122,8 @@ spec:
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}
             volumeMounts:
-            - name: tmp
-              mountPath: /tmp
+            - name: home
+              mountPath: /home/{{ kustom.name }}
             - name: ssh-auth
               mountPath: /tmp/.ssh
               readOnly: true
@@ -140,7 +140,7 @@ spec:
               mountPath: /etc/subgid
               subPath: etc-subgid
           volumes:
-          - name: tmp
+          - name: home
             emptyDir: {}
           - name: ssh-auth
             secret:

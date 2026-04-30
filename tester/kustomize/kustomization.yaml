@@ -14,11 +14,10 @@ configMapGenerator:
 
 - name: {{ kustom.name }}
   literals:
-  - etc-passwd="{{ kustom.name }}:x:{{ kustom.security.runAsUser }}:{{ kustom.security.runAsGroup }}:,,,:/home/myuser:/bin/bash"
+  - etc-passwd="{{ kustom.name }}:x:{{ kustom.security.runAsUser }}:{{ kustom.security.runAsGroup }}:,,,:/home/{{ kustom.name }}:/bin/bash"
   - etc-group="{{ kustom.name }}:x:{{ kustom.security.runAsGroup }}:"
   - etc-subuid="{{ kustom.name }}:100000:65536"
   - etc-subgid="{{ kustom.name }}:100000:65536"
-
 
 secretGenerator:
 - name: {{ kustom.name }}
