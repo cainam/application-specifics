@@ -54,6 +54,7 @@ spec:
             - |
               # run molecule
               set -x
+              env 
               mkdir -p ~/.ssh
               cp /tmp/.ssh/* ~/.ssh
               chmod 400 ~/.ssh/*
@@ -84,7 +85,7 @@ spec:
                 config_options:
                   defaults:
                     fact_caching: jsonfile
-                    fact_caching_connection: /tmp/ansible_cache
+                    fact_caching_connection: ${PWD}/ansible_cache
                     gather_facts: true
                     # Ensures the engine knows to load the junit plugin
                     callbacks_enabled: junit
