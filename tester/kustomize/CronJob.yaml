@@ -91,76 +91,22 @@ spec:
               verifier:
                 name: ansible
               EOF
-              cd home-cluster-deployment/roles/shared_helper/
-
-              TEST_NAME="foo"
-              STATUS="bar"
+              NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
+              TOKEN=$(cat ${SERVICEACCOUNT}/token)
               TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-              #VALUE="{\"status\":\"$STATUS\",\"time\":\"$TIMESTAMP\"}"
+
+              cd home-cluster-deployment/roles/shared_helper/
 
               /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml create --scenario-name test_directory_sync
               /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml converge --scenario-name test_directory_sync
               /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml verify --scenario-name test_directory_sync
 
-              NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
-              TOKEN=$(cat ${SERVICEACCOUNT}/token)
-
               VALUE=$(cat /tmp/molecule/results.yaml)
-              DATA="{\"metadata\":{\"annotations\":{\"$TEST_NAME\":\"${VALUE//\"/\\\"}\"}}}"
+              DATA="{\"metadata\":{\"annotations\":{"last_start":"${TIMESTAMP}","${VALUE//\"/\\\"}"}}}"
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
                    --data "${DATA}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
-              while sleep 99; do true; done
+              #while sleep 99; do true; done
             securityContext:
-              allowPrivilegeEscalation: true
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}
-              seccompProfile:
-                type: RuntimeDefault
-              #  type: Localhost
-              #  localhostProfile: podman.json
-              capabilities:
-                add: ["SETUID","SETGID","SYS_ADMIN"]
-            volumeMounts:
-            - name: tmp
-              mountPath: /tmp
-            - name: varlibcontainers
-              mountPath: /var/lib/containers
-            - name: tun
-              mountPath: /dev/net/tun
-            - name: {{ kustom.name }}-certs
-              mountPath: /etc/certs
-              readOnly: true
-            - name: etc
-              mountPath: /etc/passwd
-              subPath: etc-passwd
-            - name: etc
-              mountPath: /etc/group
-              subPath: etc-group
-            - name: etc
-              mountPath: /etc/subuid
-              subPath: etc-subuid
-            - name: etc
-              mountPath: /etc/subgid
-              subPath: etc-subgid
-            - name: ssh-auth
-              mountPath: /tmp/.ssh
-              readOnly: true
-          volumes:
-          - name: tmp
-            emptyDir: {}
-          - name: varlibcontainers
-            emptyDir: {}
-          - name: tun
-            hostPath:
-              path: /dev/net/tun
-          - name: {{ kustom.name }}-certs
-            configMap:
-              name: {{ kustom.name }}-certs
-          - name: etc
-            configMap:
-              name: {{ kustom.name }}
-          - name: ssh-auth
-            secret:
-              secretName: {{ kustom.name }}
-              defaultMode: 0400
