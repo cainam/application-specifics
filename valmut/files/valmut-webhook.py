@@ -161,14 +161,18 @@ def process_pod_object(req_object, mutate, exemptions=None):
               messages.append(f"- adding emptyDir volumeMount in container {c_name} for {ed['path']}")
               patch_ops.append({"op": "add", "path": container_path+"/volumeMounts/-", "value": {'name': ed['name'], 'mountPath': ed['path'] } })
 
-        if config.get('set') is not None and config.get('set').get(c_name) is not None and config.get('set').get(c_name).get('uid') is not None:
+        if 'user' in exemption_list:
+          messages.append(f"- Container '{c_name}' - user treatment is exempted")
+        else:
+          if config.get('set') is not None and config.get('set').get(c_name) is not None and config.get('set').get(c_name).get('uid') is not None:
             uid = config['set'][c_name]['uid']
-        else:
+          else:
             uid = random.randint(2**16, 2**31-1)
-        if config.get('set') is not None and config.get('set').get(c_name) is not None and config.get('set').get(c_name).get('gid') is not None:
+          if config.get('set') is not None and config.get('set').get(c_name) is not None and config.get('set').get(c_name).get('gid') is not None:
             gid = config['set'][c_name]['gid']
-        else:
+          else:
             gid = random.randint(2**16, 2**31-1)
+
         set_caps = []
         if config.get('set') is not None and config.get('set').get(c_name) is not None and config.get('set').get(c_name).get('caps') is not None:
             set_caps = config['set'][c_name]['caps']

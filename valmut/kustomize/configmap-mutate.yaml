@@ -12,9 +12,10 @@ data:
             identifiedBy: label
             label: app.kubernetes.io/name
             exemptions:
-            - hostPath
-            - allowPrivilegeEscalation
-            - caps_add
+            - user
+            - XhostPath
+            - XallowPrivilegeEscalation
+            - Xcaps_add
             kljsdfcaps:
             - SETUID
             - SETGID
