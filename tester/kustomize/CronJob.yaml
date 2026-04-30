@@ -110,3 +110,20 @@ spec:
             securityContext:
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}
+            volumeMounts:
+            - name: etc
+              mountPath: /etc/passwd
+              subPath: etc-passwd
+            - name: etc
+              mountPath: /etc/group
+              subPath: etc-group
+            - name: etc
+              mountPath: /etc/subuid
+              subPath: etc-subuid
+            - name: etc
+              mountPath: /etc/subgid
+              subPath: etc-subgid
+                    - name: etc
+          volumes:
+            configMap:
+              name: {{ kustom.name }}
