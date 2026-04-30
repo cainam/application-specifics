@@ -113,6 +113,9 @@ spec:
             volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: ssh-auth
+              mountPath: /tmp/.ssh
+              readOnly: true
             - name: etc
               mountPath: /etc/passwd
               subPath: etc-passwd
@@ -128,6 +131,10 @@ spec:
           volumes:
           - name: tmp
             emptyDir: {}
+          - name: ssh-auth
+            secret:
+              secretName: {{ kustom.name }}
+              defaultMode: 0400
           - name: etc
             configMap:
               name: {{ kustom.name }}
