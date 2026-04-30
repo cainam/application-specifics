@@ -82,7 +82,7 @@ def services_status(request: Request):
     output={}
     output["registry"] = subprocess.run(["curl","-k","-s","-X","GET","-I",registry+"/v2/_catalog"], capture_output=True).stdout.decode('ascii')
 
-    stage3_html = subprocess.run(["curl","-s","http://distfiles.gentoo.org/releases/arm64/autobuilds/current-stage3-arm64-musl-hardened-openrc/"], capture_output=True).stdout.decode('ascii')
+    stage3_html = subprocess.run(["curl","-s","http://distfiles.gentoo.org/releases/arm64/autobuilds/current-stage3-arm64-musl-hardened-openrc/"], capture_output=True, text=True, encoding='utf-8').stdout
     stage3_pattern = re.compile(r'<a\s+href=["\'](.*?\.tar\.xz)["\'][^>]*>', re.IGNORECASE)
     stage3_match = stage3_pattern.search(stage3_html)
     output['stage3'] = stage3_match.group(1) if stage3_match else ''
