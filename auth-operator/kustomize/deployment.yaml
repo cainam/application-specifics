@@ -55,4 +55,4 @@ spec:
       volumes:
       - name: {{ kustom.name }}
         configMap:
-          claimName: {{ kustom.name }}
+          name: {{ kustom.name }}
