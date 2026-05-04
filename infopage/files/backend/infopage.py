@@ -8,7 +8,9 @@ namespace = open(serviceaccount+'/namespace', 'r').read()
 headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
 
 def test_results():
+  import json
   CRONJOB_NAME='tester'
+
   try:
     response = requests.get(f"{apiserver}/apis/batch/v1/namespaces/{namespace}/cronjobs/{CRONJOB_NAME}", verify=cacert, headers=headers)
     response.raise_for_status()
@@ -18,9 +20,11 @@ def test_results():
     for key, value in annotations.items():
         print(f"  {key}: {value}")
     print("type of tests: "+str(type(annotations.get('tests', []))))
+    tests = json.loads(annotations.get('tests', [])
+    print("type of tests loaded: "+str(type(tests)))
   except Exception as e:
     print(f"Error fetching test_results: {e}")
-  return annotations.get('last_start', 'no date'), annotations.get('tests', [])
+  return annotations.get('last_start', 'no date'), tests
 
   
 def vs_info():
