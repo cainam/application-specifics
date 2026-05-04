@@ -10,7 +10,7 @@ headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
 def test_results():
   CRONJOB_NAME='tester'
   try:
-    response = requests.get(apiserver+"/apis/batch/v1/namespaces/{namespac}/cronjobs/{CRONJOB_NAME}", verify=cacert, headers=headers)
+    response = requests.get(f"{apiserver}/apis/batch/v1/namespaces/{namespace}/cronjobs/{CRONJOB_NAME}", verify=cacert, headers=headers)
     response.raise_for_status()
     cronjob =  response.json()
     annotations = cronjob.get("metadata", {}).get("annotations", {})
