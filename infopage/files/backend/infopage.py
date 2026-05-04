@@ -24,7 +24,7 @@ def test_results():
     print("type of tests loaded: "+str(type(tests)))
   except Exception as e:
     print(f"Error fetching test_results: {e}")
-  return annotations.get('last_start', 'no date'), tests
+  return annotations.get('last_start', 'no date'), tests['tests']
 
   
 def vs_info():
