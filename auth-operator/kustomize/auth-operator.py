@@ -6,6 +6,7 @@ import os
 import base64
 import yaml
 import requests
+import logging
 
 # env vars: namespace oauth2-proxy, hydra, secret, client_name, redirect_url, etc.
 redirect_url = os.environ.get('REDIRECT_URL')
