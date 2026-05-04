@@ -142,14 +142,13 @@ async def delete_image(request: Request):
 def registry_images(request: Request):
   import requests
 
-  serviceaccount = "/var/run/secrets/kubernetes.io/serviceaccount"
-  cacert = serviceaccount+"/ca.crt"
+  cacert = '/certs/service-ca-bundle.crt'
   headers = {}
-  images = requests.get(registry+"/v2/_catalog", verify=False, headers=headers).json()
+  images = requests.get(registry+"/v2/_catalog", verify=cacert, headers=headers).json()
 
   images_list = []
   for i in images["repositories"]:
-    versions = requests.get(registry+"/v2/"+i+"/tags/list", verify=False, headers=headers).json()
+    versions = requests.get(registry+"/v2/"+i+"/tags/list", verify=cacert, headers=headers).json()
     if versions["tags"] is None:
       images_list.append([i, 'None'])
     else:
