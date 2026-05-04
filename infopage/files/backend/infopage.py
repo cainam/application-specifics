@@ -20,7 +20,7 @@ def test_results():
     for key, value in annotations.items():
         print(f"  {key}: {value}")
     print("type of tests: "+str(type(annotations.get('tests', []))))
-    tests = json.loads(annotations.get('tests', [])
+    tests = json.loads(annotations.get('tests', []))
     print("type of tests loaded: "+str(type(tests)))
   except Exception as e:
     print(f"Error fetching test_results: {e}")
