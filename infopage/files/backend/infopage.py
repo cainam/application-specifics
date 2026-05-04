@@ -4,8 +4,24 @@ serviceaccount = "/var/run/secrets/kubernetes.io/serviceaccount"
 cacert = serviceaccount+"/ca.crt"
 apiserver = "https://kubernetes.default.svc"
 token = open(serviceaccount+'/token', 'r').read()
+namespace = open(serviceaccount+'/namespace', 'r').read()
 headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
 
+def test_results():
+  CRONJOB_NAME='tester'
+  try:
+    response = requests.get(apiserver+"/apis/batch/v1/namespaces/{namespac}/cronjobs/{CRONJOB_NAME}", verify=cacert, headers=headers).json()
+    response.raise_for_status()
+    cronjob =  response.json()
+    annotations = cronjob.get("metadata", {}).get("annotations", {})
+    print(f"Annotations for {CRONJOB_NAME}:")
+    for key, value in annotations.items():
+        print(f"  {key}: {value}")
+
+  except Exception as e:
+    print(f"Error fetching test_results: {e}")
+
+  
 def vs_info():
   # list all namespaces
   content = []

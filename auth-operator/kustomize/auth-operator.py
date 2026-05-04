@@ -15,11 +15,15 @@ hydra_service = os.environ.get('HYDRA_SERVICE')
 hydra_service_port = os.environ.get('HYDRA_SERVICE_PORT') # "4445"
 hydra_search_label_key = os.environ.get('HYDRA_SEARCH_LABEL_KEY')
 hydra_search_label_value = os.environ.get('HYDRA_SEARCH_LABEL_VALUE')
+kopf_restart_request = 60
+kopf_request_timeout = 5.0
 
 @kopf.on.startup()
 def configure(settings: kopf.OperatorSettings, **_):
     # Disable cluster-wide namespace scanning
     settings.scanning.disabled = True
+    settings.networking.cluster_connection_timeout = 300.0
+    logging.getLogger('kopf').setLevel(logging.INFO)
 
 # extend with decorator for hydra
 @kopf.on.create('pods', labels={'app.kubernetes.io/instance': 'hydra'} )
@@ -27,11 +31,12 @@ async def fun2(namespace, spec, body, logger, **kwargs):
   d = dict(body)
   logger.debug(json.dumps(d, indent=4))
 
-  s = body.get("status")
+  s = body.get("status", {})
   logger.debug("status, type:"+str(type(s))+" content:"+json.dumps(s, indent=4)  )
-  logger.info("status phase:"+s["phase"] )
+  phase = s.get("phase", "Unknown")
+  logger.info("status phase:"+phase )
 
-  if s["phase"] != "Running":
+  if phase != "Running":
     raise kopf.TemporaryError(f"Pod is not ready yet", delay=10)
 
   api = kubernetes.client.CoreV1Api()
@@ -47,7 +52,12 @@ async def fun2(namespace, spec, body, logger, **kwargs):
 
   # is a client_id set on hydra with same - client_secret should be checked too implementation left as TODO
   url = 'http://'+hydra_service+'.'+namespace+':'+hydra_service_port+'/clients'
-  response = requests.get(url)
+  try:
+    response = requests.get(url, timeout=kopf_request_timeout)
+  except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+    # Tell Kopf to log this and retry in xx seconds
+    raise kopf.TemporaryError("Hydra is sleepy, retrying...", delay=kopf_restart_request)
+
   client_missing = True
   for x in response.json():
     if x['client_id'] == client_id:
@@ -67,7 +77,13 @@ async def fun2(namespace, spec, body, logger, **kwargs):
       'token_endpoint_auth_method': 'client_secret_post'
     }
     logger.info("request for new client"+str(client_request))
-    response = requests.post(url, json=client_request)
+    try:
+      response = requests.post(url, json=client_request, timeout=kopf_request_timeout)
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+      # Tell Kopf to log this and retry in xx seconds
+      raise kopf.TemporaryError("Hydra is sleepy, retrying...", delay=kopf_restart_request)
+
+
     logger.info("HTTP status of client creation request:"+str(response))
 
 #kopf.run()
