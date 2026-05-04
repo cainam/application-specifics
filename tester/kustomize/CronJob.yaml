@@ -5,6 +5,8 @@ metadata:
 spec:
   schedule: "*/5 * * * *" # Runs every 5 minutes
   concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
@@ -26,7 +28,7 @@ spec:
             - name: PODMAN_SSH_OPTS
               value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
             - name: CONTAINER_HOST
-              value: ssh://podman@10.10.10.10/run/podman/podman.sock
+              value: ssh://podman@podman.adm13/run/podman/podman.sock
             - name: SERVICEACCOUNT
               value: /var/run/secrets/kubernetes.io/serviceaccount
             - name: ANSIBLE_STDOUT_CALLBACK
@@ -48,7 +50,7 @@ spec:
               set -x
               env 
               cd 
-              mkdir -p ~/.ssh ansible_cache tmp/cp tmp/ansible_cache
+              mkdir -p ~/.ssh tmp/cp tmp/ansible_cache
               export TMPDIR="${PWD}/tmp"
               export CONTAINER_SSHKEY="${PWD}/.ssh/key"
               export ANSIBLE_CONTROL_PATH_DIR="${PWD}/tmp/cp"
