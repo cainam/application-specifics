@@ -5,6 +5,6 @@ resources:
 
 configMapGenerator:
   - name: {{ kustom.name }}
-    behavior: replace
+    #behavior: replace
     files:
       - {{ kustom.name }}.py
