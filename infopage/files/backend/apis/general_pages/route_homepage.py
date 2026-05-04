@@ -48,20 +48,17 @@ class LogFilter(logging.Filter):
 uvicorn_logger = logging.getLogger("uvicorn.access")
 uvicorn_logger.addFilter(LogFilter())
 
-#logging.getLogger("uvicorn.access").setLevel(logging.CRITICAL)
 @general_pages_router.get("/")
 async def home(request: Request):
 	return templates.TemplateResponse(request=request,name="general_pages/homepage.html",context={})
 
 @general_pages_router.get("/check")
-#@log
 async def check(request: Request):
     return "ok"
 
 #logging.getLogger("uvicorn.access").setLevel(logging.DEBUG)
 
 @general_pages_router.get("/node_status")
-#@log
 async def node_status(request: Request):
     content = infopage.node_info()
     return templates.TemplateResponse(request=request,name="general_pages/node_info.html",context={"nodes": content, "name": "node status"})
@@ -71,9 +68,12 @@ async def vs(request: Request):
     content = infopage.vs_info()
     return templates.TemplateResponse(request=request,name="general_pages/vs_info.html",context={"vss": content, "name": "virtual services"})
 
+@general_pages_router.get("/test_results")
+async def test_results(request: Request):
+    content = infopage.test_results()
+    return templates.TemplateResponse(request=request,name="general_pages/vs_info.html",context={"vss": content, "name": "virtual services"})
 
 @general_pages_router.get("/services_status")
-#@log
 #async def services_status(request: Request):
 def services_status(request: Request):
     import re, requests
@@ -145,8 +145,6 @@ def registry_images(request: Request):
   serviceaccount = "/var/run/secrets/kubernetes.io/serviceaccount"
   cacert = serviceaccount+"/ca.crt"
   headers = {}
-
-  content = []
   images = requests.get(registry+"/v2/_catalog", verify=False, headers=headers).json()
 
   images_list = []
@@ -159,12 +157,6 @@ def registry_images(request: Request):
         images_list.append([i, t])
 
   return templates.TemplateResponse(request=request,name="general_pages/images_list.html",context={"images_list": images_list, "name": "registry images" } )
-
-# @general_pages_router.get("/software")
-# #async def software(request: Request):
-# def software(request: Request, name: str | None = None):
-#     raw, content = infopage.software()
-#     return templates.TemplateResponse("general_pages/software.html",{"request":request, "content": content, "raw": raw, "name": "software"})
 
 @general_pages_router.get("/software")
 #async def software(request: Request):

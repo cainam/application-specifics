@@ -25,7 +25,8 @@
 
     <table class="oTable"><tr>
       <td><div class="tab-section" data-tab="status" itemprop="load" value="/node_status"> </div></td>
-      <td><div class="tab-section" data-tab="status" itemprop="load" value="/services_status"> </div></td>
+      <td><div class="tab-section" data-tab="status" itemprop="load" value="/test_results"> </div></td>
+     </tr><tr><td><div class="tab-section" data-tab="status" itemprop="load" value="/services_status"> </div></td>
     </tr></table>
     </div>
   </div>
@@ -88,15 +89,3 @@
 </style>
 {% endblock %}
 
-
-{% block contentold %} 
-  <table class="oTable"><tr>
-    <td><div itemprop="load" value="/virtual_services"> </div></td>
-    <td><div itemprop="load" value="/registry_images"> </div></td>
-    <td><div itemprop="load" value="/software"> </div> </td>
-  </tr></table>
-  <table class="oTable"><tr>
-    <td><div itemprop="load" value="/software"> </div> </td>
-  </tr></table>
-  <iframe name="null"  style="display: none;"></iframe> {# used as target for form actions #}
-{% endblock %} 
