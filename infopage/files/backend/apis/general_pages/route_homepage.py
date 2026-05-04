@@ -31,7 +31,7 @@ def log(func):
 
 templates = Jinja2Templates(directory="templates")
 general_pages_router = APIRouter()
-registry = "https://10.10.10.10:443"
+registry = "https://myregistry.adm13:443"
 	
 loglev = logging.getLogger("uvicorn.access").level
 
@@ -122,16 +122,17 @@ def services_status(request: Request):
 async def delete_image(request: Request):
     import requests, hashlib
 
+    cacert = '/certs/service-ca-bundle.crt'
     payload = await request.json()
     logger.info("/delete_image called, body: "+str(payload ) )
 
     # header includes digest already, but I went to compute it from the body
     headers = {'Accept': 'application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json'}
-    manifest = requests.get(registry+"/v2/"+payload["image"]+"/manifests/"+payload["tag"], verify=False, headers=headers)
+    manifest = requests.get(registry+"/v2/"+payload["image"]+"/manifests/"+payload["tag"], verify=cacert, headers=headers)
     hexdigest = hashlib.sha256(manifest.text.encode()).hexdigest()
     logger.info("digest for deletion: "+hexdigest)
     
-    del_return = requests.delete(registry+"/v2/"+payload["image"]+"/manifests/sha256:"+hexdigest, verify=False, headers=headers)
+    del_return = requests.delete(registry+"/v2/"+payload["image"]+"/manifests/sha256:"+hexdigest, verify=cacert, headers=headers)
     #logger("del_return: "+str(del_return))
 
     logger.info("status:"+str(del_return.status_code))
