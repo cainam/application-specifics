@@ -20,3 +20,6 @@ rules:
   - pods
   verbs:
   - list
+- apiGroups: ["batch"]
+  resources: ["cronjobs"]
+  verbs: ["get", "list"]
