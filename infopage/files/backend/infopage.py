@@ -28,7 +28,9 @@ def vs_info():
   namespaces = requests.get(apiserver+"/api/v1/namespaces/", verify=cacert, headers=headers).json()
   for n in namespaces["items"]:
     namespace = n["metadata"]["name"]
-    vss = requests.get(apiserver+"/apis/networking.istio.io/v1beta1/namespaces/"+namespace+"/virtualservices/", verify=cacert, headers=headers).json()
+    vss_res = requests.get(apiserver+"/apis/networking.istio.io/v1/namespaces/"+namespace+"/virtualservices/", verify=cacert, headers=headers)
+    vss_res.raise_for_status()
+    vss = vss_res.json()
     for vs in vss["items"]:
       #print(vs["metadata"]["name"])
       #print(vs["spec"]["hosts"])

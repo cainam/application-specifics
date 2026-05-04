@@ -6,6 +6,16 @@ resources:
 - service.yaml
 - serviceaccount.yaml
 
+
+configMapGenerator:
+- name: {{ kustom.name }}-certs
+  literals:
+  - |
+    service-ca-bundle.crt={{ application_playbooks[application.key].vars.ca_bundle | indent(4) }}
+
+generatorOptions:
+  disableNameSuffixHash: true
+
 patches:
   - path: service-ports.yaml
     target:
