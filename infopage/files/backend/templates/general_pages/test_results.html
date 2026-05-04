@@ -1,0 +1,16 @@
+<hr/>{{ name }}<br/>
+<hr/>
+<table class="iTable">
+
+<tr><th>test name</th><th>test results</th><th>duration</th></tr>
+        {% if tests %}
+        {% for t in tests %}
+	<tr>
+	{% for i in t %}
+	  <td>{{ i }}</td>
+	{% endfor %}
+	</tr>
+
+        {% endfor %}
+        {% endif %}
+</table>

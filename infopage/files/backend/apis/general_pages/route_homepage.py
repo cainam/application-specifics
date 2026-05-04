@@ -70,8 +70,8 @@ async def vs(request: Request):
 
 @general_pages_router.get("/test_results")
 async def test_results(request: Request):
-    content = infopage.test_results()
-    return templates.TemplateResponse(request=request,name="general_pages/vs_info.html",context={"vss": content, "name": "virtual services"})
+    last_start, tests = infopage.test_results()
+    return templates.TemplateResponse(request=request,name="general_pages/vs_info.html",context={"tests": tests, "name": "test results"})
 
 @general_pages_router.get("/services_status")
 #async def services_status(request: Request):
