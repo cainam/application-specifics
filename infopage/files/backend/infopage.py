@@ -17,6 +17,7 @@ def test_results():
     print(f"Annotations for {CRONJOB_NAME}:")
     for key, value in annotations.items():
         print(f"  {key}: {value}")
+    print("type of tests: "+str(type(annotations.get('tests', []))))
   except Exception as e:
     print(f"Error fetching test_results: {e}")
   return annotations.get('last_start', 'no date'), annotations.get('tests', [])
