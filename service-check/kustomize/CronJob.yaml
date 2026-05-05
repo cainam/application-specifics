@@ -4,6 +4,9 @@ metadata:
   name: {{ kustom.name }}
 spec:
   schedule: "*/5 * * * *" # Runs every 5 minutes
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
