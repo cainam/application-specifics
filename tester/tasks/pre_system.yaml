@@ -4,7 +4,8 @@
       {% for file in local_ca_files %}
       {{ lookup('file', cert_path ~'/'~ file) }}
       {% endfor %}
+    ca_ssh: {{ lookup('file', cert_path ~ '/ssh_ca.pub') }}
   set_fact:
-    application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'ca_bundle': ca_bundle, 'uid': (2**31-1)|random(65536), 'gid': (2**31-1)|random(65536)  }} }, recursive=True) }}"
+    application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'ca_bundle': ca_bundle, 'uid': (2**31-1)|random(65536), 'gid': (2**31-1)|random(65536) , 'ca_ssh': ca_ssh}} }, recursive=True) }}"
     
  
