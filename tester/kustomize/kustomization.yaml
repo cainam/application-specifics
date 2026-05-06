@@ -22,7 +22,8 @@ configMapGenerator:
 secretGenerator:
 - name: {{ kustom.name }}
   literals:
-  - key={{ ssh_keys.podman.key | indent(4) }}
+  - |
+    key={{ ssh_keys.podman.key | indent(4) }}
   - known_hosts=@cert-authority {{ inventory_hostname }},{% for l in net.virtual_ips %}{{ l.ip }}{% for n in l.names %},{{ n }}{%endfor %}{% endfor %} {{ application_playbooks[application.key].vars.ca_ssh }}
 
 generatorOptions:
