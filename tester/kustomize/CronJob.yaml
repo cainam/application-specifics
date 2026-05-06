@@ -25,7 +25,7 @@ spec:
               value: vfs
             - name: APISERVER
               value: https://kubernetes.default.svc
-            - name: PODMAN_SSH_OPTS
+            - name: XXXPODMAN_SSH_OPTS
               value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
             - name: CONTAINER_HOST
               value: ssh://podman@podman.adm13/run/podman/podman.sock
