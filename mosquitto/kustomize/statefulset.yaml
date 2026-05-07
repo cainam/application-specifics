@@ -27,6 +27,9 @@ spec:
       initContainers:
       - name: setup-passwd
         image: {{ kustom.image }}
+        securityContext:
+          runAsUser: {{ kustom.security.runAsUser }}
+          runAsGroup: {{ kustom.security.fsGroup }}
         command: ["sh", "-c"]
         args: 
             - |
