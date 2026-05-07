@@ -34,15 +34,9 @@ spec:
         args: 
             - |
               set -x
-              ls -ld /{{ kustom.name }}/data
-              ls -Rtl /{{ kustom.name }}/data
-              id
               echo "mosquitto:x:{{ kustom.security.runAsUser }}:{{ kustom.security.fsGroup }}:mosquitto:/var/empty:/sbin/nologin" > /mnt/passwd
               echo "mosquitto:x:{{ kustom.security.fsGroup }}:" > /mnt/group
-              #chown -R {{ kustom.security.runAsUser }}:{{ kustom.security.fsGroup }} /{{ kustom.name }}/data/
         volumeMounts:
-        - name: data
-          mountPath: /{{ kustom.name }}/data
         - name: writable
           mountPath: /mnt
       containers:
