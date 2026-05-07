@@ -31,7 +31,8 @@ spec:
         args: 
             - |
               set -x
-              ls -Rtl /mnt
+              ls -ld /{{ kustom.name }}/data
+              ls -Rtl /{{ kustom.name }}/data
               id
               echo "mosquitto:x:{{ kustom.security.runAsUser }}:{{ kustom.security.fsGroup }}:mosquitto:/var/empty:/sbin/nologin" > /mnt/passwd
               echo "mosquitto:x:{{ kustom.security.fsGroup }}:" > /mnt/group
