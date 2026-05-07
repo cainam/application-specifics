@@ -15,6 +15,7 @@
     echo "$I"
   register: source_images
   failed_when: source_images.rc > 1
+  delegate_to: localhost
   changed_when: false
 
 - name: "set var {{ var_additional_images }}"
@@ -38,8 +39,6 @@
   set_fact:
     "{{ var_additional_images }}": >-
       {{ source_images.stdout_lines | map('regex_replace', '^(.*)/(.*):(.*)$', '{"name": "\\2", "tag": "\\3", "section": "' ~ registry_path ~ '", "type": "fetch", "source": "\\0"}') | map('from_json') | list }}
-
-
 
 - name: "Build image list for {{ var_additional_images }}"
   set_fact:

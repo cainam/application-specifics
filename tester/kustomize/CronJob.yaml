@@ -25,8 +25,6 @@ spec:
               value: vfs
             - name: APISERVER
               value: https://kubernetes.default.svc
-            - name: XXXPODMAN_SSH_OPTS
-              value: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
             - name: CONTAINER_HOST
               value: ssh://podman@podman.adm13/run/podman/podman.sock
             - name: SERVICEACCOUNT
@@ -117,7 +115,7 @@ spec:
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
                    --data "${PAYLOAD}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
-              while sleep 99; do true; done
+              #while sleep 99; do true; done
             securityContext:
               runAsUser: {{ kustom.security.runAsUser }}
               runAsGroup: {{ kustom.security.runAsGroup }}

@@ -2,13 +2,21 @@
 - name: test for major version update
   ansible.builtin.shell: |
     set -o pipefail
-    kubectl diff -k {{ kustomize_dir }} | grep -i "image:" | sort -u | awk '
-    /^-/ { match($0, /[0-9]+/); old = substr($0, RSTART, RLENGTH) }
-    /^\+/ { match($0, /[0-9]+/); new = substr($0, RSTART, RLENGTH) }
-    END { 
-      if (old != "" && new != "" && new > old) print "true"; 
-      else print "false" 
-    }'
+    old=$(kubectl get -n {{ k8s_namespace.key }} pod -o yaml -l app=postgres -o jsonpath='{.items[0].spec.containers[0].image}' | cut -d : -f 2 | cut -d . -f 1)
+    new="{{ software.postgresql.version|string|split('.')|first|int }}"
+    #kubectl diff -k {{ kustomize_dir }} | grep -i "image:" | sort -u | awk '
+    #/^-/ { match($0, /[0-9]+/); old = substr($0, RSTART, RLENGTH) }
+    #/^\+/ { match($0, /[0-9]+/); new = substr($0, RSTART, RLENGTH) }
+    #END { 
+    #  if (old != "" && new != "" && new > old) print "true"; 
+    #  else print "false" 
+    #}'
+    if [ $new -gt $old ]; then
+      echo "true"
+    else
+      echo "false"
+    fi
+    exit 2323 # just for testing, remove me if it works for the next upgrade!
   register: major_upgrade_result
   failed_when: major_upgrade_result.rc > 1
   changed_when: false
