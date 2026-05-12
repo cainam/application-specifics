@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: {{ kustom.name }}
 spec:
-  schedule: "*/5 * * * *" # Runs every 5 minutes
+  schedule: "5 */2 * * *" # Runs every 2 hours
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
