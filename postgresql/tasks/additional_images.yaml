@@ -1,6 +1,7 @@
 
 - name: test for major version update
   ansible.builtin.shell: |
+    set -x
     set -o pipefail
     old=$(kubectl get -n {{ k8s_namespace.key }} pod -o yaml -l app=postgres -o jsonpath='{.items[0].spec.containers[0].image}' | cut -d : -f 2 | cut -d . -f 1)
     new="{{ software.postgresql.version|string|split('.')|first|int }}"
