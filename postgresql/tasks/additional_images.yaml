@@ -17,7 +17,6 @@
     else
       echo "false"
     fi
-    exit 2323 # just for testing, remove me if it works for the next upgrade!
   register: major_upgrade_result
   failed_when: major_upgrade_result.rc > 1
   changed_when: false
