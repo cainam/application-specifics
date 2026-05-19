@@ -9,7 +9,7 @@
 
   - name: "{{ name_prefix }} certificates for internal service"
     vars:
-      cert_results_var: "reg_cert"
+      cert_results_var: "my_cert"
       caBundle_var: "caBundle"
       ca_init: false
       certificates_configuration: "{{ my_certs.conf }}"
@@ -18,3 +18,5 @@
         alt_names: "{{ alt_names }}"
     include_role: 
       name: certificates
+  delegate_to: localhost
+  run_once: true
