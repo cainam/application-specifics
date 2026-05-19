@@ -1,0 +1,20 @@
+- block:
+  - name: set alt_names
+    set_fact:
+      alt_names: "{%- if application.value.network.publish == true -%}{{ application.value.network.hosts }}{%- else -%}{{ [application.key~'.'~k8s_namespace.key~'.svc'] }}{%- endif -%}"
+      cert_name: "{%- if application.value.network.publish == true -%}{{ application.value.network.domain }}{%- else -%}{{ application.key }}.{{ k8s_namespace.key }}.svc{%- endif -%}"
+
+  - debug:
+      msg: "name: {{ cert_name }}\nalt_names: {{ alt_names }}"
+
+  - name: "{{ name_prefix }} certificates for internal service"
+    vars:
+      cert_results_var: "reg_cert"
+      caBundle_var: "caBundle"
+      ca_init: false
+      certificates_configuration: "{{ my_certs.conf }}"
+      ca_requests:
+      - name: "{{ cert_name }}"
+        alt_names: "{{ alt_names }}"
+    include_role: 
+      name: certificates
