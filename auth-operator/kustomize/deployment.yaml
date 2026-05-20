@@ -29,7 +29,7 @@ spec:
         - name: PATH
           value: /py_env/bin:/bin:/usr/bin
         - name: REDIRECT_URL
-          value: https://my-lb.adm13/oauth2-hydra/callback https://adm13.dnshome.de:44354/oauth2-hydra/callback
+          value: "https://{{ net.base_domain }}/oauth2-hydra/callback https://{{ net.domain_external }}:44354/oauth2-hydra/callback"
         - name: NAMESPACE
           value: auth
         - name: OAUTH2_CONFIG_SECRET

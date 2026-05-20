@@ -10,9 +10,9 @@ spec:
   - to:
     - operation:
         hosts:
-        - my-lb.adm13
-        - '*.my-lb.adm13'
-        - adm13.dnshome.de:*
+        - "{{ net.base_domain }}"
+        - "*.{{ net.base_domain }}"
+        - "{{ net.domain_external }}":*
         notPaths:
         - /oauth2-hydra/callback
         - /hydra/*

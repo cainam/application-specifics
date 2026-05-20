@@ -12,3 +12,13 @@ resources:
   - Middleware-oauth2-proxy.yaml
   - Middleware-redirect-rewriter.yaml
   - deploy.yaml
+
+secretGenerator:
+- name: tls-{{ kustom.name }}
+  files:
+  - tls.crt=tls.crt
+  - tls.key=tls.key
+  type: "kubernetes.io/tls"
+generatorOptions:
+  disableNameSuffixHash: true
+
