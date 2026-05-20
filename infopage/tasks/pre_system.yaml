@@ -9,7 +9,7 @@
 - name: read certificate and set uid and gid for kustomize
   vars:
     ca_bundle: |
-      {% for file in local_ca_files %}
+      {% for file in my_certs.local_ca_files %}
       {{ lookup('file', cert_path ~'/'~ file) }}
       {% endfor %}
   set_fact:
