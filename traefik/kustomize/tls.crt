@@ -1,1 +1,1 @@
-{{ reg_cert }}
+{{ my_cert[cert_name].cert }}
