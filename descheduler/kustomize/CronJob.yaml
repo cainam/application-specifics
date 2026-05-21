@@ -7,7 +7,9 @@ metadata:
     app.kubernetes.io/instance: deschedule
 spec:
   schedule: '*/2 * * * *'
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
