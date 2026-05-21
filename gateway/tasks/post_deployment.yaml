@@ -1,0 +1,4 @@
+
+- name: restart deployment so that the auto sidecar injection functions to apply currently configured proxyv2 image
+  ansible.builtin.shell: |
+    kubectl rollout restart -n {{ k8s_namespace.key }} deploy {{ application.key }}
