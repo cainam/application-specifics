@@ -18,6 +18,8 @@ spec:
         - name: suricata-config
           configMap:
             name: suricata-config
+      securityContext:
+        fsGroup: {{ kustom.security.runAsGroup }}
 
       containers:
         # --- Container 1: Fetcher (Fritz!Box HTTPS Stream) ---
