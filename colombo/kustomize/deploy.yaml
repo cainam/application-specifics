@@ -26,6 +26,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
+              set -x
               TRAFFIC_FILTER="not (src net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16) and dst net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16))"
               IFACE="2-0"  # WAN
               IFACE="1-lan" # LAN
