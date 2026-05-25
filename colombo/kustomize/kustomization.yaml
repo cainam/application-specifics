@@ -1,0 +1,11 @@
+namespace: {{ kustom.namespace }}
+resources:
+  - configmap.yaml
+  - deploy.yaml
+
+secretGenerator:
+  - name: {{ kustom.name }}
+    literals:
+      - username={{ fritz[1].user }}
+      - password={{ fritz[1].pass }}
+
