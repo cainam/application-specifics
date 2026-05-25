@@ -40,12 +40,12 @@ spec:
                 sid="$1"
                 u="$2"
                 p="$3"
-                echo "Trying to login into $FRITZIP as user $u" >&2
-                sid_status=$(curl -s "$FRITZIP/login_sid.lua?sid=${sid}" | awk -F'</?SID>' 'NF>1{print $2}')
+                echo "Trying to login into $FRITZ_IP as user $u" >&2
+                sid_status=$(curl -s "$FRITZ_IP/login_sid.lua?sid=${sid}" | awk -F'</?SID>' 'NF>1{print $2}')
                 if [ ${sid_status} = '0000000000000000' ]; then
-                  CHALLENGE=$(curl -k -s $FRITZIP/login_sid.lua |  grep -o "<Challenge>[a-z0-9]\{8\}" | cut -d'>' -f 2)
+                  CHALLENGE=$(curl -k -s $FRITZ_IP/login_sid.lua |  grep -o "<Challenge>[a-z0-9]\{8\}" | cut -d'>' -f 2)
                   HASH=$(printf "%s-%s" "$CHALLENGE" "$p" | iconv -t UTF-16LE | md5sum | cut -d' ' -f1)
-                  sid=$(curl -k -s "$FRITZIP/login_sid.lua" -d "response=$CHALLENGE-$HASH" -d 'username='${u} | grep -o "<SID>[a-z0-9]\{16\}" | cut -d'>' -f 2)
+                  sid=$(curl -k -s "$FRITZ_IP/login_sid.lua" -d "response=$CHALLENGE-$HASH" -d 'username='${u} | grep -o "<SID>[a-z0-9]\{16\}" | cut -d'>' -f 2)
                   echo "${sid}" | grep ^0+$ && echo "Login failed. Did you create & use explicit Fritz!Box users?" >&2 && exit 1
                 fi
                 echo "${sid}"
@@ -59,7 +59,7 @@ spec:
               while true; do
                   #FILE="$OUT-$(date +%s).pcap"
                   SID=$(valid_sid ${SID} $U1 $P1)
-                  URL="$FRITZIP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
+                  URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
                   #curl --no-buffer -s "$URL" --output $FILE # | podman run --rm -i -v /tmp:/tmp myregistry.adm13:443/local/shark:20260429 tcpdump -r - -w "$FILE" -C 10 -W 20 -G 60 -z gzip
                   curl --no-buffer -s "$URL" > $F | tcpdump -r - -w "$FILE" -C 1 "$TRAFFIC_FILTER"
               done
