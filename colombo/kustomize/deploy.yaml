@@ -102,7 +102,7 @@ spec:
               while true; do
                 echo "Suricata listening to pipe..."
                 #suricata -r /data/fritzpipe -c /etc/suricata/suricata.yaml
-                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml
+                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
                 sleep 2
               done
@@ -112,5 +112,5 @@ spec:
             - name: suricata-logs
               mountPath: /var/log/suricata
             - name: suricata-config
-              mountPath: /etc/suricata/suricata.yaml
+              mountPath: /etc/suricata/suricata.yaml.nok
               subPath: suricata.yaml
