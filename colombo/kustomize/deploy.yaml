@@ -87,6 +87,7 @@ spec:
         # --- Container 2: Analyzer (Suricata IDS) ---
         - name: suricata-ids
           image: myregistry.adm13:443/local/suricata:20260521
+          workingDir: /data
           command: ["/bin/sh", "-c"]
           args:
             - |
