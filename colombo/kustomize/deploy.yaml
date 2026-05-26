@@ -65,7 +65,7 @@ spec:
                   SID=$(valid_sid ${SID} $U1 $P1)
                   URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
                   #curl --no-buffer -s "$URL" --output $FILE # | podman run --rm -i -v /tmp:/tmp myregistry.adm13:443/local/shark:20260429 tcpdump -r - -w "$FILE" -C 10 -W 20 -G 60 -z gzip
-                  curl --no-buffer -s "$URL" > $F | tcpdump -r - -w "$FILE" -C 1 "$TRAFFIC_FILTER"
+                  curl --no-buffer -s "$URL" > $F #| tcpdump -r - -w "$FILE" -C 1 "$TRAFFIC_FILTER"
               done
           env:
             - name: FRITZ_IP
