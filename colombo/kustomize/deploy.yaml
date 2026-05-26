@@ -59,14 +59,17 @@ spec:
               SID=$(valid_sid ${SID} $U1 $P1)
               curl -X POST "http://fritz.box/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
 
-              [ -p /data/fritzpipe ] || mkfifo /data/fritzpipe
-              FILE=/data/fritzpipe
+              #[ -p /data/fritzpipe ] || mkfifo /data/fritzpipe
+              #FILE=/data/fritzpipe
+              mkdir /data/pcaps
               while true; do
                   #FILE="$OUT-$(date +%s).pcap"
+                  FILE="/data/pcaps/fritz-$(date +%s).pcap"
                   SID=$(valid_sid ${SID} $U1 $P1)
                   URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
                   #curl --no-buffer -s "$URL" --output $FILE # | podman run --rm -i -v /tmp:/tmp myregistry.adm13:443/local/shark:20260429 tcpdump -r - -w "$FILE" -C 10 -W 20 -G 60 -z gzip
-                  curl --no-buffer -s "$URL" > $FILE #| tcpdump -r - -w "$FILE" -C 1 "$TRAFFIC_FILTER"
+                  #curl --no-buffer -s "$URL" > $FILE #| tcpdump -r - -w "$FILE" -C 1 "$TRAFFIC_FILTER"
+                  curl --no-buffer -s "$URL" --output "$FILE"
               done
           env:
             - name: FRITZ_IP
@@ -95,7 +98,8 @@ spec:
               while [ ! -p /data/fritzpipe ]; do echo "Waiting for pipe..."; sleep 1; done
               while true; do
                 echo "Suricata listening to pipe..."
-                suricata -r /data/fritzpipe -c /etc/suricata/suricata.yaml
+                #suricata -r /data/fritzpipe -c /etc/suricata/suricata.yaml
+                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
                 sleep 2
               done
