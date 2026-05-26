@@ -70,6 +70,7 @@ spec:
                   #curl --no-buffer -s "$URL" --output $FILE # | podman run --rm -i -v /tmp:/tmp myregistry.adm13:443/local/shark:20260429 tcpdump -r - -w "$FILE" -C 10 -W 20 -G 60 -z gzip
                   #curl --no-buffer -s "$URL" > $FILE #| tcpdump -r - -w "$FILE" -C 1 "$TRAFFIC_FILTER"
                   curl --no-buffer -s "$URL" --output "$FILE"
+                  [ -f "$FILE" ] && [ ! -s "$FILE" ] && rm -v "$FILE"
               done
           env:
             - name: FRITZ_IP
