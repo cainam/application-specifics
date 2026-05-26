@@ -13,6 +13,8 @@ spec:
         app: fritzbox-analyzer
     spec:
       volumes:
+        - name: suricata-logs
+          emptyDir: {}
         - name: shared-pipe
           emptyDir: {}
         - name: suricata-config
@@ -88,9 +90,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              # Wait until the capture container initializes the pipe
               while [ ! -p /data/fritzpipe ]; do echo "Waiting for pipe..."; sleep 1; done
-              
               while true; do
                 echo "Suricata listening to pipe..."
                 suricata -r /data/fritzpipe -c /etc/suricata/suricata.yaml
@@ -100,6 +100,8 @@ spec:
           volumeMounts:
             - name: shared-pipe
               mountPath: /data
+            - name: suricata-logs
+              mountPath: /var/log/suricata
             - name: suricata-config
               mountPath: /etc/suricata/suricata.yaml
               subPath: suricata.yaml
