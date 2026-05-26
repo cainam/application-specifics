@@ -98,7 +98,7 @@ spec:
           args:
             - |
               #while [ ! -p /data/fritzpipe ]; do echo "Waiting for pipe..."; sleep 1; done
-              while [ ! -d /data/pcap ]; do echo "Waiting for directory ..."; sleep 1; done
+              while [ ! -d /data/pcaps ]; do echo "Waiting for directory ..."; sleep 1; done
               while true; do
                 echo "Suricata listening to pipe..."
                 #suricata -r /data/fritzpipe -c /etc/suricata/suricata.yaml
