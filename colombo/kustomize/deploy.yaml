@@ -95,7 +95,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              while [ ! -p /data/fritzpipe ]; do echo "Waiting for pipe..."; sleep 1; done
+              #while [ ! -p /data/fritzpipe ]; do echo "Waiting for pipe..."; sleep 1; done
               while true; do
                 echo "Suricata listening to pipe..."
                 #suricata -r /data/fritzpipe -c /etc/suricata/suricata.yaml
