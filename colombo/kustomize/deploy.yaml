@@ -86,6 +86,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
+              mkdir -p /var/log/suricata/
               while [ ! -d /data/pcaps ]; do echo "Waiting for directory ..."; sleep 1; done
               while true; do
                 echo "Suricata listening to pipe..."
