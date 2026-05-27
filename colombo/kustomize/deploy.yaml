@@ -12,19 +12,20 @@ spec:
       labels:
         app: fritzbox-analyzer
     spec:
-      volumes:
-        - name: suricata-logs
-          emptyDir: {}
-        - name: shared-pipe
-          emptyDir: {}
-        - name: suricata-config
-          configMap:
-            name: suricata-config
       securityContext:
         fsGroup: {{ kustom.security.runAsGroup }}
-
+      volumes:
+      - name: {{ kustom.name }}
+        persistentVolumeClaim:
+          claimName: {{ kustom.name }}
+      - name: suricata-logs
+        emptyDir: {}
+      - name: shared-pipe
+        emptyDir: {}
+      - name: suricata-config
+        configMap:
+          name: suricata-config
       containers:
-        # --- Container 1: Fetcher (Fritz!Box HTTPS Stream) ---
         - name: stream-capture
           image: myregistry.adm13:443/local/shark:20260429
           command: ["/bin/sh", "-c"]
@@ -35,11 +36,7 @@ spec:
               IFACE="2-0"  # WAN
               IFACE="1-lan" # LAN
               #IFACE="internet"
-              U1=$FRITZ_USER #$1
-              P1=$FRITZ_PASS #$2
-              OUT=$3
               SID='0000000000000000'
-
               valid_sid(){
                 sid="$1"
                 u="$2"
@@ -56,20 +53,14 @@ spec:
               }
               
               echo "Capturing traffic on Fritz!Box interface $IFACE ..." 1>&2
-              SID=$(valid_sid ${SID} $U1 $P1)
+              SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
               curl -X POST "http://fritz.box/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
 
-              #[ -p /data/fritzpipe ] || mkfifo /data/fritzpipe
-              #FILE=/data/fritzpipe
               mkdir /data/pcaps
               while sleep 5; do
-                  #FILE="$OUT-$(date +%s).pcap"
                   FILE="/data/pcaps/fritz-$(date +%s).pcap"
-                  SID=$(valid_sid ${SID} $U1 $P1)
+                  SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
                   URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
-                  #curl --no-buffer -s "$URL" --output $FILE # | podman run --rm -i -v /tmp:/tmp myregistry.adm13:443/local/shark:20260429 tcpdump -r - -w "$FILE" -C 10 -W 20 -G 60 -z gzip
-                  #curl --no-buffer -s "$URL" > $FILE #| tcpdump -r - -w "$FILE" -C 1 "$TRAFFIC_FILTER"
-                  #curl --no-buffer -s "$URL" --output "$FILE"
                   curl --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 1 
                   [ -f "$FILE" ] && [ ! -s "$FILE" ] && rm -fv "$FILE"
               done
@@ -89,19 +80,15 @@ spec:
           volumeMounts:
             - name: shared-pipe
               mountPath: /data
-
-        # --- Container 2: Analyzer (Suricata IDS) ---
         - name: suricata-ids
           image: myregistry.adm13:443/local/suricata:20260521
           workingDir: /data
           command: ["/bin/sh", "-c"]
           args:
             - |
-              #while [ ! -p /data/fritzpipe ]; do echo "Waiting for pipe..."; sleep 1; done
               while [ ! -d /data/pcaps ]; do echo "Waiting for directory ..."; sleep 1; done
               while true; do
                 echo "Suricata listening to pipe..."
-                #suricata -r /data/fritzpipe -c /etc/suricata/suricata.yaml
                 suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
                 sleep 2
@@ -109,8 +96,5 @@ spec:
           volumeMounts:
             - name: shared-pipe
               mountPath: /data
-            - name: suricata-logs
-              mountPath: /var/log/suricata
-            - name: suricata-config
-              mountPath: /etc/suricata/suricata.yaml.nok
-              subPath: suricata.yaml
+            - name: {{ kustom.name }}
+              mountPath: /var/log

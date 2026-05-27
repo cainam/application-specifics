@@ -16,10 +16,6 @@ spec:
         app: traefik
     spec:
       serviceAccountName: traefik-ingress-controller
-      #volumes:
-      #- name: traefik-plugins
-      #  persistentVolumeClaim:
-      #    claimName: traefik-plugins
       containers:
         - name: traefik
           image: {{ kustom.image }}
