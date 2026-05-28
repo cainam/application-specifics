@@ -14,6 +14,7 @@ spec:
       labels:
         app: fritzbox-analyzer
     spec:
+      shareProcessNamespace: true # this allows to access the process of suricata from another container
       securityContext:
         fsGroup: {{ kustom.security.runAsGroup }}
       volumes:
