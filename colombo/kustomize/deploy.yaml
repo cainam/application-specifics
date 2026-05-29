@@ -102,7 +102,7 @@ spec:
           - name: {{ kustom.name }}
             mountPath: /var/log
         - name: process-suricata-alerts
-          image: myregistry.adm13:443/local/python:20260521
+          image: myregistry.adm13:443/local/python3:20260521
           command: ["python", "/app/{{ kustom.name }}.py"]
           volumeMounts:
           - mountPath: /app/{{ kustom.name }}.py
