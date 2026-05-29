@@ -9,3 +9,8 @@ secretGenerator:
       - username={{ fritz[1].user }}
       - password={{ fritz[1].pass }}
 
+configMapGenerator:
+  - name: {{ kustom.name }}
+    #behavior: replace
+    files:
+      - process_suricata_alerts.py
