@@ -28,6 +28,9 @@ spec:
       - name: suricata-config
         configMap:
           name: suricata-config
+      - name: {{ kustom.name }}-config
+        configMap:
+          name: {{ kustom.name }}
       containers:
         - name: stream-capture
           image: myregistry.adm13:443/local/shark:20260429
@@ -36,9 +39,7 @@ spec:
             - |
               set -x
               TRAFFIC_FILTER="not (src net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16) and dst net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16))"
-              IFACE="2-0"  # WAN
-              IFACE="1-lan" # LAN
-              #IFACE="internet"
+              IFACE="1-lan" # LAN IFACE="2-0"  # WAN #IFACE="internet"?
               SID='0000000000000000'
               valid_sid(){
                 sid="$1"
@@ -53,19 +54,17 @@ spec:
                   echo "${sid}" | grep ^0+$ && echo "Login failed. Did you create & use explicit Fritz!Box users?" >&2 && exit 1
                 fi
                 echo "${sid}"
-              }
-              
+
               echo "Capturing traffic on Fritz!Box interface $IFACE ..." 1>&2
               SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
               curl -X POST "http://fritz.box/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
-
               mkdir /data/pcaps
               while sleep 5; do
-                  FILE="/data/pcaps/fritz-$(date +%s).pcap"
-                  SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
-                  URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
-                  curl --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 1 
-                  [ -f "$FILE" ] && [ ! -s "$FILE" ] && rm -fv "$FILE"
+                FILE="/data/pcaps/fritz-$(date +%s).pcap"
+                SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
+                URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
+                curl --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 1
+                [ -f "$FILE" ] && [ ! -s "$FILE" ] && rm -fv "$FILE"
               done
           env:
             - name: FRITZ_IP
@@ -98,7 +97,16 @@ spec:
                 sleep 2
               done
           volumeMounts:
-            - name: shared-pipe
-              mountPath: /data
-            - name: {{ kustom.name }}
-              mountPath: /var/log
+          - name: shared-pipe
+            mountPath: /data
+          - name: {{ kustom.name }}
+            mountPath: /var/log
+        - name: process_suricata_alerts
+          image: myregistry.adm13:443/local/python:20260521
+          command: ["python", "/app/{{ kustom.name }}.py"]
+          volumeMounts:
+          - mountPath: /app/{{ kustom.name }}.py
+            name: {{ kustom.name }}-config
+            subPath: process_suricata_alerts.py
+          - name: {{ kustom.name }}
+            mountPath: /var/log
