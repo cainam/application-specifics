@@ -109,7 +109,7 @@ spec:
           - name: PCAP_DIR
             value: /data/pcaps
           - name: INTERVAL
-            value: 900
+            value: "900"
           command: ["/bin/sh", "-c"]
           args:
             - |
