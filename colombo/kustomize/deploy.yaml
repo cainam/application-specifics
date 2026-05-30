@@ -58,6 +58,7 @@ spec:
               echo "Capturing traffic on Fritz!Box interface $IFACE ..." 1>&2
               SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
               curl -X POST "http://fritz.box/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
+              umask 0002
               mkdir /data/pcaps
               while sleep 5; do
                 FILE="/data/pcaps/fritz-$(date +%s).pcap"
