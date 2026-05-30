@@ -38,7 +38,7 @@ spec:
           args:
             - |
               set -x
-              TRAFFIC_FILTER="not (src net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16) and dst net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16))"
+              # TRAFFIC_FILTER="not (src net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16) and dst net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16))"
               IFACE="1-lan" # LAN IFACE="2-0"  # WAN #IFACE="internet"?
               SID='0000000000000000'
               valid_sid(){
@@ -101,6 +101,31 @@ spec:
             mountPath: /data
           - name: {{ kustom.name }}
             mountPath: /var/log
+        - name: cleanup-pcaps
+          image: myregistry.adm13:443/local/python3:20260521
+          env:
+          - name: SURICATA_LOG
+            value: /var/log/suricata/suricata.log
+          - name: PCAP_DIR
+            value: /data/pcaps
+          - name: INTERVAL
+            value: 900
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -x
+              while sleep "${INTERVAL}"; do
+                echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Running cleanup..."
+                last_processed=$(tail -n 100 "${SURICATA_LOG}" | grep "Processed file" | tail -n 1 | sed 's/.*Processed file \(.*\),.*/\1/')
+                if [ -z "${last_processed}" ]; then
+                  echo "No processed files found in last 100 lines of suricata.log, skipping."
+                elif [ ! -f "${last_processed}" ]; then
+                  echo "Last processed file already deleted: ${last_processed}, skipping."
+                else
+                  echo "Last processed: ${last_processed}"
+                  find "${PCAP_DIR}" -name "*.pcap*" ! -newer "${last_processed}" -print -delete
+                fi
+              done
         - name: process-suricata-alerts
           image: myregistry.adm13:443/local/python3:20260521
           command: ["python", "/app/{{ kustom.name }}.py"]
