@@ -8,6 +8,7 @@ secretGenerator:
     literals:
       - username={{ fritz[1].user }}
       - password={{ fritz[1].pass }}
+      - openrouter={{ openrouter_api_key }}
 
 configMapGenerator:
   - name: {{ kustom.name }}

@@ -141,3 +141,67 @@ spec:
             subPath: process_suricata_alerts.py
           - name: {{ kustom.name }}
             mountPath: /var/log
+        - name: ask-claude
+          image: myregistry.adm13:443/local/claude:20260429
+          env:
+          - name: SURICATA_FLOWS
+            value: /var/log/suricata/flows
+          - name: CLAUDE_FLOWS
+            value: /var/log/suricata/flows-claude
+          - name: HOME
+            value: /var/log/suricata/claude
+          - name: INTERVAL
+            value: "900"
+          - name: CLAUDE_CODE_SKIP_FAST_MODE_ORG_CHECK
+            value: "1"
+          - name: ANTHROPIC_BASE_URL
+            value: https://openrouter.ai/api
+            - name: ANTHROPIC_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ kustom.name }}
+                  key: openrouter
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -x
+              [ ! -d "${CLAUDE_FLOWS}" ] && mkdir -p "${CLAUDE_FLOWS}"
+              rm -rf "${HOME}"
+              mkdir -p "${HOME}"/.claude
+              cat > "${HOME}"/.claude/settings.json <<EOF
+              {"theme": "auto",
+              "model": "poolside/laguna-xs.2:free",
+              "smallModel": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
+              }
+              EOF
+              cat > "${HOME}"/.claude.json << EOF
+              {
+                "hasCompletedOnboarding": true,
+                "projects": {
+                  "$HOME": {
+                    "allowedTools": [],
+                    "hasTrustDialogAccepted": true
+                  }
+                }
+              }
+              EOF
+              cd
+              instructions="You are a network security analyst. Explain the following Suricata flow in plain language. Focus on:
+              - What triggered the alert
+              - What device initiated the connection and where to
+              - Whether this looks like a genuine threat or a false positive
+              - What action if any should be taken
+
+              Flow data:"
+              while sleep "${INTERVAL}"; do
+                echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Asking claude..."
+                touch "${CLAUDE_FLOWS}/ts" && sleep 5
+                for f in $(cd "${SURICATA_FLOWS}/" && find . -type f ! -newer "${CLAUDE_FLOWS}/ts"); do
+                  (echo "$instructions"; cat "${SURICATA_FLOWS}/$f") | /opt/bin/claude --verbose -p --output-format stream-json --dangerously-skip-permissions > "${CLAUDE_FLOWS}/$f.full"
+                  cat "${CLAUDE_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${CLAUDE_FLOWS}/$f.claude"
+                  mv "${SURICATA_FLOWS}/$f" "${CLAUDE_FLOWS}/$f"
+                done
+              done
+          volumeMounts:
+          - name: {{ kustom.name }}
+            mountPath: /var/log
