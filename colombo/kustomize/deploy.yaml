@@ -126,6 +126,11 @@ spec:
                   find "${PCAP_DIR}" -name "*.pcap*" ! -newer "${last_processed}" -print -delete
                 fi
               done
+          volumeMounts:
+          - name: shared-pipe
+            mountPath: /data
+          - name: {{ kustom.name }}
+            mountPath: /var/log
         - name: process-suricata-alerts
           image: myregistry.adm13:443/local/python3:20260521
           command: ["python", "/app/{{ kustom.name }}.py"]
