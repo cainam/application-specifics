@@ -156,11 +156,11 @@ spec:
             value: "1"
           - name: ANTHROPIC_BASE_URL
             value: https://openrouter.ai/api
-            - name: ANTHROPIC_AUTH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ kustom.name }}
-                  key: openrouter
+          - name: ANTHROPIC_AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ kustom.name }}
+                key: openrouter
           command: ["/bin/sh", "-c"]
           args:
             - |
