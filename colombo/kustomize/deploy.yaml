@@ -91,6 +91,7 @@ spec:
             - |
               mkdir -p /var/log/suricata/
               while [ ! -d /data/pcaps ]; do echo "Waiting for directory ..."; sleep 1; done
+              rm -f /var/log/suricata/* /data/pcaps/*
               while true; do
                 echo "Suricata listening to pipe..."
                 suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/
