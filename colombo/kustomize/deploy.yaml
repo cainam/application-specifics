@@ -142,8 +142,8 @@ spec:
           - name: {{ kustom.name }}
             mountPath: /var/log
         - name: ask-claude
-          image: myregistry.adm13:443/local/shark:20260429
-          # image: myregistry.adm13:443/local/claude:20260521
+          #image: myregistry.adm13:443/local/shark:20260429
+          image: myregistry.adm13:443/local/claude:20260521
           env:
           - name: SURICATA_FLOWS
             value: /var/log/suricata/flows
