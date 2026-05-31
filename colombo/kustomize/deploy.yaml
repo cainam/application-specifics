@@ -64,7 +64,7 @@ spec:
                 FILE="/data/pcaps/fritz-$(date +%s).pcap"
                 SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
                 URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
-                curl --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 1
+                curl --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 20
                 [ -f "$FILE" ] && [ ! -s "$FILE" ] && rm -fv "$FILE"
               done
           env:
