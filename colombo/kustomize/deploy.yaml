@@ -151,7 +151,7 @@ spec:
           - name: HOME
             value: /var/log/suricata/claude
           - name: INTERVAL
-            value: "900"
+            value: "90"
           - name: CLAUDE_CODE_SKIP_FAST_MODE_ORG_CHECK
             value: "1"
           - name: ANTHROPIC_BASE_URL
