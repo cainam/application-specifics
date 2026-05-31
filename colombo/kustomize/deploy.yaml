@@ -197,8 +197,23 @@ spec:
                 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Asking claude..."
                 touch "${CLAUDE_FLOWS}/ts" && sleep 5
                 for f in $(cd "${SURICATA_FLOWS}/" && find . -type f ! -newer "${CLAUDE_FLOWS}/ts"); do
-                  (echo "$instructions"; cat "${SURICATA_FLOWS}/$f") | /opt/bin/claude --verbose -p --output-format stream-json --dangerously-skip-permissions > "${CLAUDE_FLOWS}/$f.full"
-                  cat "${CLAUDE_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${CLAUDE_FLOWS}/$f.claude"
+                  #(echo "$instructions"; cat "${SURICATA_FLOWS}/$f") | /opt/bin/claude --verbose -p --output-format stream-json --dangerously-skip-permissions > "${CLAUDE_FLOWS}/$f.full"
+                  payload=$(jq -n --arg system_content "$((echo "$instructions"; cat "${SURICATA_FLOWS}/$f") )" '{
+                  "model": "poolside/laguna-xs.2:free",
+                  "messages": [
+                    {
+                      "role": "system",
+                      "content": $system_content
+                    }
+                  ]
+                }')
+                curl https://openrouter.ai/api/v1/chat/completions \
+                  -H "Content-Type: application/json" \
+                  -H "Authorization: Bearer ${ANTHROPIC_AUTH_TOKEN}" \
+                  -H "HTTP-Referer: http://localhost:3000" \
+                  -H "X-Title: My Batch Script" \
+                  -d "$payload" | jq .  > "${CLAUDE_FLOWS}/$f.full"
+                  #cat "${CLAUDE_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${CLAUDE_FLOWS}/$f.claude"
                   mv "${SURICATA_FLOWS}/$f" "${CLAUDE_FLOWS}/$f"
                 done
               done
