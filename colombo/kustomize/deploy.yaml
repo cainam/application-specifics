@@ -195,7 +195,7 @@ spec:
                     -H "X-Title: My Batch Script" \
                     -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow}.full"
                   #cat "${ENRICHED_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${ENRICHED_FLOWS}/${flow}.claude"
-                  enrichment="${ENRICHED_DIR}/${base_flow%.json}.enrichment.json"
+                  enrichment="${ENRICHED_FLOWS}/${base_flow%.json}.enrichment.json"
                   python3 /app/flow-information-collector.py "${flow}" "${enrichment}"
                   mv "${flow}" "${ENRICHED_FLOWS}/"
                 done
