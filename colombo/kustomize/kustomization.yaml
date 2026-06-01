@@ -14,4 +14,5 @@ configMapGenerator:
   - name: {{ kustom.name }}
     #behavior: replace
     files:
-      - process_suricata_alerts.py
+    - process_suricata_alerts.py
+    - flow-information-collector.py

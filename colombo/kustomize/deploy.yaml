@@ -146,20 +146,15 @@ spec:
             subPath: process_suricata_alerts.py
           - name: {{ kustom.name }}
             mountPath: /var/log
-        - name: ask-claude
-          #image: myregistry.adm13:443/local/shark:20260429
-          image: myregistry.adm13:443/local/claude:20260521
+        - name: spider-collect
+          image: myregistry.adm13:443/local/spider-collect:20260521
           env:
           - name: SURICATA_FLOWS
             value: /var/log/suricata/flows
-          - name: CLAUDE_FLOWS
-            value: /var/log/suricata/flows-claude
-          - name: HOME
-            value: /var/log/suricata/claude
+          - name: ENRICHED_FLOWS
+            value: /var/log/suricata/flows-enriched
           - name: INTERVAL
             value: "90"
-          - name: CLAUDE_CODE_SKIP_FAST_MODE_ORG_CHECK
-            value: "1"
           - name: ANTHROPIC_BASE_URL
             value: https://openrouter.ai/api
           - name: ANTHROPIC_AUTH_TOKEN
@@ -171,27 +166,6 @@ spec:
           args:
             - |
               set -x
-              [ ! -d "${CLAUDE_FLOWS}" ] && mkdir -p "${CLAUDE_FLOWS}"
-              rm -rf "${HOME}"
-              mkdir -p "${HOME}"/.claude
-              cat > "${HOME}"/.claude/settings.json <<EOF
-              {"theme": "auto",
-              "model": "poolside/laguna-xs.2:free",
-              "smallModel": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
-              }
-              EOF
-              cat > "${HOME}"/.claude.json << EOF
-              {
-                "hasCompletedOnboarding": true,
-                "projects": {
-                  "$HOME": {
-                    "allowedTools": [],
-                    "hasTrustDialogAccepted": true
-                  }
-                }
-              }
-              EOF
-              cd
               instructions="You are a network security analyst. Explain the following Suricata flow in plain language. Focus on:
               - What triggered the alert
               - What device initiated the connection and where to
@@ -200,12 +174,11 @@ spec:
 
               Flow data:"
               while sleep "${INTERVAL}"; do
-                echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Asking claude..."
-                touch "${CLAUDE_FLOWS}/ts" && sleep 5
-                for f in $(cd "${SURICATA_FLOWS}/" && find . -type f ! -newer "${CLAUDE_FLOWS}/ts"); do
-                  #(echo "$instructions"; cat "${SURICATA_FLOWS}/$f") | /opt/bin/claude --verbose -p --output-format stream-json --dangerously-skip-permissions > "${CLAUDE_FLOWS}/$f.full"
-                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "${SURICATA_FLOWS}/$f")" '{
-                  "model": "poolside/laguna-xs.2:free",
+                echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Asking AI..."
+                touch "${ENRICHED_FLOWS}/ts" && sleep 5
+                for flow in $(find "${SURICATA_FLOWS}/" -type f ! -newer "${ENRICHED_FLOWS}/ts"); do
+                  [ -f "${flow}" ] || continue
+                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "poolside/laguna-xs.2:free",
                   "messages": [
                     {
                       "role": "system",
@@ -213,16 +186,21 @@ spec:
                     }
                   ]
                   }')
-                  curl https://openrouter.ai/api/v1/chat/completions \
+                  curl ${ANTHROPIC_BASE_URL}/v1/chat/completions \
                     -H "Content-Type: application/json" \
                     -H "Authorization: Bearer ${ANTHROPIC_AUTH_TOKEN}" \
                     -H "HTTP-Referer: http://localhost:3000" \
                     -H "X-Title: My Batch Script" \
-                    -d "$payload" | jq .  > "${CLAUDE_FLOWS}/$f.full"
-                  #cat "${CLAUDE_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${CLAUDE_FLOWS}/$f.claude"
-                  mv "${SURICATA_FLOWS}/$f" "${CLAUDE_FLOWS}/$f"
+                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${flow}.full"
+                  #cat "${ENRICHED_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${ENRICHED_FLOWS}/${flow}.claude"
+                  enrichment="${ENRICHED_DIR}/${flow%.json}.enrichment.json"
+                  python3 /app/flow-information-collector.py "${SURICATA_FLOWS}/${flow}" "${enrichment}"
+                  mv "${SURICATA_FLOWS}/${flow}" "${ENRICHED_FLOWS}/${flow}"
                 done
               done
           volumeMounts:
           - name: {{ kustom.name }}
             mountPath: /var/log
+          - mountPath: /app/flow-information-collector.py
+            name: {{ kustom.name }}-config
+            subPath: flow-information-collector.py
