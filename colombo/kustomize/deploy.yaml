@@ -98,6 +98,8 @@ spec:
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
                 sleep 2
               done
+          securityContext:
+            runAsUser: {{ kustom.security.runAsUser }}
           volumeMounts:
           - name: shared-pipe
             mountPath: /data
@@ -136,6 +138,8 @@ spec:
         - name: process-suricata-alerts
           image: myregistry.adm13:443/local/python3:20260521
           command: ["python", "/app/{{ kustom.name }}.py"]
+          securityContext:
+            runAsUser: {{ kustom.security.runAsUser }}
           volumeMounts:
           - mountPath: /app/{{ kustom.name }}.py
             name: {{ kustom.name }}-config
