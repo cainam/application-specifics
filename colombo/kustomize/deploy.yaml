@@ -173,6 +173,7 @@ spec:
               - What action if any should be taken
 
               Flow data:"
+              mkdir -p ${ENRICHED_FLOWS}
               while sleep "${INTERVAL}"; do
                 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Asking AI..."
                 touch "${ENRICHED_FLOWS}/ts" && sleep 5
