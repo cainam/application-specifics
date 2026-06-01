@@ -179,6 +179,7 @@ spec:
                 touch "${ENRICHED_FLOWS}/ts" && sleep 5
                 for flow in $(find "${SURICATA_FLOWS}/" -type f ! -newer "${ENRICHED_FLOWS}/ts"); do
                   [ -f "${flow}" ] || continue
+                  base_flow=$(basename "${flow}")
                   payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "poolside/laguna-xs.2:free",
                   "messages": [
                     {
@@ -192,11 +193,11 @@ spec:
                     -H "Authorization: Bearer ${ANTHROPIC_AUTH_TOKEN}" \
                     -H "HTTP-Referer: http://localhost:3000" \
                     -H "X-Title: My Batch Script" \
-                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${flow}.full"
+                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow}.full"
                   #cat "${ENRICHED_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${ENRICHED_FLOWS}/${flow}.claude"
-                  enrichment="${ENRICHED_DIR}/${flow%.json}.enrichment.json"
-                  python3 /app/flow-information-collector.py "${SURICATA_FLOWS}/${flow}" "${enrichment}"
-                  mv "${SURICATA_FLOWS}/${flow}" "${ENRICHED_FLOWS}/${flow}"
+                  enrichment="${ENRICHED_DIR}/${base_flow%.json}.enrichment.json"
+                  python3 /app/flow-information-collector.py "${flow}" "${enrichment}"
+                  mv "${flow}" "${ENRICHED_FLOWS}/"
                 done
               done
           volumeMounts:
