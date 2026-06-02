@@ -9,7 +9,7 @@ Endpoints:
   GET /flows/<flow_id>    — full flow events + enrichment (enrichment null if not ready)
 
 Environment variables:
-  ENRICHED_DIR   directory containing flow and enrichment files
+  FLOWS_DIR      directory containing flow and enrichment files
                  (default: /var/log/suricata/flows_enriched)
   HOST           bind host (default: 0.0.0.0)
   PORT           bind port (default: 8000)
@@ -24,7 +24,10 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 
-ENRICHED_DIR = Path(os.getenv("ENRICHED_DIR", "/var/log/suricata/flows_enriched"))
+flows_dir_env = os.getenv("FLOWS_DIR")
+if not flows_dir_env:
+    raise KeyError("Environment variable 'FLOWS_DIR' is not set.")
+FLOWS_DIR = Path(flows_dir_env)
 
 app = FastAPI(title="Suricata Flow API")
 
@@ -83,7 +86,7 @@ def list_flows():
     """List all flows, newest first, with summary info."""
     results = []
 
-    for path in sorted(ENRICHED_DIR.glob("*.json"), reverse=True):
+    for path in sorted(FLOWS_DIR.glob("*.json"), reverse=True):
         parsed = parse_filename(path.name)
         if not parsed:
             continue  # skip enrichment files and anything unexpected
@@ -109,7 +112,7 @@ def get_flow(flow_id: str):
 
     # Find the flow file — there may be multiple files with the same flow_id
     # (unlikely but possible across restarts); return the newest
-    matches = sorted(ENRICHED_DIR.glob(f"*_{flow_id}.json"), reverse=True)
+    matches = sorted(FLOWS_DIR.glob(f"*_{flow_id}.json"), reverse=True)
     matches = [p for p in matches if parse_filename(p.name)]
 
     if not matches:
@@ -136,7 +139,9 @@ def get_flow(flow_id: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        app,
+        "main:app",
         host=os.getenv("HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "8000")),
+        log_level="info",
+        access_log=True
     )
