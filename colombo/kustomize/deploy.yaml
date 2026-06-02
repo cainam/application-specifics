@@ -167,6 +167,11 @@ spec:
               secretKeyRef:
                 name: {{ kustom.name }}
                 key: abuseipdb
+          - name: GROQ
+            valueFrom:
+              secretKeyRef:
+                name: {{ kustom.name }}
+                key: groq
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -186,22 +191,22 @@ spec:
                   [ -f "${flow}" ] || continue
                   base_flow=$(basename "${flow}")
                   payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "poolside/laguna-xs.2:free",
-                  "messages": [
-                    {
-                      "role": "system",
-                      "content": $system_content
-                    }
-                  ]
+                    "messages": [{"role": "system", "content": $system_content}]
                   }')
                   curl ${ANTHROPIC_BASE_URL}/v1/chat/completions \
                     -H "Content-Type: application/json" \
                     -H "Authorization: Bearer ${ANTHROPIC_AUTH_TOKEN}" \
                     -H "HTTP-Referer: http://localhost:3000" \
                     -H "X-Title: My Batch Script" \
-                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow}.full"
-                  #cat "${ENRICHED_FLOWS}/$f.full" | jq -r 'select(.type=="assistant") | .message.content[] | select(.type=="text") | .text' > "${ENRICHED_FLOWS}/${flow}.claude"
-                  enrichment="${ENRICHED_FLOWS}/${base_flow%.json}.enrichment.json"
-                  python3 /app/flow-information-collector.py "${flow}" "${enrichment}"
+                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow%.json}.ai-1.json"
+                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "llama-3.3-70b-specdec",
+                    "messages": [{"role": "system", "content": $system_content}]
+                  }')
+                  curl https://api.groq.com/openai/v1/chat/completions \
+                    -H "Content-Type: application/json" \
+                    -H "Authorization: Bearer ${GROQ}" \
+                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow%.json}.ai-2.json"
+                  python3 /app/flow-information-collector.py "${flow}" "${ENRICHED_FLOWS}/${base_flow%.json}.enrichment.json"
                   mv "${flow}" "${ENRICHED_FLOWS}/"
                 done
               done

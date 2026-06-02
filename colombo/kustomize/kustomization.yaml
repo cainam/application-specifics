@@ -10,6 +10,7 @@ secretGenerator:
       - password={{ fritz[1].pass }}
       - openrouter={{ openrouter_api_key }}
       - abuseipdb={{ abuseipdb }}
+      - groq={{ groq }}
 
 configMapGenerator:
   - name: {{ kustom.name }}
