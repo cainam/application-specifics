@@ -38,4 +38,5 @@ spec:
     app: api
   ports:
   - name: http
-    port: {{ kustom.network.svcPort }}
+    port: 80
+    targetPort: http
