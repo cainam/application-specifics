@@ -35,7 +35,7 @@ metadata:
   name: {{ kustom.name }}
 spec:
   selector:
-    app: api
+    app: {{ kustom.name }}
   ports:
   - name: http
     port: 80

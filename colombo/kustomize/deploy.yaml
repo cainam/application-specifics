@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fritzbox-analyzer
+  name: {{ kustom.name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fritzbox-analyzer
+      app: {{ kustom.name }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: fritzbox-analyzer
+        app: {{ kustom.name }}
     spec:
       shareProcessNamespace: true # this allows to access the process of suricata from another container
       securityContext:
