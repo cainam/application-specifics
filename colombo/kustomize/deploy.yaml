@@ -162,6 +162,11 @@ spec:
               secretKeyRef:
                 name: {{ kustom.name }}
                 key: openrouter
+          - name: ABUSEIPDB_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ kustom.name }}
+                key: abuseipdb
           command: ["/bin/sh", "-c"]
           args:
             - |
