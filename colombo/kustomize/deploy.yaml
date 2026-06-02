@@ -199,7 +199,7 @@ spec:
                     -H "HTTP-Referer: http://localhost:3000" \
                     -H "X-Title: My Batch Script" \
                     -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow%.json}.ai-1.json"
-                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "llama-3.3-70b-specdec",
+                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "system", "content": $system_content}]
                   }')
                   curl https://api.groq.com/openai/v1/chat/completions \
