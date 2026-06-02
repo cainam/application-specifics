@@ -221,6 +221,8 @@ spec:
           env:
           - name: ENRICHED_FLOWS
             value: /var/log/suricata/flows-enriched
+          - name: PYTHONPATH
+            value: /py_env/lib/python3.13/site-packages/
           command: ["python", "-u",  "/app/api.py"]
           ports:
           - containerPort: 8000
