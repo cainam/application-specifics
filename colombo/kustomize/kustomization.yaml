@@ -1,6 +1,6 @@
 namespace: {{ kustom.namespace }}
 resources:
-  - configmap.yaml
+  - configmap_and_service.yaml
   - deploy.yaml
 
 secretGenerator:
@@ -18,3 +18,4 @@ configMapGenerator:
     files:
     - process_suricata_alerts.py
     - flow-information-collector.py
+    - api.py

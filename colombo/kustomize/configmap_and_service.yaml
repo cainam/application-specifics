@@ -28,3 +28,14 @@ data:
     default-rule-path: /var/lib/suricata/rules
     rule-files:
       - suricata.rules
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ kustom.name }}
+spec:
+  selector:
+    app: api
+  ports:
+  - name: http
+    port: {{ kustom.network.svcPort }}
