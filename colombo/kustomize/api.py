@@ -139,7 +139,7 @@ def get_flow(flow_id: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "main:app",
+        "api:app",
         host=os.getenv("HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "8000")),
         log_level="info",
