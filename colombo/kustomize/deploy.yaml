@@ -219,7 +219,7 @@ spec:
         - name: api
           image: myregistry.adm13:443/local/fastapi:20260521
           env:
-          - name: ENRICHED_FLOWS
+          - name: FLOWS_DIR
             value: /var/log/suricata/flows-enriched
           - name: PYTHONPATH
             value: /py_env/lib/python3.13/site-packages/
