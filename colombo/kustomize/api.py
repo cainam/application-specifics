@@ -92,17 +92,7 @@ def list_flows():
             continue  # skip enrichment files and anything unexpected
         timestamp_str, flow_id = parsed
 
-        events = read_json(path)
-        if not isinstance(events, list):
-            continue
-
-        enrichment_path = path.with_suffix("").with_suffix(".enrichment.json")
-        # with_suffix replaces last suffix, so do it in two steps:
-        enrichment_path = path.parent / (path.stem + ".enrichment.json")
-        enrichment      = read_json(enrichment_path) if enrichment_path.exists() else None
-
-        results.append(flow_summary(timestamp_str, flow_id, events, enrichment))
-
+        results.append({'id': flow_id, 'ts': timestamp_str})
     return JSONResponse(content=results)
 
 
