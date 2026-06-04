@@ -52,16 +52,26 @@ function trigger_backend(action, data){
     {% endblock %}
 
 <script>
-const dContainer = document.querySelector('#TabsSystem')
+const dContainer = document.querySelector('#TabsSystem');
 
-dContainer
-.querySelectorAll('.TabButton')
-.forEach( tab =>
-  tab.onclick =_=>
-    {
-    dContainer.dataset.tab = tab.dataset.tab
-    }
-  )
+dContainer.querySelectorAll('.TabButton').forEach(tab => {
+  tab.onclick = () => {
+    const targetTab = tab.dataset.tab;
+
+    // 1. Remove 'active' class from all buttons and set it on the clicked one
+    dContainer.querySelectorAll('.TabButton').forEach(b => b.classList.remove('active'));
+    tab.classList.add('active');
+
+    // 2. Remove 'active' class from all content sections and add it only to the matching ones
+    dContainer.querySelectorAll('.tab-section').forEach(section => {
+      if (section.dataset.tab === targetTab) {
+        section.classList.add('active');
+      } else {
+        section.classList.remove('active');
+      }
+    });
+  };
+});
 </script>
 
     {% block scripts %}

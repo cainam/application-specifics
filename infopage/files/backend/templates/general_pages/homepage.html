@@ -1,22 +1,22 @@
 {% extends "shared/base.html" %}
 
-{% block title %} 
+{% block title %}
   <title>Infopage</title>
-{% endblock %} 
+{% endblock %}
 
-{% block content %} 
-  <div class="container" id="TabsSystem" data-tab="Tab1">
+{% block content %}
+  <div class="container" id="TabsSystem">
   <div class="d-flex">
     <div class="d-flex text-center">
-      <div class="TabButton" data-tab="software"> Software</div>
+      <div class="TabButton active" data-tab="software"> Software</div>
       <div class="TabButton" data-tab="services"> Services</div>
       <div class="TabButton" data-tab="status"> Status</div>
     </div>
   </div>
   <div class="d-flex-col">
     <table class="oTable"><tr>
-      <td><div class="tab-section" data-tab="software" itemprop="load" value="/registry_images"> </div></td>
-      <td><div class="tab-section" data-tab="software" itemprop="load" value="/software"> </div></td>
+      <td><div class="tab-section active" data-tab="software" itemprop="load" value="/registry_images"> </div></td>
+      <td><div class="tab-section active" data-tab="software" itemprop="load" value="/software"> </div></td>
     </tr></table>
 
     <table class="oTable"><tr>
@@ -26,66 +26,70 @@
     <table class="oTable"><tr>
       <td><div class="tab-section" data-tab="status" itemprop="load" value="/node_status"> </div></td>
       <td><div class="tab-section" data-tab="status" itemprop="load" value="/test_results"> </div></td>
-     </tr><tr><td><div class="tab-section" data-tab="status" itemprop="load" value="/services_status"> </div></td>
+    </tr><tr><td><div class="tab-section" data-tab="status" itemprop="load" value="/services_status"> </div></td>
     </tr></table>
     </div>
   </div>
 {% endblock %}
 
 {% block style %}
-    <style>
-.container {
-  width               : 100%
-  }
-.d-flex {
-  display             : flex;
-  width               : 100%;
-  }
+<style>
+/* --- Layout Utilities --- */
+.container,
+.d-flex,
 .d-flex-col {
-  display             : flex;
-  width               : 100%;
-  flex-direction      : column;
-  }
+  width: 100%;
+}
+.d-flex {
+  display: flex;
+}
+.d-flex-col {
+  display: flex;
+  flex-direction: column;
+}
 .text-center {
-  text-align          : center;
-  }
-#TabsSystem .TabButton {
-  width               : 100%;
-  color               : #5A5A61;
-  border              : 0;
-  border-bottom       : 1px solid #e0e0e0;
-  background-color    : #FFFFFF;
-  margin              : 0;
-  font-size           : 14px;
-  line-height         : 16px;
-  font-weight         : normal;
-  padding             : 16px;
-  cursor              : pointer;
-  }
-#TabsSystem[data-tab="software"] .TabButton[data-tab="software"],
-#TabsSystem[data-tab="services"] .TabButton[data-tab="services"],
-#TabsSystem[data-tab="status"] .TabButton[data-tab="status"]{
-  color               : #7A1315;
-  border-bottom-color : #C94927;
-  font-weight         : 500;
-  }
-#TabsSystem .tab-section {
-  display : none;
-  }
-#TabsSystem[data-tab="software"] .tab-section[data-tab="software"],
-#TabsSystem[data-tab="services"] .tab-section[data-tab="services"],
-#TabsSystem[data-tab="status"] .tab-section[data-tab="status"] {
-  display : block;
-  }
+  text-align: center;
+}
 
-      table { border-collapse:collapse; }
-      .iTable table,.iTable td,.iTable th,.iTable tr{
-        border: 1px solid;
-        border-collapse:collapse;
-      }
-      .oTable td{ 
-	vertical-align: top;
-      }
+/* --- Tabs System Base --- */
+#TabsSystem .TabButton {
+  width: 100%;
+  color: #5A5A61;
+  border: 0;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #FFFFFF;
+  margin: 0;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: normal;
+  padding: 16px;
+  cursor: pointer;
+}
+.tab-section {
+  display: none;
+}
+
+/* --- Merged Active Tab States --- */
+#TabsSystem .TabButton.active {
+  color: #7A1315;
+  border-bottom-color: #C94927;
+  font-weight: 500;
+}
+.tab-section.active {
+  display: block;
+}
+
+/* --- Tables --- */
+table {
+  border-collapse: collapse;
+}
+.iTable,
+.iTable th,
+.iTable td {
+  border: 1px solid;
+}
+.oTable td {
+  vertical-align: top;
+}
 </style>
 {% endblock %}
-
