@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 import subprocess
 import logging
 import functools
+import requests
 
 import infopage.helper
 
@@ -76,7 +77,7 @@ async def test_results(request: Request):
 @general_pages_router.get("/services_status")
 #async def services_status(request: Request):
 def services_status(request: Request):
-    import re, requests
+    import re
     from datetime import datetime
 
     output={}
@@ -120,7 +121,7 @@ def services_status(request: Request):
 
 @general_pages_router.post("/delete_image")
 async def delete_image(request: Request):
-    import requests, hashlib
+    import hashlib
 
     cacert = '/certs/service-ca-bundle.crt'
     payload = await request.json()
@@ -140,8 +141,6 @@ async def delete_image(request: Request):
 
 @general_pages_router.get("/registry_images")
 def registry_images(request: Request):
-  import requests
-
   cacert = '/certs/service-ca-bundle.crt'
   headers = {}
   images = requests.get(registry+"/v2/_catalog", verify=cacert, headers=headers).json()
