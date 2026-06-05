@@ -168,7 +168,7 @@ def software(request: Request, software: str | None = None):
 
 @general_pages_router.get("/flow_list")
 def flow_list(request: Request):
-  flows = requests.get("http://colombo.tools/flows", verify=cacert, headers={}).json()
+  flows = requests.get("http://colombo.tools/flows", headers={}).json()
   for flow in flows:
     logger.info("flow: "+str(flow))
 
