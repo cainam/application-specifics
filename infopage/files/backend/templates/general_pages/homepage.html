@@ -11,27 +11,29 @@
         <div class="TabButton active" data-tab="software">Software</div>
         <div class="TabButton" data-tab="services">Services</div>
         <div class="TabButton" data-tab="status">Status</div>
+        <div class="TabButton" data-tab="status">Flows</div>
       </div>
     </div>
 
-    <div class="d-flex-col" style="margin-top: 16px; gap: 16px;">
+    <div class="d-flex-col">
 
-      <div class="d-flex" style="gap: 16px;">
+      <div class="d-flex">
         <div class="tab-section active" style="flex: 1;" data-tab="software" itemprop="load" value="/registry_images"></div>
         <div class="tab-section active" style="flex: 1;" data-tab="software" itemprop="load" value="/software"></div>
       </div>
 
       <div class="d-flex">
-        <div class="tab-section style="flex: 1;" data-tab="services" itemprop="load" value="/virtual_services"></div>
+        <div class="tab-section" style="flex: 1;" data-tab="services" itemprop="load" value="/virtual_services"></div>
       </div>
 
-      <div class="d-flex-col" style="gap: 16px;">
-        <div class="d-flex" style="gap: 16px;">
-          <div class="tab-section style="flex: 1;" data-tab="status" itemprop="load" value="/node_status"></div>
-          <div class="tab-section style="flex: 1;" data-tab="status" itemprop="load" value="/test_results"></div>
+      <div class="d-flex-col">
+        <div class="d-flex">
+          <div class="tab-section" style="flex: 1;" data-tab="status" itemprop="load" value="/node_status"></div>
+          <div class="tab-section" style="flex: 1;" data-tab="status" itemprop="load" value="/test_results"></div>
         </div>
-        <div class="tab-section style="flex: 1;" data-tab="status" itemprop="load" value="/services_status"></div>
+        <div class="tab-section" style="flex: 1;" data-tab="status" itemprop="load" value="/services_status"></div>
       </div>
+
 
     </div>
   </div>
@@ -47,10 +49,12 @@
 }
 .d-flex {
   display: flex;
+  gap: 1rem
 }
 .d-flex-col {
   display: flex;
   flex-direction: column;
+  gap: 1rem
 }
 .text-center {
   text-align: center;
