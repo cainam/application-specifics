@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI, Request
 from core.config import settings
-from apis.general_pages.route_homepage import general_pages_router
+from infopage.route_homepage import general_pages_router
 
 import logging
 import re

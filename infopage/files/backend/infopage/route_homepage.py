@@ -7,7 +7,7 @@ import subprocess
 import logging
 import functools
 
-import infopage
+import infopage.helper
 
 logging.basicConfig(level = logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -139,7 +139,6 @@ async def delete_image(request: Request):
     return ""
 
 @general_pages_router.get("/registry_images")
-#async def registry_images(request: Request):
 def registry_images(request: Request):
   import requests
 
@@ -159,8 +158,8 @@ def registry_images(request: Request):
   return templates.TemplateResponse(request=request,name="general_pages/images_list.html",context={"images_list": images_list, "name": "registry images" } )
 
 @general_pages_router.get("/software")
-#async def software(request: Request):
 def software(request: Request, software: str | None = None):
+    # if software is None, table is rendered, if software is set, then the row of one software is rendered
     raw, content = infopage.software(software)
     if (software is None ):
       return templates.TemplateResponse(request=request,name="general_pages/software.html",context={"content": content, "raw": raw, "name": "software"})
