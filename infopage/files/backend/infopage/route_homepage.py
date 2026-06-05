@@ -172,5 +172,5 @@ def flow_list(request: Request):
   sorted_flows = sorted(flows, key=lambda x: x["ts"], reverse=True)
   for flow in sorted_flows:
     logger.info("flow: "+str(flow))
-
+  return templates.TemplateResponse(request=request,name="flow_list.html",context={"flows": sorted_flows, "name": "List of Flows"})
 
