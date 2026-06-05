@@ -75,7 +75,6 @@ async def test_results(request: Request):
     return templates.TemplateResponse(request=request,name="test_results.html",context={"tests": tests, "name": "test results"})
 
 @general_pages_router.get("/services_status")
-#async def services_status(request: Request):
 def services_status(request: Request):
     import re
     from datetime import datetime
@@ -138,6 +137,13 @@ async def delete_image(request: Request):
 
     logger.info("status:"+str(del_return.status_code))
     return ""
+
+@general_pages_router.post("/get_flow")
+async def get_flow(request: Request):
+   payload = await request.json()
+   logger.info("/get_flow called, payload: "+str(payload ) )
+   return ""
+
 
 @general_pages_router.get("/registry_images")
 def registry_images(request: Request):
