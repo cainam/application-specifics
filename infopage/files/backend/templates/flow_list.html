@@ -1,0 +1,14 @@
+<hr/>{{ name }}<br/>
+<hr/>
+<table class="iTable">
+
+<tr><th>flow</th><th>timestamp</th></tr>
+    {% if flows %}
+        {% for flow in flows %}
+	<tr>
+	  <td><pre>{{ flow.id }}</pre></td>
+	  <td><pre>{{ flow.ts }}</pre></td>
+	</tr>
+        {% endfor %}
+    {% endif %}
+</table>
