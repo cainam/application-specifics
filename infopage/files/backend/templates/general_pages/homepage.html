@@ -6,28 +6,33 @@
 
 {% block content %}
   <div class="container" id="TabsSystem">
-  <div class="d-flex">
-    <div class="d-flex text-center">
-      <div class="TabButton active" data-tab="software"> Software</div>
-      <div class="TabButton" data-tab="services"> Services</div>
-      <div class="TabButton" data-tab="status"> Status</div>
+    <div class="d-flex">
+      <div class="d-flex text-center">
+        <div class="TabButton active" data-tab="software">Software</div>
+        <div class="TabButton" data-tab="services">Services</div>
+        <div class="TabButton" data-tab="status">Status</div>
+      </div>
     </div>
-  </div>
-  <div class="d-flex-col">
-    <table class="oTable"><tr>
-      <td><div class="tab-section active" data-tab="software" itemprop="load" value="/registry_images"> </div></td>
-      <td><div class="tab-section active" data-tab="software" itemprop="load" value="/software"> </div></td>
-    </tr></table>
 
-    <table class="oTable"><tr>
-      <td><div class="tab-section" data-tab="services" itemprop="load" value="/virtual_services"> </div></td>
-    </tr></table>
+    <div class="d-flex-col" style="margin-top: 16px; gap: 16px;">
 
-    <table class="oTable"><tr>
-      <td><div class="tab-section" data-tab="status" itemprop="load" value="/node_status"> </div></td>
-      <td><div class="tab-section" data-tab="status" itemprop="load" value="/test_results"> </div></td>
-    </tr><tr><td><div class="tab-section" data-tab="status" itemprop="load" value="/services_status"> </div></td>
-    </tr></table>
+      <div class="d-flex" style="gap: 16px;">
+        <div class="tab-section active" style="flex: 1;" data-tab="software" itemprop="load" value="/registry_images"></div>
+        <div class="tab-section active" style="flex: 1;" data-tab="software" itemprop="load" value="/software"></div>
+      </div>
+
+      <div class="d-flex">
+        <div class="tab-section style="flex: 1;" data-tab="services" itemprop="load" value="/virtual_services"></div>
+      </div>
+
+      <div class="d-flex-col" style="gap: 16px;">
+        <div class="d-flex" style="gap: 16px;">
+          <div class="tab-section style="flex: 1;" data-tab="status" itemprop="load" value="/node_status"></div>
+          <div class="tab-section style="flex: 1;" data-tab="status" itemprop="load" value="/test_results"></div>
+        </div>
+        <div class="tab-section style="flex: 1;" data-tab="status" itemprop="load" value="/services_status"></div>
+      </div>
+
     </div>
   </div>
 {% endblock %}
@@ -69,7 +74,7 @@
   display: none;
 }
 
-/* --- Merged Active Tab States --- */
+/* --- Active Tab States --- */
 #TabsSystem .TabButton.active {
   color: #7A1315;
   border-bottom-color: #C94927;
@@ -79,7 +84,7 @@
   display: block;
 }
 
-/* --- Tables --- */
+/* --- Tables (Kept only for inner data rendering) --- */
 table {
   border-collapse: collapse;
 }
@@ -87,9 +92,6 @@ table {
 .iTable th,
 .iTable td {
   border: 1px solid;
-}
-.oTable td {
-  vertical-align: top;
 }
 </style>
 {% endblock %}
