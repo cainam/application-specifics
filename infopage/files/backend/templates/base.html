@@ -34,7 +34,7 @@ function trigger_backend(action, data){
   // alert("image:"+data.image+"\ntag: "+data.tag);
   extend_url = currentUrl.endsWith("/") ? "" : "/";
   fetch(currentUrl+extend_url+action, { method: 'post',
-    body: JSON.stringify({ image: data.image, tag: data.tag }),
+    body: JSON.stringify(data),
     headers: { 'Content-type': 'application/json; charset=UTF-8', }
   })
 
