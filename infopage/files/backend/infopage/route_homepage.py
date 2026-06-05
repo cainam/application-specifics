@@ -60,17 +60,17 @@ async def check(request: Request):
 
 @general_pages_router.get("/node_status")
 async def node_status(request: Request):
-    content = infopage.node_info()
+    content = infopage.helper.node_info()
     return templates.TemplateResponse(request=request,name="general_pages/node_info.html",context={"nodes": content, "name": "node status"})
 
 @general_pages_router.get("/virtual_services")
 async def vs(request: Request):
-    content = infopage.vs_info()
+    content = infopage.helper.vs_info()
     return templates.TemplateResponse(request=request,name="general_pages/vs_info.html",context={"vss": content, "name": "virtual services"})
 
 @general_pages_router.get("/test_results")
 async def test_results(request: Request):
-    last_start, tests = infopage.test_results()
+    last_start, tests = infopage.helper.test_results()
     return templates.TemplateResponse(request=request,name="general_pages/test_results.html",context={"tests": tests, "name": "test results"})
 
 @general_pages_router.get("/services_status")
@@ -160,7 +160,7 @@ def registry_images(request: Request):
 @general_pages_router.get("/software")
 def software(request: Request, software: str | None = None):
     # if software is None, table is rendered, if software is set, then the row of one software is rendered
-    raw, content = infopage.software(software)
+    raw, content = infopage.helper.software(software)
     if (software is None ):
       return templates.TemplateResponse(request=request,name="general_pages/software.html",context={"content": content, "raw": raw, "name": "software"})
     else:
