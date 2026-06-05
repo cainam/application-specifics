@@ -18,23 +18,23 @@
     <div class="d-flex-col">
 
       <div class="d-flex">
-        <div class="tab-section active" style="flex: 1;" data-tab="software" itemprop="load" value="/registry_images"></div>
-        <div class="tab-section active" style="flex: 1;" data-tab="software" itemprop="load" value="/software"></div>
+        <div class="tab-section active" data-tab="software" itemprop="load" value="/registry_images"></div>
+        <div class="tab-section active" data-tab="software" itemprop="load" value="/software"></div>
       </div>
 
       <div class="d-flex">
-        <div class="tab-section" style="flex: 1;" data-tab="services" itemprop="load" value="/virtual_services"></div>
+        <div class="tab-section" data-tab="services" itemprop="load" value="/virtual_services"></div>
       </div>
 
       <div class="d-flex-col">
         <div class="d-flex">
-          <div class="tab-section" style="flex: 1;" data-tab="status" itemprop="load" value="/node_status"></div>
-          <div class="tab-section" style="flex: 1;" data-tab="status" itemprop="load" value="/test_results"></div>
+          <div class="tab-section" data-tab="status" itemprop="load" value="/node_status"></div>
+          <div class="tab-section" data-tab="status" itemprop="load" value="/test_results"></div>
         </div>
-        <div class="tab-section" style="flex: 1;" data-tab="status" itemprop="load" value="/services_status"></div>
+        <div class="tab-section" data-tab="status" itemprop="load" value="/services_status"></div>
       </div>
-
-
+      <div class="d-flex-col">
+      </div>
     </div>
   </div>
 {% endblock %}
@@ -76,6 +76,7 @@
 }
 .tab-section {
   display: none;
+  flex: 1;
 }
 
 /* --- Active Tab States --- */
@@ -86,6 +87,15 @@
 }
 .tab-section.active {
   display: block;
+}
+
+table {
+  border-collapse: collapse;
+}
+.iTable,
+.iTable th,
+.iTable td {
+  border: 1px solid;
 }
 </style>
 {% endblock %}
