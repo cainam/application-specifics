@@ -50,7 +50,7 @@ uvicorn_logger.addFilter(LogFilter())
 
 @general_pages_router.get("/")
 async def home(request: Request):
-	return templates.TemplateResponse(request=request,name="general_pages/homepage.html",context={})
+	return templates.TemplateResponse(request=request,name="homepage.html",context={})
 
 @general_pages_router.get("/check")
 async def check(request: Request):
@@ -61,17 +61,17 @@ async def check(request: Request):
 @general_pages_router.get("/node_status")
 async def node_status(request: Request):
     content = infopage.helper.node_info()
-    return templates.TemplateResponse(request=request,name="general_pages/node_info.html",context={"nodes": content, "name": "node status"})
+    return templates.TemplateResponse(request=request,name="node_info.html",context={"nodes": content, "name": "node status"})
 
 @general_pages_router.get("/virtual_services")
 async def vs(request: Request):
     content = infopage.helper.vs_info()
-    return templates.TemplateResponse(request=request,name="general_pages/vs_info.html",context={"vss": content, "name": "virtual services"})
+    return templates.TemplateResponse(request=request,name="vs_info.html",context={"vss": content, "name": "virtual services"})
 
 @general_pages_router.get("/test_results")
 async def test_results(request: Request):
     last_start, tests = infopage.helper.test_results()
-    return templates.TemplateResponse(request=request,name="general_pages/test_results.html",context={"tests": tests, "name": "test results"})
+    return templates.TemplateResponse(request=request,name="test_results.html",context={"tests": tests, "name": "test results"})
 
 @general_pages_router.get("/services_status")
 #async def services_status(request: Request):
@@ -116,7 +116,7 @@ def services_status(request: Request):
     output['stage3'] = output['stage3'] + '\n' + latest_file_name
 
     # logger.info("response: "+response)
-    return templates.TemplateResponse(request=request,name="general_pages/service_status.html",context={"content": output, "name": "service status" } )
+    return templates.TemplateResponse(request=request,name="service_status.html",context={"content": output, "name": "service status" } )
 
 @general_pages_router.post("/delete_image")
 async def delete_image(request: Request):
@@ -155,15 +155,15 @@ def registry_images(request: Request):
       for t in versions["tags"]:
         images_list.append([i, t])
 
-  return templates.TemplateResponse(request=request,name="general_pages/images_list.html",context={"images_list": images_list, "name": "registry images" } )
+  return templates.TemplateResponse(request=request,name="images_list.html",context={"images_list": images_list, "name": "registry images" } )
 
 @general_pages_router.get("/software")
 def software(request: Request, software: str | None = None):
     # if software is None, table is rendered, if software is set, then the row of one software is rendered
     raw, content = infopage.helper.software(software)
     if (software is None ):
-      return templates.TemplateResponse(request=request,name="general_pages/software.html",context={"content": content, "raw": raw, "name": "software"})
+      return templates.TemplateResponse(request=request,name="software.html",context={"content": content, "raw": raw, "name": "software"})
     else:
       logger.info("software: "+software+" content:"+str(content))
-      return templates.TemplateResponse(request=request,name="general_pages/software_versions.html",context={"content": content, "raw": raw})
+      return templates.TemplateResponse(request=request,name="software_versions.html",context={"content": content, "raw": raw})
 
