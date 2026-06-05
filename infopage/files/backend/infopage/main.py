@@ -1,7 +1,7 @@
 #main.py 
 
 from fastapi import FastAPI, Request
-from core.config import settings
+from infopage.config import settings
 from infopage.route_homepage import general_pages_router
 
 import logging
