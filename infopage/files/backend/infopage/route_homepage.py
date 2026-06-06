@@ -138,13 +138,6 @@ async def delete_image(request: Request):
     logger.info("status:"+str(del_return.status_code))
     return ""
 
-@general_pages_router.post("/get_flow")
-async def get_flow(request: Request):
-   payload = await request.json()
-   logger.info("/get_flow called, payload: "+str(payload ) )
-   return ""
-
-
 @general_pages_router.get("/registry_images")
 def registry_images(request: Request):
   cacert = '/certs/service-ca-bundle.crt'
@@ -180,3 +173,8 @@ def flow_list(request: Request):
     logger.info("flow: "+str(flow))
   return templates.TemplateResponse(request=request,name="flow_list.html",context={"flows": sorted_flows, "name": "List of Flows"})
 
+@general_pages_router.post("/get_flow")
+async def get_flow(request: Request):
+   payload = await request.json()
+   logger.info("/get_flow called, payload: "+str(payload ) )
+   return ""

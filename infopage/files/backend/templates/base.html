@@ -29,14 +29,18 @@ function load_sw_details(element){
   }
 }
 
-function trigger_backend(action, data){
-  // alert("backend!"+"\n action"+action+"\ndata: "+data);
+function trigger_backend(endpoint, data, dest = undefined){
+  // alert("backend!"+"\n endpoint"+endpoint+"\ndata: "+data);
   // alert("image:"+data.image+"\ntag: "+data.tag);
   extend_url = currentUrl.endsWith("/") ? "" : "/";
-  fetch(currentUrl+extend_url+action, { method: 'post',
+  content = fetch(currentUrl+extend_url+endpoint, { method: 'post',
     body: JSON.stringify(data),
     headers: { 'Content-type': 'application/json; charset=UTF-8', }
   })
+  if (dest !== undefined) {
+    const targetDiv = document.querySelector('.tab-section['+dest+']');
+    targetDiv.innerHTML = content;
+  }
 
 }
     </script>

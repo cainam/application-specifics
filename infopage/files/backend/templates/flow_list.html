@@ -10,7 +10,6 @@
 	  <td><pre>{{ flow.ts }}</pre></td>
 	  <td>
             <form action="javascript:void(0);" method="post">
-              <input type="hidden" name="flowX" value="{{ flow.id }}" />
               <button type=submit onclick='trigger_backend("get_flow", {"flow": "{{ flow.id }}"});return false;'>fetch</button>
             </form>
 	  </td>
