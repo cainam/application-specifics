@@ -28,7 +28,7 @@ function load_sw_details(element){
   }
 }
 
-function trigger_backend(endpoint, data, dest = undefined){
+async function trigger_backend(endpoint, data, dest = undefined){
   extend_url = currentUrl.endsWith("/") ? "" : "/";
   const response = await fetch(currentUrl+extend_url+endpoint, { method: 'post',
     body: JSON.stringify(data),
