@@ -177,4 +177,4 @@ def flow_list(request: Request):
 async def get_flow(request: Request):
    payload = await request.json()
    logger.info("/get_flow called, payload: "+str(payload ) )
-   return "some data here!"
+   return requests.get("http://colombo.tools/flows/"+str(payload.flow), headers={}).json()
