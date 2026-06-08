@@ -37,7 +37,7 @@
       <div class="d-flex-col content-row">
         <div class="d-flex">
           <div class="tab-section card" data-tab="flows" itemprop="load" value="/flow_list"></div>
-          <div class="tab-section card" data-tab="flows" itemprop="load" value="/flow_info" data-dest="flows"></div>
+          <div class="tab-section card json-block" data-tab="flows" itemprop="load" value="/flow_info" data-dest="flows"></div>
         </div>
       </div>
     </div>
@@ -87,6 +87,13 @@
 .nav-wrapper {
   display: flex;
   margin-bottom: 1.5rem;
+}
+
+.json-block {
+    white-space: pre-wrap;
+    font-family: monospace; /* Makes it look like code */
+    background-color: #f4f4f4;
+    padding: 0.625rem;
 }
 
 .tab-navigation {

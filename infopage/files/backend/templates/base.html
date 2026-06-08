@@ -39,7 +39,7 @@ async function trigger_backend(endpoint, data, dest = undefined){
   if (dest !== undefined) {
     console.log("dest specified, content:",htmlContent);
     const targetDiv = document.querySelector('.tab-section[data-dest='+dest+']');
-    targetDiv.innerHTML = htmlContent;
+    targetDiv.textContent = JSON.stringify(htmlContent, null, 2);;
   }
 }
     </script>
