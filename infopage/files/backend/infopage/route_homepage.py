@@ -175,6 +175,10 @@ def flow_list(request: Request):
 
 @general_pages_router.post("/get_flow")
 async def get_flow(request: Request):
-   payload = await request.json()
-   logger.info("/get_flow called, payload: "+str(payload ) )
-   return requests.get("http://colombo.tools/flows/"+str(payload.flow), headers={}).json()
+  payload = await request.json()
+  logger.info("/get_flow called, payload: "+str(payload ) )
+  flow_id = payload.get("flow")
+  if not flow_id:
+    return {"error": "Missing 'flow' key in payload"}, 400
+
+  return requests.get("http://colombo.tools/flows/" + str(flow_id), headers={}).json()
