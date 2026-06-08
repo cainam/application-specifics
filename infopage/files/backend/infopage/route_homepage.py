@@ -177,4 +177,4 @@ def flow_list(request: Request):
 async def get_flow(request: Request):
    payload = await request.json()
    logger.info("/get_flow called, payload: "+str(payload ) )
-   return ""
+   return "some data here!"
