@@ -2,12 +2,13 @@
 <hr/>
 <table class="iTable">
 
-<tr><th>flow</th><th>timestamp</th></tr>
+<tr><th>flow</th><th>timestamp</th><th>verdict</th></tr>
     {% if flows %}
         {% for flow in flows %}
 	<tr>
 	  <td><pre>{{ flow.id }}</pre></td>
 	  <td><pre>{{ flow.ts }}</pre></td>
+	  <td><pre>{{ flow.verdict }}</pre></td>
 	  <td>
             <form action="javascript:void(0);" method="post">
               <button type=submit onclick='trigger_backend("get_flow", {"flow": "{{ flow.id }}"}, "flows");return false;'>fetch</button>

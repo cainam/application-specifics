@@ -91,7 +91,7 @@ def list_flows():
         if not parsed:
             continue  # skip enrichment files and anything unexpected
         timestamp_str, flow_id = parsed
-        with open(timestamp_str+"_"+flow_id+".enrichment.json", "r") as file:
+        with open(FLOWS_DIR+"/"+timestamp_str+"_"+flow_id+".enrichment.json", "r") as file:
             data = json.load(file)
         verdict_level = data.get("verdict", {}).get("level")
 
