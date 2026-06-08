@@ -25,7 +25,6 @@ function load_sw_details(element){
     .then(response => response.text())
       .then(html => {inner_elems[i].innerHTML = html;})
       .catch(error => {console.log(error);})
-
   }
 }
 
@@ -38,6 +37,7 @@ function trigger_backend(endpoint, data, dest = undefined){
     headers: { 'Content-type': 'application/json; charset=UTF-8', }
   })
   if (dest !== undefined) {
+    console.log("dest specified");
     const targetDiv = document.querySelector('.tab-section['+dest+']');
     targetDiv.innerHTML = content;
   }
