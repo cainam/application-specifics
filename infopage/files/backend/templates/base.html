@@ -36,6 +36,8 @@ function trigger_backend(endpoint, data, dest = undefined){
     body: JSON.stringify(data),
     headers: { 'Content-type': 'application/json; charset=UTF-8', }
   })
+  console.log("trigger_backend");
+
   if (dest !== undefined) {
     console.log("dest specified");
     const targetDiv = document.querySelector('.tab-section['+dest+']');
