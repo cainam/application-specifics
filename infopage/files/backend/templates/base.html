@@ -29,19 +29,17 @@ function load_sw_details(element){
 }
 
 function trigger_backend(endpoint, data, dest = undefined){
-  // alert("backend!"+"\n endpoint"+endpoint+"\ndata: "+data);
-  // alert("image:"+data.image+"\ntag: "+data.tag);
   extend_url = currentUrl.endsWith("/") ? "" : "/";
-  content = fetch(currentUrl+extend_url+endpoint, { method: 'post',
+  const response = await fetch(currentUrl+extend_url+endpoint, { method: 'post',
     body: JSON.stringify(data),
     headers: { 'Content-type': 'application/json; charset=UTF-8', }
   })
-  console.log("trigger_backend");
+  const htmlContent = await response.text();
 
   if (dest !== undefined) {
-    console.log("dest specified");
+    console.log("dest specified, content:",htmlContent);
     const targetDiv = document.querySelector('.tab-section[data-dest='+dest+']');
-    targetDiv.innerHTML = content;
+    targetDiv.innerHTML = htmlContent;
   }
 }
     </script>
