@@ -40,10 +40,9 @@ function trigger_backend(endpoint, data, dest = undefined){
 
   if (dest !== undefined) {
     console.log("dest specified");
-    const targetDiv = document.querySelector('.tab-section['+dest+']');
+    const targetDiv = document.querySelector('.tab-section[data-dest='+dest+']');
     targetDiv.innerHTML = content;
   }
-
 }
     </script>
     {% block style %}

@@ -10,7 +10,7 @@
 	  <td><pre>{{ flow.ts }}</pre></td>
 	  <td>
             <form action="javascript:void(0);" method="post">
-              <button type=submit onclick='trigger_backend("get_flow", {"flow": "{{ flow.id }}"});return false;'>fetch</button>
+              <button type=submit onclick='trigger_backend("get_flow", {"flow": "{{ flow.id }}"}, "flows");return false;'>fetch</button>
             </form>
 	  </td>
 	</tr>
