@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         flow_list_callback: function(element) {
             populateFilterOptions();
+            filterTable();
         },
     };
 
@@ -35,11 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(html => { elem.innerHTML = html; })
             .catch(error => { console.log(error); });
     }
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-    populateFilterOptions();
-    filterTable(); // Run initially to apply the default "NOT_CLEAN" filter
 });
 
 function populateFilterOptions() {
