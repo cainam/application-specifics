@@ -1,12 +1,9 @@
 <hr/>{{ name }}<br/>
 <hr/>
 
-<div style="margin-bottom: 15px;">
+<div style="margin-bottom: 1rem;">
     <label for="verdictFilter">Filter Verdict: </label>
     <select id="verdictFilter" onchange="filterTable()">
-        <option value="ALL">All</option>
-        <option value="NOT_CLEAN" selected>All except CLEAN</option>
-        <option value="CLEAN">CLEAN</option>
     </select>
 </div>
 
@@ -25,7 +22,7 @@
       <td class="verdict-cell"><pre>{{ flow.verdict }}</pre></td>
       <td>
             <form action="javascript:void(0);" method="post">
-              <button type=submit onclick='trigger_backend("get_flow", {"flow": "{{ flow.id }}"}, "flows");return false;'>fetch</button>
+              <button type=submit onclick='trigger_backend("get_flow", {"flow": "{{ flow.id }}"}, "flows"); populateFilterOptions();return false;'>fetch</button>
             </form>
       </td>
     </tr>
