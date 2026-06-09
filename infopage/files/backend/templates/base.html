@@ -4,15 +4,35 @@
   <base href="https://my-lb.adm13/infopage" target="_blank">
     <script>
     const currentUrl = window.location.href;
-document.addEventListener('DOMContentLoaded', ()=> {
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loadCallbacks = {
+        software_callback: function(element) {
+            load_sw_details(element);
+        },
+        // add more callbacks here, e.g.:
+        // virtual_services_callback: function(element) { ... }
+    };
+
     ItemElems = document.querySelectorAll("[itemprop='load']");
     for (let i = 0; i < ItemElems.length; i++) {
-      fetch(currentUrl+ItemElems[i].getAttribute('value'))
-      .then(response => response.text())
-      .then(html => {ItemElems[i].innerHTML = html;})
-      .catch(error => {console.log(error);})
-      .then(function(){if(ItemElems[i].getAttribute('value')=="/software"){load_sw_details(ItemElems[i]);} })
-      ;
+        const elem = ItemElems[i];
+        const value = elem.getAttribute('value');
+        const callbackName = value.replace('/', '') + '_callback';
+
+        if (callbackName in loadCallbacks) {
+            const observer = new MutationObserver((mutations, obs) => {
+                obs.disconnect();
+                loadCallbacks[callbackName](elem);
+            });
+            observer.observe(elem, { childList: true });
+        }
+
+        fetch(currentUrl + value)
+            .then(response => response.text())
+            .then(html => { elem.innerHTML = html; })
+            .catch(error => { console.log(error); });
     }
 });
 
