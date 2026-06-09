@@ -1,20 +1,34 @@
 <hr/>{{ name }}<br/>
 <hr/>
-<table class="iTable">
 
-<tr><th>flow</th><th>timestamp</th><th>verdict</th></tr>
+<div style="margin-bottom: 15px;">
+    <label for="verdictFilter">Filter Verdict: </label>
+    <select id="verdictFilter" onchange="filterTable()">
+        <option value="ALL">All</option>
+        <option value="NOT_CLEAN" selected>All except CLEAN</option>
+        <option value="CLEAN">CLEAN</option>
+    </select>
+</div>
+
+<table class="iTable" id="flowTable">
+    <tr>
+        <th>flow</th>
+        <th>timestamp</th>
+        <th>verdict</th>
+        <th>actions</th>
+    </tr>
     {% if flows %}
         {% for flow in flows %}
-	<tr>
-	  <td><pre>{{ flow.id }}</pre></td>
-	  <td><pre>{{ flow.ts }}</pre></td>
-	  <td><pre>{{ flow.verdict }}</pre></td>
-	  <td>
+    <tr class="flow-row" data-verdict="{{ flow.verdict }}">
+      <td><pre>{{ flow.id }}</pre></td>
+      <td><pre>{{ flow.ts }}</pre></td>
+      <td class="verdict-cell"><pre>{{ flow.verdict }}</pre></td>
+      <td>
             <form action="javascript:void(0);" method="post">
               <button type=submit onclick='trigger_backend("get_flow", {"flow": "{{ flow.id }}"}, "flows");return false;'>fetch</button>
             </form>
-	  </td>
-	</tr>
+      </td>
+    </tr>
         {% endfor %}
     {% endif %}
 </table>

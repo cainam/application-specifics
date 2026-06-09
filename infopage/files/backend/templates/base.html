@@ -15,6 +15,60 @@ document.addEventListener('DOMContentLoaded', ()=> {
       ;
     }
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+    populateFilterOptions();
+    filterTable(); // Run initially to apply the default "NOT_CLEAN" filter
+});
+
+function populateFilterOptions() {
+    const rows = document.querySelectorAll(".flow-row");
+    const select = document.getElementById("verdictFilter");
+    const uniqueVerdicts = new Set();
+
+    // Gather all unique verdicts from the rendered data
+    rows.forEach(row => {
+        const verdict = row.getAttribute("data-verdict").trim();
+        if (verdict && verdict !== "CLEAN") {
+            uniqueVerdicts.add(verdict);
+        }
+    });
+
+    // Dynamically add unique values to the spreadsheet filter
+    uniqueVerdicts.forEach(verdict => {
+        const option = document.createElement("option");
+        option.value = verdict;
+        option.textContent = verdict;
+        select.appendChild(option);
+    });
+}
+
+function filterTable() {
+    const selectedValue = document.getElementById("verdictFilter").value;
+    const rows = document.querySelectorAll(".flow-row");
+
+    rows.forEach(row => {
+        const rowVerdict = row.getAttribute("data-verdict").trim();
+
+        if (selectedValue === "ALL") {
+            row.style.display = ""; // Show everything
+        } else if (selectedValue === "NOT_CLEAN") {
+            if (rowVerdict === "CLEAN") {
+                row.style.display = "none"; // Hide CLEAN
+            } else {
+                row.style.display = ""; // Show everything else
+            }
+        } else {
+            // Exact match for specific dropdown selections
+            if (rowVerdict === selectedValue) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        }
+    });
+}
+
 function load_sw_details(element){
   console.log("sw details"+element);
   inner_elems = element.querySelectorAll("[itemprop='inner_load']");
