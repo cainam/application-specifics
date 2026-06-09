@@ -176,13 +176,15 @@ spec:
           args:
             - |
               set -x
-              instructions="You are a network security analyst. Explain the following Suricata flow in plain language. Focus on:
-              - What triggered the alert
-              - What device initiated the connection and where to
-              - Whether this looks like a genuine threat or a false positive
-              - What action if any should be taken
+              instructions="You are a network security analyzer. Analyze the following network capture data.
 
-              Flow data:"
+              CRITICAL: Provide ONLY the result and a short description using the exact format below. Do not include any introductory text, greetings, markdown formatting outside of the keys, or long explanations. If you violate this, the output breaks my parser.
+
+              Format:
+              result: [One-word status, e.g., Safe, Suspicious, Malicious]
+              desc: [A 2-4 word technical reason]
+
+              Flows: "
               mkdir -p ${ENRICHED_FLOWS}
               while sleep "${INTERVAL}"; do
                 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Asking AI..."
