@@ -83,7 +83,7 @@ spec:
           volumeMounts:
             - name: shared-pipe
               mountPath: /data
-        - name: suricata-ids
+        - name: suricata
           image: myregistry.adm13:443/local/suricata:20260521
           workingDir: /data
           command: ["/bin/sh", "-c"]
@@ -94,6 +94,7 @@ spec:
               rm -f /var/log/suricata/* /data/pcaps/*
               while true; do
                 echo "Suricata listening to pipe..."
+                cat >>
                 suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
                 sleep 2
@@ -105,6 +106,9 @@ spec:
             mountPath: /data
           - name: {{ kustom.name }}
             mountPath: /var/log
+          - mountPath: /etc/suricata/threshold.config
+            name: suricata-config
+            subPath: threshold.config
         - name: cleanup-pcaps
           image: myregistry.adm13:443/local/python3:20260521
           env:
@@ -137,6 +141,9 @@ spec:
             mountPath: /var/log
         - name: process-suricata-alerts
           image: myregistry.adm13:443/local/python3:20260521
+          env:
+          - name: FLOWS_DIR
+            value: /var/log/flows
           command: ["python", "/app/{{ kustom.name }}.py"]
           securityContext:
             runAsUser: {{ kustom.security.runAsUser }}
@@ -150,9 +157,9 @@ spec:
           image: myregistry.adm13:443/local/spider-collect:20260521
           env:
           - name: SURICATA_FLOWS
-            value: /var/log/suricata/flows
+            value: /var/log/flows
           - name: ENRICHED_FLOWS
-            value: /var/log/suricata/flows-enriched
+            value: /var/log/flows-enriched
           - name: INTERVAL
             value: "90"
           - name: ANTHROPIC_AUTH_TOKEN
@@ -218,7 +225,7 @@ spec:
           image: myregistry.adm13:443/local/fastapi:20260521
           env:
           - name: FLOWS_DIR
-            value: /var/log/suricata/flows-enriched
+            value: /var/log/flows-enriched
           - name: PYTHONPATH
             value: /py_env/lib/python3.13/site-packages/
           command: ["python", "-u",  "/app/api.py"]

@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: suricata-config
 data:
+  threshold.config: |
+    suppress gen_id 1, sig_id 2036220 # Android connectivity checks
   suricata.yaml: |
     %YAML 1.1
     ---

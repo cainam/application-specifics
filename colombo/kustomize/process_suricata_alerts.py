@@ -3,9 +3,9 @@
 tail_alerts.py
 
 Tails eve.json written by Suricata and writes one JSON file per alerting
-flow into FLOW_DIR:
+flow into FLOWS_DIR:
 
-    FLOW_DIR/<timestamp>_<flow_id>.json
+    FLOWS_DIR/<timestamp>_<flow_id>.json
 
 Each file contains a JSON array of all events sharing that flow_id.
 The timestamp prefix is the ISO8601 time of the first event seen for
@@ -38,10 +38,12 @@ import subprocess
 from collections import defaultdict
 
 EVE_PATH      = os.getenv("EVE_PATH",   "/var/log/suricata/eve.json")
-FLOW_DIR      = os.getenv("FLOW_DIR",   "/var/log/suricata/flows")
+FLOWS_DIR      = os.getenv("FLOWS_DIR")
 MAX_SIZE      = int(os.getenv("MAX_SIZE",      str(100 * 1024 * 1024)))  # 100MB
 POLL_INTERVAL = float(os.getenv("POLL_INTERVAL", "0.1"))                 # seconds
 FLOW_TTL      = float(os.getenv("FLOW_TTL",      "120"))                 # seconds
+if not FLOWS_DIR:
+    raise KeyError("Environment variable 'FLOWS_DIR' is not set.")
 
 EVE_OLD_PATH  = EVE_PATH + ".old"
 
@@ -167,7 +169,7 @@ def remove_old() -> None:
 
 
 def write_flow(first_ts: str, events: list[dict]) -> None:
-    """Write all events for one alerting flow to FLOW_DIR/<timestamp>_<flow_id>.json"""
+    """Write all events for one alerting flow to FLOWS_DIR/<timestamp>_<flow_id>.json"""
     flow_id  = events[0].get("flow_id", "unknown")
 
     # Normalise timestamp to a filename-safe string: 2026-05-28T19:21:36.252199+0000
@@ -175,7 +177,7 @@ def write_flow(first_ts: str, events: list[dict]) -> None:
     safe_ts  = first_ts[:19].replace("-", "").replace(":", "")
 
     filename = f"{safe_ts}_{flow_id}.json"
-    path     = os.path.join(FLOW_DIR, filename)
+    path     = os.path.join(FLOWS_DIR, filename)
 
     with open(path, "w") as f:
         json.dump(events, f, indent=2)
@@ -249,11 +251,11 @@ def tail_eve(eve_path: str, buf: FlowBuffer) -> None:
 # ── entry point ───────────────────────────────────────────────────────────────
 
 def main() -> None:
-    os.makedirs(FLOW_DIR, exist_ok=True)
+    os.makedirs(FLOWS_DIR, exist_ok=True)
     print(
         f"Starting eve tailer\n"
         f"  EVE_PATH={EVE_PATH}\n"
-        f"  FLOW_DIR={FLOW_DIR}\n"
+        f"  FLOWS_DIR={FLOWS_DIR}\n"
         f"  MAX_SIZE={MAX_SIZE / 1024 / 1024:.0f}MB\n"
         f"  POLL_INTERVAL={POLL_INTERVAL}s\n"
         f"  FLOW_TTL={FLOW_TTL}s",
