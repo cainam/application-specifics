@@ -160,6 +160,11 @@ spec:
               secretKeyRef:
                 name: {{ kustom.name }}
                 key: openrouter
+          - name: GROQ
+            valueFrom:
+              secretKeyRef:
+                name: {{ kustom.name }}
+                key: groq
           - name: ABUSEIPDB_KEY
             valueFrom:
               secretKeyRef:
