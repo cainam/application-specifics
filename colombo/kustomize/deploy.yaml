@@ -21,9 +21,7 @@ spec:
       - name: {{ kustom.name }}
         persistentVolumeClaim:
           claimName: {{ kustom.name }}
-      - name: suricata-logs
-        emptyDir: {}
-      - name: shared-pipe
+      - name: pcap-data
         emptyDir: {}
       - name: suricata-config
         configMap:
@@ -38,7 +36,6 @@ spec:
           args:
             - |
               set -x
-              # TRAFFIC_FILTER="not (src net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16) and dst net (10.0.0.0/8 or 172.16.0.0/12 or 192.168.0.0/16))"
               IFACE="1-lan" # LAN IFACE="2-0"  # WAN #IFACE="internet"?
               SID='0000000000000000'
               valid_sid(){
@@ -57,7 +54,7 @@ spec:
               }
               echo "Capturing traffic on Fritz!Box interface $IFACE ..." 1>&2
               SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
-              curl -X POST "http://fritz.box/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
+              curl -X POST "$FRITZ_IP/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
               umask 0002
               mkdir /data/pcaps
               while sleep 5; do
@@ -81,7 +78,7 @@ spec:
                   name: {{ kustom.name }}
                   key: password
           volumeMounts:
-            - name: shared-pipe
+            - name: pcap-data
               mountPath: /data
         - name: suricata
           image: myregistry.adm13:443/local/suricata:20260521
@@ -92,16 +89,15 @@ spec:
               mkdir -p /var/log/suricata/
               while [ ! -d /data/pcaps ]; do echo "Waiting for directory ..."; sleep 1; done
               rm -f /var/log/suricata/* /data/pcaps/*
-              while true; do
+              while sleep 2; do
                 echo "Suricata listening to pipe..."
                 suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
-                sleep 2
               done
           securityContext:
             runAsUser: {{ kustom.security.runAsUser }}
           volumeMounts:
-          - name: shared-pipe
+          - name: pcap-data
             mountPath: /data
           - name: {{ kustom.name }}
             mountPath: /var/log
@@ -134,7 +130,7 @@ spec:
                 fi
               done
           volumeMounts:
-          - name: shared-pipe
+          - name: pcap-data
             mountPath: /data
           - name: {{ kustom.name }}
             mountPath: /var/log
