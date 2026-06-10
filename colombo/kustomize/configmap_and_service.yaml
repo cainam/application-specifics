@@ -5,6 +5,8 @@ metadata:
 data:
   threshold.config: |
     suppress gen_id 1, sig_id 2036220 # Android connectivity checks
+    suppress gen_id 1, sig_id 2013504 # Raspberry Pi / Debian APT package updates
+    suppress gen_id 1, class not-suspicious
   suricata.yaml: |
     %YAML 1.1
     ---
