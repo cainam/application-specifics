@@ -155,8 +155,6 @@ spec:
             value: /var/log/suricata/flows-enriched
           - name: INTERVAL
             value: "90"
-          - name: ANTHROPIC_BASE_URL
-            value: https://openrouter.ai/api
           - name: ANTHROPIC_AUTH_TOKEN
             valueFrom:
               secretKeyRef:
@@ -180,7 +178,6 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              set -x
               instructions="You are a network security analyzer. Analyze the following network capture data.
 
               CRITICAL: Provide ONLY the result and a short description using the exact format below. Do not include any introductory text, greetings, markdown formatting outside of the keys, or long explanations. If you violate this, the output breaks my parser.
@@ -197,22 +194,11 @@ spec:
                 for flow in $(find "${SURICATA_FLOWS}/" -type f ! -newer "${ENRICHED_FLOWS}/ts"); do
                   [ -f "${flow}" ] || continue
                   base_flow=$(basename "${flow}")
-                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "poolside/laguna-xs.2:free",
+                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "llama-3.1-8b-instant",
                     "messages": [{"role": "system", "content": $system_content}]
                   }')
-                  curl ${ANTHROPIC_BASE_URL}/v1/chat/completions \
-                    -H "Content-Type: application/json" \
-                    -H "Authorization: Bearer ${ANTHROPIC_AUTH_TOKEN}" \
-                    -H "HTTP-Referer: http://localhost:3000" \
-                    -H "X-Title: My Batch Script" \
-                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow%.json}.ai-1.json"
-                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "llama-3.3-70b-versatile",
-                    "messages": [{"role": "system", "content": $system_content}]
-                  }')
-                  curl https://api.groq.com/openai/v1/chat/completions \
-                    -H "Content-Type: application/json" \
-                    -H "Authorization: Bearer ${GROQ}" \
-                    -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow%.json}.ai-2.json"
+                  curl https://api.groq.com/openai/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer ${GROQ}" \
+                      -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow%.json}.ai-2.json"
                   python3 /app/flow-information-collector.py "${flow}" "${ENRICHED_FLOWS}/${base_flow%.json}.enrichment.json"
                   mv "${flow}" "${ENRICHED_FLOWS}/"
                 done
