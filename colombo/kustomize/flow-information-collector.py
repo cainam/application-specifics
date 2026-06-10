@@ -23,6 +23,7 @@ import urllib.parse
 from datetime import datetime, timezone
 
 ABUSEIPDB_KEY = os.getenv("ABUSEIPDB_KEY", "")
+URLHAUS_KEY = os.getenv("URLHAUS", "")
 
 
 # ── HTTP helpers ──────────────────────────────────────────────────────────────
@@ -75,7 +76,7 @@ def lookup_urlhaus(domain: str) -> dict:
     result = http_post(
         "https://urlhaus-api.abuse.ch/v1/host/",
         data={"host": domain},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        headers={"Auth-Key": URLHAUS_KEY, "Content-Type": "application/x-www-form-urlencoded"},
     )
     if not result:
         return {"error": "request failed"}

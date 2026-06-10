@@ -167,11 +167,16 @@ spec:
               secretKeyRef:
                 name: {{ kustom.name }}
                 key: abuseipdb
-          - name: GROQ
+          - name: ABUSEIPDB_KEY
             valueFrom:
               secretKeyRef:
                 name: {{ kustom.name }}
-                key: groq
+                key: abuseipdb
+          - name: URLHAUS
+            valueFrom:
+              secretKeyRef:
+                name: {{ kustom.name }}
+                key: urlhaus
           command: ["/bin/sh", "-c"]
           args:
             - |

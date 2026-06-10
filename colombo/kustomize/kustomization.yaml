@@ -11,6 +11,7 @@ secretGenerator:
       - openrouter={{ openrouter_api_key }}
       - abuseipdb={{ abuseipdb }}
       - groq={{ groq }}
+      - urlhaus={{ urlhaus }}
 
 configMapGenerator:
   - name: {{ kustom.name }}
