@@ -122,11 +122,14 @@ def get_flow(flow_id: str):
 
     enrichment_path = flow_path.parent / (flow_path.stem + ".enrichment.json")
     enrichment      = read_json(enrichment_path) if enrichment_path.exists() else None
+    ai_path = flow_path.parent / (flow_path.stem + ".ai-2.json")
+    ai      = read_json(ai_path) if ai_path.exists() else None
 
     return JSONResponse(content={
         "flow_id":    flow_id,
         "flow":       events,
         "enrichment": enrichment,   # null if enrichment not ready yet
+        "ai":         ai
     })
 
 
