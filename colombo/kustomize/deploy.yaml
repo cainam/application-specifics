@@ -94,7 +94,6 @@ spec:
               rm -f /var/log/suricata/* /data/pcaps/*
               while true; do
                 echo "Suricata listening to pipe..."
-                cat >>
                 suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
                 sleep 2
