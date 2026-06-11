@@ -89,7 +89,10 @@ spec:
               mkdir -p /var/log/suricata/
               while [ ! -d /data/pcaps ]; do echo "Waiting for directory ..."; sleep 1; done
               rm -f /var/log/suricata/* /data/pcaps/*
-              grep -rh 'classtype:not-suspicious' /var/lib/suricata/rules/ | grep -v '^#' | sed 's/.*sid:\([0-9]*\).*/\1/' | sort -u | awk '{print "suppress gen_id 1, sig_id " $1}' > /data/threshold.conf
+              grep -rh 'classtype:not-suspicious' /var/lib/suricata/rules/ | grep -v '^#' | sed 's/.*sid:\([0-9]*\).*/\1/' > /data/suppress_sids.txt
+              grep -rh 'signature_severity Informational' /var/lib/suricata/rules/ | grep -v '^#' | grep 'alert_only' | sed 's/.*sid:\([0-9]*\).*/\1/' >> /data/suppress_sids.txt
+              grep -rh 'signature_severity Informational' /var/lib/suricata/rules/ | grep -v '^#' | grep -v 'xbits:set' | sed 's/.*sid:\([0-9]*\).*/\1/' >> /data/suppress_sids.txt
+              sort -u /data/suppress_sids.txt | awk '{print "suppress gen_id 1, sig_id " $1}' >> /data/threshold.conf
               while sleep 2; do
                 echo "Suricata listening to pipe..."
                 suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/ --set threshold-file=/data/threshold.conf
@@ -102,9 +105,6 @@ spec:
             mountPath: /data
           - name: {{ kustom.name }}
             mountPath: /var/log
-          - mountPath: /etc/suricata/threshold.config
-            name: suricata-config
-            subPath: threshold.config
         - name: cleanup-pcaps
           image: {{ kustom.images['python3'] }}
           env:

@@ -3,11 +3,6 @@ kind: ConfigMap
 metadata:
   name: suricata-config
 data:
-  threshold.config: |
-    # Android connectivity checks
-    suppress gen_id 1, sig_id 2036220
-    # Raspberry Pi / Debian APT package updates
-    suppress gen_id 1, sig_id 2013504
   suricata.yaml: |
     %YAML 1.1
     ---
