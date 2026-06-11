@@ -81,7 +81,7 @@ spec:
             - name: pcap-data
               mountPath: /data
         - name: suricata
-          image: {{ kustom.images['suricata'] }}
+          image: {{ kustom.images['suricatta']|default("") }}
           workingDir: /data
           command: ["/bin/sh", "-c"]
           args:
