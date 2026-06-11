@@ -31,7 +31,7 @@ spec:
           name: {{ kustom.name }}
       containers:
         - name: stream-capture
-          image: myregistry.adm13:443/local/shark:20260603
+          image: {{ kustom.images['shark'] }}
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -92,7 +92,7 @@ spec:
               grep -rh 'classtype:not-suspicious' /var/lib/suricata/rules/ | sed 's/.*sid:\([0-9]*\).*/\1/' | sort -u | awk '{print "suppress gen_id 1, sig_id " $1}' > /data/threshold.conf
               while sleep 2; do
                 echo "Suricata listening to pipe..."
-                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/ --set threshold-file= /data/threshold.conf
+                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/ --set threshold-file=/data/threshold.conf
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
               done
           securityContext:
@@ -106,7 +106,7 @@ spec:
             name: suricata-config
             subPath: threshold.config
         - name: cleanup-pcaps
-          image: myregistry.adm13:443/local/python3:20260603
+          image: {{ kustom.images['python3'] }}
           env:
           - name: SURICATA_LOG
             value: /var/log/suricata/suricata.log
@@ -136,7 +136,7 @@ spec:
           - name: {{ kustom.name }}
             mountPath: /var/log
         - name: process-suricata-alerts
-          image: myregistry.adm13:443/local/python3:20260603
+          image: {{ kustom.images['python3'] }}
           env:
           - name: FLOWS_DIR
             value: /var/log/flows
@@ -150,7 +150,7 @@ spec:
           - name: {{ kustom.name }}
             mountPath: /var/log
         - name: spider-collect
-          image: myregistry.adm13:443/local/spider-collect:20260603
+          image: {{ kustom.images['spider-collect'] }}
           env:
           - name: SURICATA_FLOWS
             value: /var/log/flows
@@ -218,7 +218,7 @@ spec:
             name: {{ kustom.name }}-config
             subPath: flow-information-collector.py
         - name: api
-          image: myregistry.adm13:443/local/fastapi:20260603
+          image: {{ kustom.images['fastapi'] }}
           env:
           - name: FLOWS_DIR
             value: /var/log/flows-enriched
