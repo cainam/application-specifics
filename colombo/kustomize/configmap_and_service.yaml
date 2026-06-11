@@ -8,7 +8,6 @@ data:
     suppress gen_id 1, sig_id 2036220
     # Raspberry Pi / Debian APT package updates
     suppress gen_id 1, sig_id 2013504
-    suppress gen_id 1, classtype not-suspicious
   suricata.yaml: |
     %YAML 1.1
     ---

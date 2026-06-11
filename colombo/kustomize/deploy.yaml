@@ -89,9 +89,10 @@ spec:
               mkdir -p /var/log/suricata/
               while [ ! -d /data/pcaps ]; do echo "Waiting for directory ..."; sleep 1; done
               rm -f /var/log/suricata/* /data/pcaps/*
+              grep -rh 'classtype:not-suspicious' /var/lib/suricata/rules/ | sed 's/.*sid:\([0-9]*\).*/\1/' | sort -u | awk '{print "suppress gen_id 1, sig_id " $1}' > /data/threshold.conf
               while sleep 2; do
                 echo "Suricata listening to pipe..."
-                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/
+                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/ --threshold-file /data/threshold.conf
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
               done
           securityContext:
