@@ -31,7 +31,7 @@ spec:
           name: {{ kustom.name }}
       containers:
         - name: stream-capture
-          image: myregistry.adm13:443/local/shark:20260429
+          image: myregistry.adm13:443/local/shark:20260603
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -81,7 +81,7 @@ spec:
             - name: pcap-data
               mountPath: /data
         - name: suricata
-          image: myregistry.adm13:443/local/suricata:20260521
+          image: myregistry.adm13:443/local/suricata:20260603
           workingDir: /data
           command: ["/bin/sh", "-c"]
           args:
@@ -106,7 +106,7 @@ spec:
             name: suricata-config
             subPath: threshold.config
         - name: cleanup-pcaps
-          image: myregistry.adm13:443/local/python3:20260521
+          image: myregistry.adm13:443/local/python3:20260603
           env:
           - name: SURICATA_LOG
             value: /var/log/suricata/suricata.log
@@ -136,7 +136,7 @@ spec:
           - name: {{ kustom.name }}
             mountPath: /var/log
         - name: process-suricata-alerts
-          image: myregistry.adm13:443/local/python3:20260521
+          image: myregistry.adm13:443/local/python3:20260603
           env:
           - name: FLOWS_DIR
             value: /var/log/flows
@@ -150,7 +150,7 @@ spec:
           - name: {{ kustom.name }}
             mountPath: /var/log
         - name: spider-collect
-          image: myregistry.adm13:443/local/spider-collect:20260521
+          image: myregistry.adm13:443/local/spider-collect:20260603
           env:
           - name: SURICATA_FLOWS
             value: /var/log/flows
@@ -218,7 +218,7 @@ spec:
             name: {{ kustom.name }}-config
             subPath: flow-information-collector.py
         - name: api
-          image: myregistry.adm13:443/local/fastapi:20260521
+          image: myregistry.adm13:443/local/fastapi:20260603
           env:
           - name: FLOWS_DIR
             value: /var/log/flows-enriched
