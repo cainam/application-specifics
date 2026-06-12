@@ -12,7 +12,7 @@ spec:
         hosts:
         - "{{ net.base_domain }}"
         - "*.{{ net.base_domain }}"
-        - "{{ net.domain_external }}":*
+        - "{{ net.domain_external }}:*"
         notPaths:
         - /oauth2-hydra/callback
         - /hydra/*
