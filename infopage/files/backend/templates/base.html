@@ -124,7 +124,7 @@ const dContainer = document.querySelector('#TabsSystem');
 dContainer.querySelectorAll('.TabButton').forEach(tab => {
   tab.onclick = () => {
     const targetTab = tab.dataset.tab;
-
+    localStorage.setItem('activeTab', targetTab); # remember tab selected for reload
     // 1. Remove 'active' class from all buttons and set it on the clicked one
     dContainer.querySelectorAll('.TabButton').forEach(b => b.classList.remove('active'));
     tab.classList.add('active');
@@ -139,6 +139,14 @@ dContainer.querySelectorAll('.TabButton').forEach(tab => {
     });
   };
 });
+// Restore last active tab on page load
+const savedTab = localStorage.getItem('activeTab');
+if (savedTab) {
+  const savedButton = dContainer.querySelector(`.TabButton[data-tab="${savedTab}"]`);
+  if (savedButton) {
+    savedButton.click();
+  }
+}
 </script>
 
     {% block scripts %}
