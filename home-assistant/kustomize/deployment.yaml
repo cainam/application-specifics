@@ -17,6 +17,8 @@ spec:
         app.kubernetes.io/name: {{ kustom.name }}
     spec:
       automountServiceAccountToken: true
+      securityContext:
+        fsGroup: {{ kustom.security.runAsGroup }}
       containers:
       - name: {{ kustom.name }}
         command: ["/bin/sh", "-c"]
@@ -51,7 +53,6 @@ spec:
         resources: {}
         securityContext:
           runAsUser: {{ kustom.security.runAsUser }}
-          fsGroup: {{ kustom.security.runAsGroup }}
         startupProbe:
           failureThreshold: 30
           periodSeconds: 5
