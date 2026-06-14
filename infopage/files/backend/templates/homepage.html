@@ -80,7 +80,6 @@ html, body {
 
 .content-container {
   flex: 1;
-  overflow-y: auto;
   min-height: 0;           /* critical for flex children to scroll correctly */
 }
 
@@ -171,6 +170,8 @@ html, body {
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   box-shadow: 0 0.0625rem 0.1875rem 0 rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
+  max-height: calc(100vh - 6rem);
 }
 
 /* --- Fallback Global Table Styling within Cards --- */
