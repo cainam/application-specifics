@@ -1,12 +1,3 @@
-- name: change ownership of a directory recursively
-  vars:
-    dest_base_dir: "{% if application.value.storage.type == 'local_folder' %}{{ local_disk_directory }}{% else %}{{ shared_mounts }}{% endif %}/{{ application.value.storage.name }}"
-  ansible.builtin.file:
-    path: "{{ dest_base_dir }}"
-    owner: "{{ application.value.security.runAsUser }}"
-    group: "{{ application.value.security.runAsGroup }}"
-    state: directory
-    recurse: yes
 
 - name: change ownership of a directory recursively
   ansible.builtin.file:
