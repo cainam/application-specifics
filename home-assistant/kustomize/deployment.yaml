@@ -51,6 +51,7 @@ spec:
         resources: {}
         securityContext:
           runAsUser: {{ kustom.security.runAsUser }}
+          fsGroup: {{ kustom.security.runAsGroup }}
         startupProbe:
           failureThreshold: 30
           periodSeconds: 5
