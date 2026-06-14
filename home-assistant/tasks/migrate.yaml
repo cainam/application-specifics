@@ -7,3 +7,12 @@
     group: "{{ application.value.security.runAsGroup }}"
     state: directory
     recurse: yes
+
+- name: change ownership of a directory recursively
+  ansible.builtin.file:
+    path: "{% if item.type == 'local_folder' %}{{ local_disk_directory }}{% else %}{{ shared_mounts }}{% endif %}/{{ item.name }}"
+    state: directory
+    owner: your_user
+    group: your_group
+    recurse: yes
+  loop: "{{ application.value.storage }}"
