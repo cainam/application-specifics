@@ -56,7 +56,6 @@ spec:
           name: infopage
         - name: ca-bundle
           mountPath: /certs
-        workingDir: /app/backend/
       serviceAccountName: {{ kustom.name }}
       volumes:
       - name: infopage
