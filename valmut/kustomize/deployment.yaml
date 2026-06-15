@@ -36,7 +36,7 @@ spec:
         - --reload
         command:
         - uvicorn
-        workingDir: /app/backend
+        workingDir: /app/
         env:
         - name: PYTHONUNBUFFERED
           value: "1"
@@ -51,7 +51,6 @@ spec:
         - name: tls-certs-volume
           mountPath: /certs
           readOnly: true
-        workingDir: /app/
       serviceAccountName: {{ kustom.name }}
       volumes:
       - configMap:
