@@ -4,7 +4,7 @@ images:
   requires:
   - python3
   build:
-    packages: "app-misc/jq app-crypt/gnupg dev-python/jinja2 dev-python/idna dev-python/certifi dev-python/requests dev-python/python-dateutil"
+    packages: "app-misc/jq app-crypt/gnupg dev-python/jinja2 dev-python/idna dev-python/certifi dev-python/requests dev-python/python-dateutil dev-python/typing-extensions"
     run_with: python3 -m homeassistant --config /config --log-file /tmp/log --skip-pip
     configure_builder: echo 'app-misc/jq -static-libs' > /etc/portage/package.use/jq
 
@@ -18,7 +18,6 @@ images:
     packages: dev-db/postgresql
     configure_builder: |
       sed -i -e '/oniguruma/d' -e '/jq/d' /etc/portage/profile/package.provided
-      # echo 'dev-db/postgresql -server' > /etc/portage/package.use/postgresql
       emerge app-misc/jq
     configure_rootfs_build: |
       set -x
