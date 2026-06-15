@@ -18,25 +18,13 @@ spec:
       containers:
       - name: {{ kustom.name }}
         image: {{ kustom.image }}
-        #args:
-        #- valmut-webhook:app
-        #- --host
-        #- 0.0.0.0
-        #- --port
-        #- "{{ container_port }}"
-        #- --ssl-certfile
-        #- /certs/tls.crt
-        #- --ssl-keyfile
-        #- /certs/tls.key
-        #- --reload
         command:
         - kopf
         - run
         - /app/curator.py
         - --all-namespaces
+        workingDir: /app/backend
         env:
-        - name: PYTHONPATH
-          value: /app/backend/:/py_env/lib/python3.13/site-packages/
         - name: USER
           value: kopf
         ports:
