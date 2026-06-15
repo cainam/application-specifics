@@ -14,6 +14,8 @@ spec:
     spec:
       containers:
       - args:
+        - -m
+        - uvicorn
         - infopage.main:app
         - --host
         - 0.0.0.0
@@ -21,11 +23,9 @@ spec:
         - "{{ internal_port }}"
         - --reload
         command:
-        - uvicorn
-        env:
-        - name: PYTHONPATH
-          value: /app/backend/:/py_env/lib/python3.13/site-packages/
+        - python
         image: {{ kustom.image }}
+        workingDir: /app/backend
         livenessProbe:
           failureThreshold: 3
           httpGet:
