@@ -19,11 +19,14 @@ spec:
       automountServiceAccountToken: true
       securityContext:
         fsGroup: {{ kustom.security.runAsGroup }}
+      volumes:
+      - name: log
+        emptyDir: {}
       containers:
       - name: {{ kustom.name }}
         command: ["/bin/sh", "-c"]
         args:
-        - "export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib/postgresql-17/lib && python -m homeassistant --config /config --log-file /tmp/home-assistant.log"
+        - "python -m homeassistant --config /config --log-file /log/home-assistant.log"
         env:
         - name: PYTHONPATH
           value: /ha/core
@@ -65,6 +68,8 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: config
+        - name: log
+          mountPath: /log
       initContainers:
       - command:
         - sh
