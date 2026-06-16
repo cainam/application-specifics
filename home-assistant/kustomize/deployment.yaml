@@ -22,6 +22,9 @@ spec:
       volumes:
       - name: log
         emptyDir: {}
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ kustom.name }}
       containers:
       - name: {{ kustom.name }}
         command: ["/bin/sh", "-c"]
@@ -81,7 +84,3 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-      volumes:
-      - name: config
-        persistentVolumeClaim:
-          claimName: {{ kustom.name }}
