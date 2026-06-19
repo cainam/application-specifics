@@ -224,7 +224,7 @@ spec:
           - name: FLOWS_DIR
             value: /var/log/flows-enriched
           - name: PORT
-            value: {{ internal_port }}
+            value: "{{ internal_port }}"
           command: ["python", "-u",  "/app/api.py"]
           ports:
           - containerPort: {{ internal_port }}
