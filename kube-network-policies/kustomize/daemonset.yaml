@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ kustom.name }}
+spec:
+  selector:
+    matchLabels:
+      app: netpol-controller
+  template:
+    metadata:
+      labels:
+        app: netpol-controller
+    spec:
+      hostNetwork: true # Needs host network access to modify iptables
+      containers:
+      - name: controller
+        image: {{ kustom.image }}
+        securityContext:
+          privileged: true # Crucial for firewall access
+        volumeMounts:
+        - mountPath: /etc/cni/net.d
+          name: cni-config
+        - mountPath: /var/run/kubernetes
+          name: kube-api
+      volumes:
+      - name: cni-config
+        hostPath:
+          path: /etc/cni/net.d
+      - name: kube-api
+        hostPath:
+          path: /var/run/kubernetes
