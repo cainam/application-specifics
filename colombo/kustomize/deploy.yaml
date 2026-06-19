@@ -1,3 +1,4 @@
+{% set internal_port = 65536|random(1024) -%}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -222,10 +223,12 @@ spec:
           env:
           - name: FLOWS_DIR
             value: /var/log/flows-enriched
+          - name: PORT
+            value: {{ internal_port }}
           command: ["python", "-u",  "/app/api.py"]
           ports:
-          - containerPort: 8000
-            name: http
+          - containerPort: {{ internal_port }}
+            name: api
           volumeMounts:
           - name: {{ kustom.name }}
             mountPath: /var/log

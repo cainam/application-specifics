@@ -37,6 +37,6 @@ spec:
   selector:
     app: {{ kustom.name }}
   ports:
-  - name: http
+  - name: api
     port: 80
-    targetPort: http
+    targetPort: api
