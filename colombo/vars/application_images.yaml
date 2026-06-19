@@ -1,0 +1,36 @@
+images:
+- name: suricata
+  section: local
+  type: gentoo-image-builder
+  requires:
+  - base
+  build:
+    packages: net-analyzer/suricata
+    configure_rootfs_build: |
+      echo -e "net-analyzer/suricata **\nnet-libs/libhtp ~arm64" > /etc/portage/package.accept_keywords/suricata
+    finish_rootfs_build: |
+      LD_LIBRARY_PATH="${ROOT}"/usr/lib/ "${ROOT}"/usr/bin/suricata-update --no-test -D "${ROOT}"/var/lib/suricata
+      chmod 755 "${ROOT}"/var/lib/suricata "${ROOT}"/var/lib/suricata/rules && chmod 644 "${ROOT}"/var/lib/suricata/rules/*
+      mv "${ROOT}"/etc/suricata "${ROOT}"/etc/suricata.org && mkdir "${ROOT}"/etc/suricata && cp "${ROOT}"/etc/suricata.org/* "${ROOT}"/etc/suricata/ && chmod 755 "${ROOT}"/etc/suricata/ "${ROOT}"/etc/suricata.org && chmod 644 "${ROOT}"/etc/suricata.org/* "${ROOT}"/etc/suricata/*
+      sed -e '/^  user:/d' -e '/^  group:/d' -e '/^run-as:/d' -e 's/# threshold-file: /threshold-file: /' -i "${ROOT}"/etc/suricata/suricata.yaml
+
+- name: spider-collect
+  section: local
+  type: gentoo-image-builder
+  requires:
+  - python3
+  build:
+    packages: app-misc/jq net-misc/curl
+
+- name: shark
+  section: local
+  type: gentoo-image-builder
+  requires:
+  - curl
+  build:
+    packages: net-analyzer/wireshark net-analyzer/tcpdump
+    configure_rootfs_build: |
+      echo "net-analyzer/wireshark -gui" >> /etc/portage/package.use/wireshark
+      echo "sys-libs/zlib minizip" >> /etc/portage/package.use/zlib
+      echo -e "${ROOT}/lib\n${ROOT}/usr/lib" >> /etc/ld.so.conf.d/99-image-builder.conf
+
