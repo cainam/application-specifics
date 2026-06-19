@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Pulls the official manifest directly from the Calico repository
+  - https://raw.githubusercontent.com/projectcalico/calico/{{ software.calico.version }}/manifests/canal.yaml
+
+# (Optional) If you need to override variables like the cluster CIDR
+# images:
+#   - name: docker.io/calico/node
+#     newTag: v3.28.0
+#
+patches:
+  - target:
+      kind: DaemonSet
+      name: canal
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/name=CALICO_NETWORKING_BACKEND/value
+        value: "none" # Ensures Calico acts strictly as a policy firewall, leaving routing to Flannel
