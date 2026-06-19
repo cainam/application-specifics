@@ -20,7 +20,7 @@ images:
       find ${ROOT}/etc
       export LD_LIBRARY_PATH=$ROOT/usr/lib
       export USER=root
-      touch ${ROOT}/etc/passwd
+      for f in passwd group; do cp /etc/${f}  ${ROOT}/etc/; done
       ansible-galaxy collection install containers.podman -p ${ROOT}/usr/share/ansible/collections
 
 - name: molecule-tester
