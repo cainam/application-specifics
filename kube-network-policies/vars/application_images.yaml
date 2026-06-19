@@ -1,0 +1,14 @@
+images:
+- name: kube-network-policies
+  section: k8s
+  requires:
+  - go
+  build:
+    entrypoint: ["/bin/kube-network-policies-standard"]
+    configure_rootfs_build: |
+      git clone  --depth 1 --single-branch -b "{{ software['kube-network-policies'].version }}" https://github.com/kubernetes-sigs/kube-network-policies.git
+      cd kube-network-policies
+      GO_LDFLAGS="-w -s" make build-standard
+      cp -dp bin/* "${ROOT}/bin"
+
+
