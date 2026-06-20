@@ -25,6 +25,9 @@ spec:
           name: kube-api
         - name: nri-sock
           mountPath: /var/run/nri
+        - name: host-netns
+          mountPath: /var/run/netns
+          mountPropagation: HostToContainer
       volumes:
       - name: cni-config
         hostPath:
@@ -36,4 +39,6 @@ spec:
         hostPath:
           path: /var/run/nri
           type: Directory
-
+      - name: host-netns
+        hostPath:
+          path: /var/run/netns
