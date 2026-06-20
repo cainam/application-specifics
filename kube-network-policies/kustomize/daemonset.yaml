@@ -11,6 +11,7 @@ spec:
       labels:
         app: netpol-controller
     spec:
+      serviceAccountName: {{ kustom.name }}
       hostNetwork: true # Needs host network access to modify iptables
       containers:
       - name: controller
