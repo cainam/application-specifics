@@ -23,6 +23,8 @@ spec:
           name: cni-config
         - mountPath: /var/run/kubernetes
           name: kube-api
+        - name: nri-sock
+          mountPath: /var/run/nri
       volumes:
       - name: cni-config
         hostPath:
@@ -30,3 +32,8 @@ spec:
       - name: kube-api
         hostPath:
           path: /var/run/kubernetes
+      - name: nri-sock
+        hostPath:
+          path: /var/run/nri
+          type: Directory
+
