@@ -7,6 +7,7 @@ images:
   build:
     packages: net-analyzer/suricata dev-python/pyyaml
     configure_rootfs_build: |
+      set -x
       echo -e "net-analyzer/suricata **\nnet-libs/libhtp ~arm64" > /etc/portage/package.accept_keywords/suricata
     finish_rootfs_build: |
       LD_LIBRARY_PATH="${ROOT}"/usr/lib/ "${ROOT}"/usr/bin/suricata-update --no-test -D "${ROOT}"/var/lib/suricata
