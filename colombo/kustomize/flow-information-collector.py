@@ -10,7 +10,6 @@ Usage:
 Sources:
   - AbuseIPDB  — IP reputation (requires ABUSEIPDB_KEY env var)
   - URLhaus    — domain/URL known-bad (no API key required)
-  - ja3er.com  — JA3 fingerprint lookup (no API key required)
 """
 
 import os
@@ -88,20 +87,6 @@ def lookup_urlhaus(domain: str) -> dict:
     }
 
 
-def lookup_ja3(ja3_hash: str) -> dict:
-    result = http_get(f"https://ja3er.com/search/{ja3_hash}")
-    if not result:
-        return {"error": "request failed"}
-    if isinstance(result, list) and result:
-        return {
-            "matches": [
-                {"user_agent": r.get("User-Agent"), "count": r.get("Count")}
-                for r in result[:5]
-            ]
-        }
-    return {"matches": []}
-
-
 # ── IOC extraction ────────────────────────────────────────────────────────────
 
 def extract_iocs(events: list[dict]) -> dict:
@@ -109,7 +94,6 @@ def extract_iocs(events: list[dict]) -> dict:
                         "172.19.", "172.2", "127.", "::1")
     ips     = set()
     domains = set()
-    ja3s    = set()
 
     for event in events:
         for field in ("src_ip", "dest_ip"):
@@ -125,8 +109,6 @@ def extract_iocs(events: list[dict]) -> dict:
         if isinstance(tls, dict):
             if tls.get("sni"):
                 domains.add(tls["sni"])
-            if tls.get("ja3", {}).get("hash"):
-                ja3s.add(tls["ja3"]["hash"])
 
         http = event.get("http", {})
         if isinstance(http, dict) and http.get("hostname"):
@@ -135,7 +117,6 @@ def extract_iocs(events: list[dict]) -> dict:
     return {
         "ips":     sorted(ips),
         "domains": sorted(domains),
-        "ja3s":    sorted(ja3s),
     }
 
 
@@ -185,7 +166,6 @@ def main(flow_path: str, output_path: str) -> None:
         "iocs":              iocs,
         "ip_reputation":     {},
         "domain_reputation": {},
-        "ja3_fingerprints":  {},
     }
 
     for ip in iocs["ips"]:
@@ -196,11 +176,6 @@ def main(flow_path: str, output_path: str) -> None:
     for domain in iocs["domains"]:
         print(f"  URLhaus: {domain}", flush=True)
         enrichment["domain_reputation"][domain] = lookup_urlhaus(domain)
-        time.sleep(0.5)
-
-    for ja3_hash in iocs["ja3s"]:
-        print(f"  JA3: {ja3_hash}", flush=True)
-        enrichment["ja3_fingerprints"][ja3_hash] = lookup_ja3(ja3_hash)
         time.sleep(0.5)
 
     enrichment["verdict"] = make_verdict(enrichment)
