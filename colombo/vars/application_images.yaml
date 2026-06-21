@@ -5,7 +5,8 @@ images:
   requires:
   - base
   build:
-    packages: net-analyzer/suricata dev-python/pyyaml
+    packages: net-analyzer/suricata 
+    configure_builder: emerge dev-python/pyyaml
     configure_rootfs_build: |
       set -x
       echo -e "net-analyzer/suricata **\nnet-libs/libhtp ~arm64" > /etc/portage/package.accept_keywords/suricata
