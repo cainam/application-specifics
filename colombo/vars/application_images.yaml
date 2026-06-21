@@ -5,7 +5,7 @@ images:
   requires:
   - base
   build:
-    packages: net-analyzer/suricata
+    packages: net-analyzer/suricata dev-python/pyyaml
     configure_rootfs_build: |
       echo -e "net-analyzer/suricata **\nnet-libs/libhtp ~arm64" > /etc/portage/package.accept_keywords/suricata
     finish_rootfs_build: |
