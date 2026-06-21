@@ -1,4 +1,7 @@
 import requests
+import datetime
+import jwt
+import os
 
 serviceaccount = "/var/run/secrets/kubernetes.io/serviceaccount"
 cacert = serviceaccount+"/ca.crt"
@@ -6,6 +9,19 @@ apiserver = "https://kubernetes.default.svc"
 token = open(serviceaccount+'/token', 'r').read()
 namespace = open(serviceaccount+'/namespace', 'r').read()
 headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
+
+with open( os.environ.get('FLOWS_PRIVATE_KEY'), "r") as f:
+    FLOWS_PRIVATE_KEY = f.read()
+
+def generate_jwt():
+    payload = {
+        "iss": "flows-client",   # Issuer
+        "sub": "flows",          # Subject
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=2) # Expiration
+    }
+    # Sign using the RSA Private Key
+    token = jwt.encode(payload, FLOWS_PRIVATE_KEY, algorithm="RS256")
+    return token
 
 def test_results():
   import json

@@ -6,6 +6,10 @@ resources:
 - service.yaml
 - serviceaccount.yaml
 
+secretGenerator:
+- name: {{ kustom.name }}
+  literals:
+  - flows_private.pem={{ api_keys.flows.private }}
 
 configMapGenerator:
 - name: {{ kustom.name }}-certs

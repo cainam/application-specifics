@@ -167,7 +167,9 @@ def software(request: Request, software: str | None = None):
 
 @general_pages_router.get("/flow_list")
 def flow_list(request: Request):
-  flows = requests.get("http://colombo.tools/flows", headers={}).json()
+  token = infopage.helper.generate_jwt()
+  headers = {"Authorization": f"Bearer {token}"}
+  flows = requests.get("http://colombo.tools/flows", headers=headers).json()
   sorted_flows = sorted(flows, key=lambda x: x["ts"], reverse=True)
   for flow in sorted_flows:
     logger.info("flow: "+str(flow))
@@ -181,4 +183,6 @@ async def get_flow(request: Request):
   if not flow_id:
     return {"error": "Missing 'flow' key in payload"}, 400
 
-  return requests.get("http://colombo.tools/flows/" + str(flow_id), headers={}).json()
+  token = infopage.helper.generate_jwt()
+  headers = {"Authorization": f"Bearer {token}"}
+  return requests.get("http://colombo.tools/flows/" + str(flow_id), headers=headers).json()

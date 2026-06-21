@@ -1,17 +1,18 @@
 namespace: {{ kustom.namespace }}
 resources:
-  - configmap_and_service.yaml
-  - deploy.yaml
+- configmap_and_service.yaml
+- deploy.yaml
 
 secretGenerator:
-  - name: {{ kustom.name }}
-    literals:
-      - username={{ fritz[1].user }}
-      - password={{ fritz[1].pass }}
-      - openrouter={{ openrouter_api_key }}
-      - abuseipdb={{ abuseipdb }}
-      - groq={{ groq }}
-      - urlhaus={{ urlhaus }}
+- name: {{ kustom.name }}
+  literals:
+  - username={{ fritz[1].user }}
+  - password={{ fritz[1].pass }}
+  - openrouter={{ openrouter_api_key }}
+  - abuseipdb={{ abuseipdb }}
+  - groq={{ groq }}
+  - urlhaus={{ urlhaus }}
+  - flows_public.pem={{ api_keys.flows.public }}
 
 configMapGenerator:
   - name: {{ kustom.name }}

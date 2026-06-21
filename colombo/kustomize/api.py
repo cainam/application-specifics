@@ -18,10 +18,12 @@ Environment variables:
 import os
 import json
 import re
+import jwt
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import JSONResponse
 
 flows_dir_env = os.getenv("FLOWS_DIR")
@@ -30,12 +32,24 @@ if not flows_dir_env:
 FLOWS_DIR = Path(flows_dir_env)
 
 app = FastAPI(title="Suricata Flow API")
+security = HTTPBearer()
 
 # Filename pattern: 20260528T192136_37918685728178.json
 FLOW_RE = re.compile(r"^(\d{8}T\d{6})_(\d+)\.json$")
-
+with open( os.environ.get('FLOWS_PUBLIC_KEY', "r") as f:
+    FLOWS_PUBLIC_KEY = f.read()
 
 # ── helpers ───────────────────────────────────────────────────────────────────
+def verify_jwt_signature(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        # Decode and verify using the RSA Public Key
+        payload = jwt.decode(token, PUBLIC_KEY, algorithms=["RS256"], issuer="flows-client")
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid cryptographic signature")
 
 def parse_filename(filename: str) -> tuple[str, str] | None:
     """Return (timestamp_str, flow_id) or None if not a flow file."""
@@ -82,7 +96,7 @@ def flow_summary(timestamp_str: str, flow_id: str, events: list, enrichment: dic
 # ── endpoints ─────────────────────────────────────────────────────────────────
 
 @app.get("/flows")
-def list_flows():
+def list_flows(payload: dict = Depends(verify_jwt_signature)):
     """List all flows, newest first, with summary info."""
     results = []
 
@@ -103,7 +117,7 @@ def list_flows():
 
 
 @app.get("/flows/{flow_id}")
-def get_flow(flow_id: str):
+def get_flow(flow_id: str, payload: dict = Depends(verify_jwt_signature)):
     """Return full flow events and enrichment for a given flow_id."""
 
     # Find the flow file — there may be multiple files with the same flow_id
