@@ -9,7 +9,8 @@ resources:
 secretGenerator:
 - name: {{ kustom.name }}
   literals:
-  - flows_private.pem={{ api_keys.flows.private }}
+  - |
+    flows_private.pem={{ api_keys.flows.private | indent(4) }}
 
 configMapGenerator:
 - name: {{ kustom.name }}-certs
