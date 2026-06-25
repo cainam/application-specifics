@@ -10,8 +10,9 @@ token = open(serviceaccount+'/token', 'r').read()
 namespace = open(serviceaccount+'/namespace', 'r').read()
 headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
 
-with open( os.environ.get('FLOWS_PRIVATE_KEY'), "r") as f:
-    FLOWS_PRIVATE_KEY = f.read()
+#with open( os.environ.get('FLOWS_PRIVATE_KEY'), "r") as f:
+#    FLOWS_PRIVATE_KEY = f.read()
+FLOWS_PRIVATE_KEY = os.environ.get('FLOWS_PRIVATE_KEY')
 
 def generate_jwt():
     payload = {
