@@ -36,8 +36,9 @@ security = HTTPBearer()
 
 # Filename pattern: 20260528T192136_37918685728178.json
 FLOW_RE = re.compile(r"^(\d{8}T\d{6})_(\d+)\.json$")
-with open( os.environ.get('FLOWS_PUBLIC_KEY', "r") as f:
-    FLOWS_PUBLIC_KEY = f.read()
+#with open( os.environ.get('FLOWS_PUBLIC_KEY', "r") as f:
+#    FLOWS_PUBLIC_KEY = f.read()
+FLOWS_PUBLIC_KEY = os.environ.get('FLOWS_PUBLIC_KEY')
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 def verify_jwt_signature(credentials: HTTPAuthorizationCredentials = Depends(security)):

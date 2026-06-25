@@ -21,3 +21,7 @@ configMapGenerator:
     - process_suricata_alerts.py
     - flow-information-collector.py
     - api.py
+
+generatorOptions:
+  disableNameSuffixHash: true
+

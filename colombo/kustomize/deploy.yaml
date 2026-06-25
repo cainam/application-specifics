@@ -225,6 +225,11 @@ spec:
             value: /var/log/flows-enriched
           - name: PORT
             value: "{{ internal_port }}"
+          - name: FLOWS_PUBLIC_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ kustom.name }}
+                key: flows_public.pem
           command: ["python", "-u",  "/app/api.py"]
           ports:
           - containerPort: {{ internal_port }}
