@@ -24,6 +24,12 @@ spec:
         - --reload
         command:
         - python
+        env:
+        - name: FLOWS_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ kustom.name }}
+              key: flows_private.pem
         image: {{ kustom.image }}
         workingDir: /app/backend
         livenessProbe:
