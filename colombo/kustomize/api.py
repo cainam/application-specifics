@@ -45,7 +45,7 @@ def verify_jwt_signature(credentials: HTTPAuthorizationCredentials = Depends(sec
     token = credentials.credentials
     try:
         # Decode and verify using the RSA Public Key
-        payload = jwt.decode(token, PUBLIC_KEY, algorithms=["RS256"], issuer="flows-client")
+        payload = jwt.decode(token, FLOWS_PUBLIC_KEY, algorithms=["EdDSA"], issuer="flows-client")
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")

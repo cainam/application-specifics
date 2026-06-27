@@ -12,7 +12,8 @@ secretGenerator:
   - abuseipdb={{ abuseipdb }}
   - groq={{ groq }}
   - urlhaus={{ urlhaus }}
-  - flows_public.pem={{ api_keys.flows.public }}
+  - |
+    flows_public.pem={{ api_keys.flows.public | indent(4) } }}
 
 configMapGenerator:
   - name: {{ kustom.name }}

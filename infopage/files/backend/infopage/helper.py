@@ -21,7 +21,7 @@ def generate_jwt():
         "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=2) # Expiration
     }
     # Sign using the RSA Private Key
-    token = jwt.encode(payload, FLOWS_PRIVATE_KEY, algorithm="RS256")
+    token = jwt.encode(payload, FLOWS_PRIVATE_KEY, algorithm="EdDSA")
     return token
 
 def test_results():
