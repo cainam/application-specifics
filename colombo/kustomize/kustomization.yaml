@@ -13,7 +13,7 @@ secretGenerator:
   - groq={{ groq }}
   - urlhaus={{ urlhaus }}
   - |
-    flows_public.pem={{ api_keys.flows.public | indent(4) } }}
+    flows_public.pem={{ api_keys.flows.public | indent(4) }}
 
 configMapGenerator:
   - name: {{ kustom.name }}
