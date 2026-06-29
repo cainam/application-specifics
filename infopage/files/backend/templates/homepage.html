@@ -12,6 +12,7 @@
         <div class="TabButton" data-tab="services">Services</div>
         <div class="TabButton" data-tab="status">Status</div>
         <div class="TabButton" data-tab="flows">Flows</div>
+        <div class="TabButton" data-tab="misc">Misc</div>
       </div>
     </div>
 
@@ -29,9 +30,8 @@
       <div class="d-flex-col content-row">
         <div class="d-flex layout-split">
           <div class="tab-section card" data-tab="status" itemprop="load" value="node_status"></div>
-          <div class="tab-section card" data-tab="status" itemprop="load" value="test_results"></div>
+          <div class="tab-section card" data-tab="status" itemprop="load" value="etcd"></div>
         </div>
-        <div class="tab-section card" data-tab="status" itemprop="load" value="services_status"></div>
       </div>
 
       <div class="d-flex-col content-row">
@@ -40,6 +40,12 @@
           <div class="tab-section card json-block" data-tab="flows" data-dest="flows"></div>
         </div>
       </div>
+
+      <div class="d-flex-col content-row">
+        <div class="tab-section card" data-tab="misc" itemprop="load" value="services_status"></div>
+        <div class="tab-section card" data-tab="misc" itemprop="load" value="test_results"></div>
+      </div>
+
     </div>
   </div>
 {% endblock %}
