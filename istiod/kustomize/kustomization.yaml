@@ -8,7 +8,7 @@ resources:
 - ClusterRole_istio-reader-clusterrole-istio-system.yaml
 - ConfigMap_istio-sidecar-injector.yaml
 - ConfigMap_istio.yaml
-- Deployment_istiod.yaml
+- deploy.yaml
 - HorizontalPodAutoscaler_istiod.yaml
 - MutatingWebhookConfiguration_istio-sidecar-injector.yaml
 - PodDisruptionBudget_istiod.yaml

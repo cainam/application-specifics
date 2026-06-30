@@ -46,7 +46,7 @@ spec:
       serviceAccountName: istiod
       containers:
         - name: discovery
-          image: {{ kustom.images[kustom.name] }}
+          image: {{ kustom.images['pilot'] }}
           args:
             - discovery
             - --monitoringAddr=:15014
