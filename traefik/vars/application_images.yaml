@@ -8,7 +8,7 @@ images:
     configure_builder: |
       echo "net-libs/nodejs npm corepack" > /etc/portage/package.use/97nodejs.conf
       mkdir -p /var/tmp/portage /var/db && chmod 755 /var/db
-      PORTAGE_TMPDIR="/var/tmp/portage" MAKEOPTS="-j3" emerge net-libs/nodejs dev-libs/icu 
+      PORTAGE_TMPDIR="/var/tmp/portage" MAKEOPTS="-j3" emerge --usepkg y net-libs/nodejs dev-libs/icu 
     configure_rootfs_build: |
       git clone --depth 1 --single-branch -b "{{ software.traefik.version }}" https://github.com/traefik/traefik.git
       set -x
