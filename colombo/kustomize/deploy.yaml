@@ -203,7 +203,7 @@ spec:
                 for flow in $(find "${SURICATA_FLOWS}/" -type f ! -newer "${ENRICHED_FLOWS}/ts"); do
                   [ -f "${flow}" ] || continue
                   base_flow=$(basename "${flow}")
-                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "llama-3.1-8b-instant",
+                  payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "openai/gpt-oss-20b", #"llama-3.1-8b-instant",
                     "messages": [{"role": "system", "content": $system_content}]
                   }')
                   curl https://api.groq.com/openai/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer ${GROQ}" \
