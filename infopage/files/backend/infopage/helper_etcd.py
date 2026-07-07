@@ -205,12 +205,12 @@ def etcd_member_status():
                 })
 
     return member_status_list
-def etcd_cluster_health():
+def get_etcd_data():
     """
     Get etcd cluster health from all endpoints
     Returns: aggregated health status across all etcd members
     """
-    health_results = []
+    health_results = {}
 
     for endpoint in ETCD_ENDPOINTS:
         try:
@@ -220,20 +220,19 @@ def etcd_cluster_health():
                 cert=(ETCD_CLIENT_CERT, ETCD_CLIENT_KEY),
                 timeout=5
             )
-            health_results.append({
-                "endpoint": endpoint,
+            health_results[endpoint] = 
                 "status": "healthy" if response.status_code == 200 else "unhealthy",
                 "response_code": response.status_code,
                 "response_text": response.text
             })
         except Exception as e:
-            health_results.append({
-                "endpoint": endpoint,
+            health_results[endpoint] =
                 "status": "error",
-                "error": str(e)
+                "response_code": -1,
+                "response_text": str(e)
             })
 
-    return health_results
+    return {'health': health_results}
 
 def get_all_etcd_data():
     """

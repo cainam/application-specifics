@@ -28,22 +28,22 @@ headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
 
 FLOWS_PRIVATE_KEY = os.environ.get('FLOWS_PRIVATE_KEY')
 
-def get_etcd_status_for_homepage():
+def get_etcd_status():
     """
     Get etcd status data formatted for homepage display
     Returns: structured etcd data ready for template rendering
     """
-    all_etcd_data = get_all_etcd_data()
+    #all_etcd_data = get_etcd_data()#
 
     # Format data for homepage display - create a consolidated view
-    etcd_status = {
-        "member_count": len(all_etcd_data["member_status"]),
-        "healthy_members": sum(1 for m in all_etcd_data["member_status"] if m.get("status") == "success"),
-        "cluster_health": all_etcd_data["cluster_health"],
-        "raw_data": all_etcd_data
-    }
+    #etcd_status = {
+    #    "member_count": len(all_etcd_data["member_status"]),
+     #   "healthy_members": sum(1 for m in all_etcd_data["member_status"] if m.get("status") == "success"),
+     #   "cluster_health": all_etcd_data["cluster_health"],
+     #   "raw_data": all_etcd_data
+    #}
 
-    return etcd_status
+    return ETCD_ENDPOINTS, get_etcd_data()
 
 def generate_jwt():
     payload = {
