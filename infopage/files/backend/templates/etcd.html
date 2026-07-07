@@ -1,0 +1,19 @@
+<hr/>{{ name }}<br/>
+<hr/>
+<table class="iTable">
+
+<tr><th>node infos</th><th>conditions</th><th>resources</th></tr>
+        {% if nodes %}
+        {% for node in nodes %}
+	<tr>
+	{% for i in node %}
+	  {%if loop.index0 == 31 %}
+	  {% else %}
+	  <td><pre>{{ i }}</pre></td>
+	  {% endif %}
+	{% endfor %}
+	</tr>
+
+        {% endfor %}
+        {% endif %}
+</table>

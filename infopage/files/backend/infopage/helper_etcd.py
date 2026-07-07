@@ -170,7 +170,7 @@ def etcd_member_status():
                 member_info = {"endpoint": backup_endpoint, "status": "success"}
                 member_info.update(maintenance_status)
                 member_info.update(member_list)
-                member_info["health"] = health_status"
+                member_info["health"] = health_status
 
             except Exception as e:
                 member_info["error"] = f"Backup endpoint also failed: {str(e)}"
