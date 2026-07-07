@@ -5,21 +5,22 @@
 {{ error }}
 {% else %}
 <table class="iTable">
-<tr><th>node infos</th><th>conditions</th><th>resources</th></tr>
         {% if etcd_data %}
+        <tr>
+        <th>Endpoint</th>
         {% for d in etcd_data.keys() %}
-        <td>{{ d }}</td>
+        <th>{{ d }}</th>
         {% endfor %}
-				</tr>
-				{% set a_key = (etcd_data.keys() | list) | last %}
-				{% for ep in etcd_data[a_key].keys() %}
-				<tr>
-				<td>{{ ep }}</td>
+        </tr>
+        {% set a_key = (etcd_data.keys() | list) | last %}
+        {% for ep in etcd_data[a_key].keys() %}
+        <tr>
+        <td>{{ ep }}</td>
         {% for k,v in etcd_data.items() %}
         <td>{{ v[ep] }}</td>
         {% endfor %}
         </tr>
-				{% endfor %}
-				{% endif %}
+        {% endfor %}
+        {% endif %}
 </table>
 {% endif %}
