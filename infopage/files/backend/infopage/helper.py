@@ -11,8 +11,7 @@ import json
 from .helper_etcd import (
     get_etcd_ssl_context,
     etcd_member_status,
-    etcd_cluster_health,
-    get_all_etcd_data,
+    get_etcd_data,
     ETCD_ENDPOINTS,
     ETCD_CLIENT_CERT,
     ETCD_CLIENT_KEY,
