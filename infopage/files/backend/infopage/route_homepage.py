@@ -11,9 +11,8 @@ import requests
 import infopage.helper
 from infopage.helper import (
     etcd_member_status,
-    etcd_cluster_health,
-    get_all_etcd_data,
-    get_etcd_status_for_homepage
+    get_etcd_data,
+    get_etcd_status
 )
 
 logging.basicConfig(level = logging.DEBUG)
