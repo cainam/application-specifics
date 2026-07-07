@@ -9,6 +9,12 @@ import functools
 import requests
 
 import infopage.helper
+from infopage.helper import (
+    etcd_member_status,
+    etcd_cluster_health,
+    get_all_etcd_data,
+    get_etcd_status_for_homepage
+)
 
 logging.basicConfig(level = logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -186,3 +192,21 @@ async def get_flow(request: Request):
   token = infopage.helper.generate_jwt()
   headers = {"Authorization": f"Bearer {token}"}
   return requests.get("http://colombo.tools/flows/" + str(flow_id), headers=headers).json()
+
+@general_pages_router.get("/etcd")
+async def etcd(request: Request):
+    try:
+        # Get etcd status data for homepage display
+        etcd_data = infopage.helper.get_etcd_status_for_homepage()
+        return templates.TemplateResponse(
+            request=request,
+            name="homepage.html",
+            context={"etcd_data": etcd_data, "name": "Etcd Cluster Status"}
+        )
+    except Exception as e:
+        logger.error(f"Error fetching etcd data: {e}")
+        return templates.TemplateResponse(
+            request=request,
+            name="homepage.html",
+            context={"error": f"Failed to fetch etcd data: {str(e)}", "name": "Error"}
+        )
