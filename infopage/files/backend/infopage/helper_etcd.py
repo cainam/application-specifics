@@ -3,10 +3,11 @@ import ssl
 import json
 
 # Etcd configuration - these should be sourced from proper configuration management
+k8s-1-int.adm13:2379,k8s-2-int.adm13:2379,k8s-3-int.adm13:2379
 ETCD_ENDPOINTS = [
-    "https://etcd-0.etcd-cluster.kubernetes.io:2379",
-    "https://etcd-1.etcd-cluster.kubernetes.io:2379",
-    "https://etcd-2.etcd-cluster.kubernetes.io:2379"
+    "k8s-1-int.adm13:2379",
+    "k8s-1-int.adm13:2379",
+    "k8s-1-int.adm13:2379"
 ]
 ETCD_CLIENT_CERT = "/etc/ssl/etcd/client-etcd-client.crt"
 ETCD_CLIENT_KEY = "/etc/ssl/etcd/client-etcd-client.key"
@@ -215,7 +216,7 @@ def get_etcd_data():
     for endpoint in ETCD_ENDPOINTS:
         try:
             response = requests.get(
-                f"{endpoint.rstrip('/')}/health",
+                f"{'https://'+endpoint.rstrip('/')}/health",
                 verify=ETCD_CA_CERT,
                 cert=(ETCD_CLIENT_CERT, ETCD_CLIENT_KEY),
                 timeout=5
