@@ -3,11 +3,10 @@ import ssl
 import json
 
 # Etcd configuration - these should be sourced from proper configuration management
-k8s-1-int.adm13:2379,k8s-2-int.adm13:2379,k8s-3-int.adm13:2379
 ETCD_ENDPOINTS = [
     "k8s-1-int.adm13:2379",
-    "k8s-1-int.adm13:2379",
-    "k8s-1-int.adm13:2379"
+    "k8s-2-int.adm13:2379",
+    "k8s-3-int.adm13:2379"
 ]
 ETCD_CLIENT_CERT = "/etc/ssl/etcd/client-etcd-client.crt"
 ETCD_CLIENT_KEY = "/etc/ssl/etcd/client-etcd-client.key"
