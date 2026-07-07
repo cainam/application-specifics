@@ -220,17 +220,17 @@ def get_etcd_data():
                 cert=(ETCD_CLIENT_CERT, ETCD_CLIENT_KEY),
                 timeout=5
             )
-            health_results[endpoint] = 
+            health_results[endpoint] = {
                 "status": "healthy" if response.status_code == 200 else "unhealthy",
                 "response_code": response.status_code,
                 "response_text": response.text
-            })
+            }
         except Exception as e:
-            health_results[endpoint] =
+            health_results[endpoint] = {
                 "status": "error",
                 "response_code": -1,
                 "response_text": str(e)
-            })
+            }
 
     return {'health': health_results}
 
