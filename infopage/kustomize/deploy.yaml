@@ -30,7 +30,7 @@ spec:
             secretKeyRef:
               name: {{ kustom.name }}
               key: flows_private.pem
-        - name: ETCD_CRT
+        - name: ETCD_CA_CRT
           valueFrom:
             secretKeyRef:
               name: {{ kustom.name }}

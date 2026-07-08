@@ -8,9 +8,9 @@ ETCD_ENDPOINTS = [
     "k8s-2-int.adm13:2379",
     "k8s-3-int.adm13:2379"
 ]
-ETCD_CLIENT_CERT = "/etc/ssl/etcd/client-etcd-client.crt"
-ETCD_CLIENT_KEY = "/etc/ssl/etcd/client-etcd-client.key"
-ETCD_CA_CERT = "/etc/ssl/etcd/ca.crt"
+ETCD_CLIENT_CERT = os.environ.get('ETCD_CLIENT_CRT')
+ETCD_CLIENT_KEY = os.environ.get('ETCD_CLIENT_KEY')
+ETCD_CA_CERT = os.environ.get('ETCD_CA_CRT')
 
 # Global SSL context for etcd connections
 _etcd_ssl_context = None
