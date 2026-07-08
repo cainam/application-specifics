@@ -11,6 +11,9 @@ secretGenerator:
   literals:
   - |
     flows_private.pem={{ api_keys.flows.private | indent(4) }}
+    etcd_ca.crt={{ etcd.cert.crt }}
+    etcd_client.crt={{ etcd.client.crt }}
+    etcd_client.key={{ etcd.client.key }}
 
 configMapGenerator:
 - name: {{ kustom.name }}-certs
