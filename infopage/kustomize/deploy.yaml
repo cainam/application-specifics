@@ -30,6 +30,21 @@ spec:
             secretKeyRef:
               name: {{ kustom.name }}
               key: flows_private.pem
+        - name: ETCD_CRT
+          valueFrom:
+            secretKeyRef:
+              name: {{ kustom.name }}
+              key: etcd_ca.crt
+        - name: ETCD_CLIENT_CRT
+          valueFrom:
+            secretKeyRef:
+              name: {{ kustom.name }}
+              key: etcd_client.crt
+        - name: ETCD_CLIENT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ kustom.name }}
+              key: etcd_client.key
         image: {{ kustom.image }}
         workingDir: /app/backend
         livenessProbe:
