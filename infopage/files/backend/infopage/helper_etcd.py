@@ -13,6 +13,12 @@ ETCD_CLIENT_CERT = os.environ.get('ETCD_CLIENT_CRT')
 ETCD_CLIENT_KEY = os.environ.get('ETCD_CLIENT_KEY')
 ETCD_CA_CERT = os.environ.get('ETCD_CA_CRT')
 
+def _memfd_path(content: str, name: str):
+    fd = os.memfd_create(name, flags=0)
+    os.write(fd, content.encode())
+    os.lseek(fd, 0, os.SEEK_SET)
+    return fd, f"/proc/self/fd/{fd}"
+
 # Global SSL context for etcd connections
 _etcd_ssl_context = None
 def get_etcd_ssl_context():
@@ -20,13 +26,19 @@ def get_etcd_ssl_context():
     global _etcd_ssl_context
     if _etcd_ssl_context is None:
         try:
-            _etcd_ssl_context = ssl.create_default_context(cafile=ETCD_CA_CERT)
-            _etcd_ssl_context.load_cert_chain(certfile=ETCD_CLIENT_CERT, keyfile=ETCD_CLIENT_KEY)
+            _etcd_ssl_context = ssl.create_default_context(cadata=ETCD_CA_CERT)
+            cert_fd, cert_path = _memfd_path(ETCD_CLIENT_CERT, "etcd-client-cert")
+            key_fd, key_path = _memfd_path(ETCD_CLIENT_KEY, "etcd-client-key")
+            _etcd_ssl_context.load_cert_chain(certfile=cert_path, keyfile=key_path)
             print(f"Etcd SSL context created successfully")
         except Exception as e:
             print(f"Error creating etcd SSL context: {e}")
             raise
+        finally:
+            os.close(cert_fd)
+            os.close(key_fd)
     return _etcd_ssl_context
+
 def etcd_member_status():
     """
     Get etcd member status efficiently
