@@ -1,6 +1,7 @@
 import requests
 import ssl
 import json
+import os
 
 # Etcd configuration - these should be sourced from proper configuration management
 ETCD_ENDPOINTS = [
