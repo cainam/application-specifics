@@ -12,11 +12,11 @@ secretGenerator:
   - |
     flows_private.pem={{ api_keys.flows.private | indent(4) }}
   - |
-    etcd_ca.crt={{ etcd.cert.crt }}
+    etcd_ca.crt={{ etcd.cert.crt | indent(4) }}
   - |
-    etcd_client.crt={{ etcd.client.crt }}
+    etcd_client.crt={{ etcd.client.crt | indent(4) }}
   - |
-    etcd_client.key={{ etcd.client.key }}
+    etcd_client.key={{ etcd.client.key | indent(4) }}
 
 configMapGenerator:
 - name: {{ kustom.name }}-certs
