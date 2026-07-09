@@ -30,6 +30,11 @@ spec:
             secretKeyRef:
               name: {{ kustom.name }}
               key: flows_private.pem
+        - name: ETCD_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ kustom.name }}
+              key: control-plane-ips
         - name: ETCD_CA_CRT
           valueFrom:
             secretKeyRef:

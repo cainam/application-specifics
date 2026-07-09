@@ -4,11 +4,8 @@ import json
 import os
 
 # Etcd configuration - these should be sourced from proper configuration management
-ETCD_ENDPOINTS = [
-    "10.10.10.21:2379",
-    "10.10.10.22:2379",
-    "10.10.10.23:2379"
-]
+ETCD_PORT = 2379
+ETCD_ENDPOINTS = [ f"{ip}:{ETCD_PORT}" for ip in os.environ["ETCD_HOSTS"].split(",") if ip ]
 ETCD_CLIENT_CERT = os.environ.get('ETCD_CLIENT_CRT')
 ETCD_CLIENT_KEY = os.environ.get('ETCD_CLIENT_KEY')
 ETCD_CA_CERT = os.environ.get('ETCD_CA_CRT')
