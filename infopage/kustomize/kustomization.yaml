@@ -21,7 +21,7 @@ secretGenerator:
 {% set cp_ips = [] %}
 {% for host in groups['all'] %}
 {%   if 'control_plane' in (hostvars[host].system_roles | default([])) %}
-{%     set _ = cp_ips.append(lookup('community.general.dig', host)) %}
+{%     set _ = cp_ips.append(hostvars[host].my_cluster_ip) %}
 {%   endif %}
 {% endfor %}
 configMapGenerator:
