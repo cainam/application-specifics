@@ -19,10 +19,11 @@ secretGenerator:
     etcd_client.key={{ etcd.client.key | indent(4) }}
 
 configMapGenerator:
-- name: {{ kustom.name }}-certs
+- name: {{ kustom.name }}
   literals:
   - |
     service-ca-bundle.crt={{ application_playbooks[application.key].vars.ca_bundle | indent(4) }}
+  - control_plane_ips={{ groups['all'] | map('extract', hostvars) | selectattr('system_roles', 'defined') | selectattr('system_roles', 'contains', 'control_plane') | map(attribute='ansible_host', default='inventory_hostname') | join(',') }}
 
 generatorOptions:
   disableNameSuffixHash: true

@@ -84,5 +84,5 @@ spec:
           claimName: infopage
       - name: ca-bundle
         configMap:
-              name: {{ kustom.name }}-certs
+              name: {{ kustom.name }}
 

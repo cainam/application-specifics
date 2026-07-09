@@ -18,9 +18,6 @@ headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
 
 FLOWS_PRIVATE_KEY = os.environ.get('FLOWS_PRIVATE_KEY')
 
-def get_etcd_status():
-    return get_etcd_data()
-
 def generate_jwt():
     payload = {
         "iss": "flows-client",   # Issuer
