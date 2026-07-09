@@ -18,12 +18,18 @@ secretGenerator:
   - |
     etcd_client.key={{ etcd.client.key | indent(4) }}
 
+{% set cp_ips = [] %}
+{% for host in groups['all'] %}
+{%   if 'control_plane' in (hostvars[host].system_roles | default([])) %}
+{%     set _ = cp_ips.append(hostvars[host].ansible_host | default(hostvars[host].ansible_default_ipv4.address | default(host))) %}
+{%   endif %}
+{% endfor %}
 configMapGenerator:
 - name: {{ kustom.name }}
   literals:
   - |
     service-ca-bundle.crt={{ application_playbooks[application.key].vars.ca_bundle | indent(4) }}
-  - control_plane_ips={% set ips = [] %}{% for h in groups['all'] if hostvars[h]['system_roles'] is defined and 'control_plane' in hostvars[h]['system_roles'] %}{% do ips.append(hostvars[h]['ansible_host'] | default(h)) %}{% endfor %}{{ ips | join(',') }}
+  - control-plane-ips={{ cp_ips | join(',') }}
 
 generatorOptions:
   disableNameSuffixHash: true
