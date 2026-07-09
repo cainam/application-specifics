@@ -263,7 +263,7 @@ def get_etcd_data():
                 "show": response.text #"healthy" if data["health"] else f"unhealthy: {data['reason']}"
             }
         except Exception as e:
-            health_results[endpoint] = {
+            maintenance_status[endpoint] = {
                 "status": "error",
                 "response_code": -1,
                 "response_text": str(e),
