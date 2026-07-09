@@ -262,7 +262,7 @@ def get_etcd_data():
                 "status": "healthy" if response.status_code == 200 else "unhealthy",
                 "response_code": response.status_code,
                 "response_text": response.text,
-                "show": response.text #"healthy" if data["health"] else f"unhealthy: {data['reason']}",
+                "show": response.text, #"healthy" if data["health"] else f"unhealthy: {data['reason']}",
                 "version": data["version"]
             }
         except Exception as e:
