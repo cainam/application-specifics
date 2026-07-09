@@ -9,11 +9,6 @@ import functools
 import requests
 
 import infopage.helper
-from infopage.helper import (
-    etcd_member_status,
-    get_etcd_data,
-    get_etcd_status
-)
 
 logging.basicConfig(level = logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -196,7 +191,7 @@ async def get_flow(request: Request):
 async def etcd(request: Request):
     try:
         # Get etcd status data for homepage display
-        etcd_data = infopage.helper.get_etcd_status()
+        etcd_data = infopage.helper.get_etcd_data()
         return templates.TemplateResponse(
             request=request,
             name="etcd.html",
