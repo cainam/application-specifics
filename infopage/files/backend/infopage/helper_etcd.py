@@ -223,7 +223,7 @@ def get_etcd_data():
     Returns: aggregated health status across all etcd members
     """
     health_results = {}
-    maintenance_status = {}
+    member_list_fetched = False
     results = {}
     for endpoint in ETCD_ENDPOINTS:
         try:
@@ -258,20 +258,26 @@ def get_etcd_data():
             )
             response.raise_for_status()
             data = response.json()
-            maintenance_status[endpoint] = {
-                "status": "healthy" if response.status_code == 200 else "unhealthy",
-                "response_code": response.status_code,
-                "response_text": response.text,
-                "show": response.text, #"healthy" if data["health"] else f"unhealthy: {data['reason']}",
-                "version": data["version"]
-            }
+            print("maintenance: "+response.text)
         except Exception as e:
-            maintenance_status[endpoint] = {
-                "status": "error",
-                "response_code": -1,
-                "response_text": str(e),
-                "show": f"unhealthy: {e}"
-            }
-        results[endpoint] = {'version':data["version"], 'raftIndex': data['raftIndex']}
+            data = {'version': 'N/A', 'raftIndex': 'N/A'}
+
+        results[endpoint]['version'] = data["version"]
+        results[endpoint]['raftIndex'] = data['raftIndex']
+
+        if False and not member_list_fetched:
+            try:
+                response = requests.post(
+                    f"{'https://'+endpoint.rstrip('/')}/v3/cluster/member/list",
+                    json={},
+                    verify=etcd_ca_path,
+                    cert=(cert_path, key_path),
+                    headers={"Content-Type": "application/json"}
+                )
+                response.raise_for_status()
+                data = response.json()
+                member_list_fetched = True
+            except Exception as e:
+                data = {'version': 'N/A', 'raftIndex': 'N/A'}
 
     return results
