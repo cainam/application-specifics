@@ -223,7 +223,7 @@ def get_etcd_data():
     Returns: aggregated health status across all etcd members
     """
     health_results = {}
-
+    maintenance_status = {}
     for endpoint in ETCD_ENDPOINTS:
         try:
             response = requests.get(
