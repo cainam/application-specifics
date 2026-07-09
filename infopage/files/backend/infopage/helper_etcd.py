@@ -19,6 +19,10 @@ def _memfd_path(content: str, name: str):
     os.lseek(fd, 0, os.SEEK_SET)
     return fd, f"/proc/self/fd/{fd}"
 
+cert_fd, cert_path = _memfd_path(ETCD_CLIENT_CERT, "etcd-client-cert")
+key_fd, key_path = _memfd_path(ETCD_CLIENT_KEY, "etcd-client-key")
+etcd_ca_fd, etcd_ca_path = _memfd_path(ETCD_CA_CERT, "etcd-ca-cert")
+
 # Global SSL context for etcd connections
 _etcd_ssl_context = None
 def get_etcd_ssl_context():
@@ -26,17 +30,13 @@ def get_etcd_ssl_context():
     global _etcd_ssl_context
     if _etcd_ssl_context is None:
         try:
-            _etcd_ssl_context = ssl.create_default_context(cadata=ETCD_CA_CERT)
-            cert_fd, cert_path = _memfd_path(ETCD_CLIENT_CERT, "etcd-client-cert")
-            key_fd, key_path = _memfd_path(ETCD_CLIENT_KEY, "etcd-client-key")
+            _etcd_ssl_context = ssl.create_default_context(cafile=etcd_ca_fd)
+
             _etcd_ssl_context.load_cert_chain(certfile=cert_path, keyfile=key_path)
             print(f"Etcd SSL context created successfully")
         except Exception as e:
             print(f"Error creating etcd SSL context: {e}")
             raise
-        finally:
-            os.close(cert_fd)
-            os.close(key_fd)
     return _etcd_ssl_context
 
 def etcd_member_status():
@@ -229,8 +229,8 @@ def get_etcd_data():
         try:
             response = requests.get(
                 f"{'https://'+endpoint.rstrip('/')}/health",
-                verify=ETCD_CA_CERT,
-                cert=(ETCD_CLIENT_CERT, ETCD_CLIENT_KEY),
+                verify=etcd_ca_fd,
+                cert=(cert_fd, key_fd),
                 timeout=5
             )
             health_results[endpoint] = {
