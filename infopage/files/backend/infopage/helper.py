@@ -8,15 +8,7 @@ import json
 #from cryptography.hazmat.primitives.asymmetric import ed25519
 
 # Import etcd helper functions
-from .helper_etcd import (
-    get_etcd_ssl_context,
-    etcd_member_status,
-    get_etcd_data,
-    ETCD_ENDPOINTS,
-    ETCD_CLIENT_CERT,
-    ETCD_CLIENT_KEY,
-    ETCD_CA_CERT
-)
+from .helper_etcd import get_etcd_data
 
 serviceaccount = "/var/run/secrets/kubernetes.io/serviceaccount"
 cacert = serviceaccount+"/ca.crt"
@@ -28,20 +20,6 @@ headers = {'Accept': '*/*', 'Authorization': 'Bearer '+token}
 FLOWS_PRIVATE_KEY = os.environ.get('FLOWS_PRIVATE_KEY')
 
 def get_etcd_status():
-    """
-    Get etcd status data formatted for homepage display
-    Returns: structured etcd data ready for template rendering
-    """
-    #all_etcd_data = get_etcd_data()#
-
-    # Format data for homepage display - create a consolidated view
-    #etcd_status = {
-    #    "member_count": len(all_etcd_data["member_status"]),
-     #   "healthy_members": sum(1 for m in all_etcd_data["member_status"] if m.get("status") == "success"),
-     #   "cluster_health": all_etcd_data["cluster_health"],
-     #   "raw_data": all_etcd_data
-    #}
-
     return get_etcd_data()
 
 def generate_jwt():
