@@ -229,8 +229,7 @@ def get_etcd_data():
             response = requests.get(
                 f"{'https://'+endpoint.rstrip('/')}/health",
                 verify=etcd_ca_path,
-                cert=(cert_path, key_path),
-                timeout=5
+                cert=(cert_path, key_path)
             )
             response.raise_for_status()
             data = response.json()
@@ -248,11 +247,12 @@ def get_etcd_data():
                 "show": f"unhealthy: {e}"
             }
         try:
-            response = requests.get(
+            response = requests.post(
                 f"{'https://'+endpoint.rstrip('/')}/v3/maintenance/status",
+                json={},
                 verify=etcd_ca_path,
                 cert=(cert_path, key_path),
-                timeout=5
+                headers={"Content-Type": "application/json"}
             )
             response.raise_for_status()
             data = response.json()
