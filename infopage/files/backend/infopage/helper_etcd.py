@@ -5,9 +5,9 @@ import os
 
 # Etcd configuration - these should be sourced from proper configuration management
 ETCD_ENDPOINTS = [
-    "k8s-1-int.adm13:2379",
-    "k8s-2-int.adm13:2379",
-    "k8s-3-int.adm13:2379"
+    "10.10.10.21:2379",
+    "10.10.10.22:2379",
+    "10.10.10.23:2379"
 ]
 ETCD_CLIENT_CERT = os.environ.get('ETCD_CLIENT_CRT')
 ETCD_CLIENT_KEY = os.environ.get('ETCD_CLIENT_KEY')
