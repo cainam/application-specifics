@@ -224,6 +224,7 @@ def get_etcd_data():
     """
     health_results = {}
     maintenance_status = {}
+    results = []
     for endpoint in ETCD_ENDPOINTS:
         try:
             response = requests.get(
@@ -246,6 +247,7 @@ def get_etcd_data():
                 "response_text": str(e),
                 "show": f"unhealthy: {e}"
             }
+        results[endpoint] = {'health': health_results[endpoint]["show"]}
         try:
             response = requests.post(
                 f"{'https://'+endpoint.rstrip('/')}/v3/maintenance/status",
@@ -260,7 +262,8 @@ def get_etcd_data():
                 "status": "healthy" if response.status_code == 200 else "unhealthy",
                 "response_code": response.status_code,
                 "response_text": response.text,
-                "show": response.text #"healthy" if data["health"] else f"unhealthy: {data['reason']}"
+                "show": response.text #"healthy" if data["health"] else f"unhealthy: {data['reason']}",
+                "version": data["version"]
             }
         except Exception as e:
             maintenance_status[endpoint] = {
@@ -269,5 +272,6 @@ def get_etcd_data():
                 "response_text": str(e),
                 "show": f"unhealthy: {e}"
             }
+        results[endpoint] = {'version':data["version"], 'raftIndex': data['raftIndex']}
 
-    return {'health': health_results, 'maintenance_status': maintenance_status}
+    return results
