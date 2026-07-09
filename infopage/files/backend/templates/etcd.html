@@ -17,7 +17,7 @@
         <tr>
         <td>{{ ep }}</td>
         {% for k,v in etcd_data.items() %}
-        <td>{{ v[ep] }}</td>
+        <td>{{ v[ep]["show"] }}</td>
         {% endfor %}
         </tr>
         {% endfor %}

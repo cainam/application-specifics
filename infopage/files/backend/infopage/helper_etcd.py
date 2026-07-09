@@ -232,16 +232,19 @@ def get_etcd_data():
                 cert=(cert_path, key_path),
                 timeout=5
             )
+            data = response.json()
             health_results[endpoint] = {
                 "status": "healthy" if response.status_code == 200 else "unhealthy",
                 "response_code": response.status_code,
                 "response_text": response.text
+                "show": "healthy" if data["health"] else f"unhealthy: {data['reason']}"
             }
         except Exception as e:
             health_results[endpoint] = {
                 "status": "error",
                 "response_code": -1,
                 "response_text": str(e)
+                "show": f"unhealthy: {e}"
             }
 
     return {'health': health_results}
