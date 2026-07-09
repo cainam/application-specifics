@@ -228,8 +228,8 @@ def get_etcd_data():
         try:
             response = requests.get(
                 f"{'https://'+endpoint.rstrip('/')}/health",
-                verify=etcd_ca_fd,
-                cert=(cert_fd, key_fd),
+                verify=etcd_ca_path,
+                cert=(cert_path, key_path),
                 timeout=5
             )
             health_results[endpoint] = {
