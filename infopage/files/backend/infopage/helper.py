@@ -5,7 +5,6 @@ import os
 import ssl
 from urllib3 import poolmanager
 import json
-#from cryptography.hazmat.primitives.asymmetric import ed25519
 
 # Import etcd helper functions
 from .helper_etcd import get_etcd_data
