@@ -232,6 +232,7 @@ def get_etcd_data():
                 cert=(cert_path, key_path),
                 timeout=5
             )
+            response.raise_for_status()
             data = response.json()
             health_results[endpoint] = {
                 "status": "healthy" if response.status_code == 200 else "unhealthy",
@@ -246,15 +247,27 @@ def get_etcd_data():
                 "response_text": str(e),
                 "show": f"unhealthy: {e}"
             }
+        try:
+            response = requests.get(
+                f"{'https://'+endpoint.rstrip('/')}/v3/maintenance/status",
+                verify=etcd_ca_path,
+                cert=(cert_path, key_path),
+                timeout=5
+            )
+            response.raise_for_status()
+            data = response.json()
+            maintenance_status[endpoint] = {
+                "status": "healthy" if response.status_code == 200 else "unhealthy",
+                "response_code": response.status_code,
+                "response_text": response.text,
+                "show": response.text #"healthy" if data["health"] else f"unhealthy: {data['reason']}"
+            }
+        except Exception as e:
+            health_results[endpoint] = {
+                "status": "error",
+                "response_code": -1,
+                "response_text": str(e),
+                "show": f"unhealthy: {e}"
+            }
 
-    return {'health': health_results}
-
-def get_all_etcd_data():
-    """
-    Convenience function to get all etcd data in one call
-    Returns: dict with member_status and cluster_health
-    """
-    return {
-        "member_status": etcd_member_status(),
-        "cluster_health": etcd_cluster_health()
-    }
+    return {'health': health_results, 'maintenance_status': maintenance_status}
