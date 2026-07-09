@@ -224,7 +224,7 @@ def get_etcd_data():
     """
     health_results = {}
     maintenance_status = {}
-    results = []
+    results = {}
     for endpoint in ETCD_ENDPOINTS:
         try:
             response = requests.get(
