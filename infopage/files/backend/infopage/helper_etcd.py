@@ -86,6 +86,6 @@ def get_etcd_data():
         results[endpoint]['version'] = data["version"]
         results[endpoint]['raftIndex'] = data['raftIndex']
         results[endpoint]['leader'] = 'true' if data['header']['member_id'] == data['leader'] else 'false'
-        results[endpoint][''] = data['dbSizeInUse'] = round(int(data['dbSizeInUse'])/1024/1024,2)
+        results[endpoint]['dbSizeInUse'] = round(int(data['dbSizeInUse'])/1024/1024,2)
 
     return results
