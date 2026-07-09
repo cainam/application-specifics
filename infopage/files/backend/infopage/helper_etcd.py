@@ -31,7 +31,6 @@ def get_etcd_ssl_context():
     if _etcd_ssl_context is None:
         try:
             _etcd_ssl_context = ssl.create_default_context(cafile=etcd_ca_fd)
-
             _etcd_ssl_context.load_cert_chain(certfile=cert_path, keyfile=key_path)
             print(f"Etcd SSL context created successfully")
         except Exception as e:
