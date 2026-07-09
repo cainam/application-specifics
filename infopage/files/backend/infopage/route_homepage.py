@@ -196,11 +196,11 @@ async def get_flow(request: Request):
 async def etcd(request: Request):
     try:
         # Get etcd status data for homepage display
-        endpoints, etcd_data = infopage.helper.get_etcd_status()
+        etcd_data = infopage.helper.get_etcd_status()
         return templates.TemplateResponse(
             request=request,
             name="etcd.html",
-            context={"etcd_data": etcd_data, "endpoints": endpoints, "name": "Etcd Cluster Status"}
+            context={"etcd_data": etcd_data, "name": "Etcd Cluster Status"}
         )
     except Exception as e:
         logger.error(f"Error fetching etcd data: {e}")

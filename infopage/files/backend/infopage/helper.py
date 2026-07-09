@@ -42,7 +42,7 @@ def get_etcd_status():
      #   "raw_data": all_etcd_data
     #}
 
-    return ETCD_ENDPOINTS, get_etcd_data()
+    return get_etcd_data()
 
 def generate_jwt():
     payload = {
