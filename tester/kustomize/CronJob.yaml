@@ -58,39 +58,6 @@ spec:
               chmod 400 ~/.ssh/*
               # rm ~/.ssh/known_hosts
               git clone --depth 1 --single-branch --recursive https://github.com/cainam/home-cluster-deployment.git
-              cat >> XXmolecule.yaml <<EOF
-              ---
-              dependency:
-                name: galaxy
-                enabled: false
-              driver:
-                name: podman
-                options:
-                  managed: true
-              platforms:
-                - name: instance
-                  image: myregistry.adm13:443/local/molecule-tester:20260416
-                  etc_hosts:
-                    "molecule-instance": "127.0.0.1"
-                  pre_build_image: true
-                  network: host
-                  security_opts:
-                    - seccomp=unconfined
-              provisioner:
-                name: ansible
-                config_options:
-                  defaults:
-                    fact_caching: jsonfile
-                    fact_caching_connection: ${PWD}/tmp/ansible_cache
-                    gather_facts: true
-                    # Ensures the engine knows to load the junit plugin
-                    callbacks_enabled: junit
-                    local_tmp: ${PWD}/tmp
-                    remote_tmp: ${PWD}/tmp
-              verifier:
-                name: ansible
-              EOF
-              NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
               TOKEN=$(cat ${SERVICEACCOUNT}/token)
               TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
@@ -115,7 +82,7 @@ spec:
               )
               # patch the configmap
               curl --cacert "${SERVICEACCOUNT}/ca.crt" -X PATCH -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/merge-patch+json" \
-                   --data "${PAYLOAD}" "${APISERVER}/apis/batch/v1/namespaces/${NAMESPACE}/cronjobs/{{ kustom.name }}"
+                   --data "${PAYLOAD}" "${APISERVER}/apis/batch/v1/namespaces/$(cat ${SERVICEACCOUNT}/namespace)/cronjobs/{{ kustom.name }}"
               #while sleep 99; do true; done
             securityContext:
               runAsUser: {{ kustom.security.runAsUser }}

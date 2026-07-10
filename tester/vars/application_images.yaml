@@ -11,6 +11,7 @@ images:
         echo "$p ~arm64" > /etc/portage/package.accept_keywords/$(basename $p)
       done
       echo "net-firewall/iptables nftables" >> /etc/portage/package.use/iptables
+      echo 'ACCEPT_KEYWORDS="~arm64"' >> /etc/portage/make.conf
       emerge dev-libs/glib app-admin/ansible-core dev-lang/go
     configure_rootfs_build: |
       VIRTUAL_ENV=/py_env
