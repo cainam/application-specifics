@@ -29,7 +29,6 @@ def generate_jwt():
     return token
 
 def test_results():
-  import json
   CRONJOB_NAME='tester'
 
   try:

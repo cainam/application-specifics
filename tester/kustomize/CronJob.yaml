@@ -48,6 +48,7 @@ spec:
               set -x
               env 
               cd 
+              pwd
               mkdir -p ~/.ssh tmp/cp tmp/ansible_cache
               export TMPDIR="${PWD}/tmp"
               export CONTAINER_SSHKEY="${PWD}/.ssh/key"
@@ -57,7 +58,7 @@ spec:
               chmod 400 ~/.ssh/*
               # rm ~/.ssh/known_hosts
               git clone --depth 1 --single-branch --recursive https://github.com/cainam/home-cluster-deployment.git
-              cat >> molecule.yaml <<EOF
+              cat >> XXmolecule.yaml <<EOF
               ---
               dependency:
                 name: galaxy
@@ -95,9 +96,9 @@ spec:
 
               cd home-cluster-deployment/roles/shared_helper/
 
-              /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml create --scenario-name test_directory_sync
-              /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml converge --scenario-name test_directory_sync
-              /py_env/bin/python -m molecule  --base-config ${HOME}/molecule.yaml verify --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config /etc/molecule.yaml create --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config /etc/molecule.yaml converge --scenario-name test_directory_sync
+              /py_env/bin/python -m molecule  --base-config /etc/molecule.yaml verify --scenario-name test_directory_sync
 
               VALUE=$(cat "${JUNIT_OUTPUT_DIR}/results.yaml")
               DATA="{\"metadata\":{\"annotations\":{"last_start":"${TIMESTAMP}","${VALUE//\"/\\\"}"}}}"
@@ -137,6 +138,9 @@ spec:
             - name: etc
               mountPath: /etc/subgid
               subPath: etc-subgid
+            - name: etc
+              mountPath: /etc/molecule.yaml
+              subPath: molecule.yaml
           volumes:
           - name: home
             emptyDir: {}
