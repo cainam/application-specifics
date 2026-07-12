@@ -1,6 +1,5 @@
 images:
 - name: molecule
-  XXsection: local
   requires:
   - python3
   type: gentoo-image-builder
@@ -25,7 +24,6 @@ images:
       ansible-galaxy collection install containers.podman -p ${ROOT}/usr/share/ansible/collections
 
 - name: molecule-tester
-  section: local
   requires:
   - python3
   type: gentoo-image-builder

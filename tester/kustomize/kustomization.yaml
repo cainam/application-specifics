@@ -30,7 +30,7 @@ configMapGenerator:
         managed: true
     platforms:
       - name: instance
-        image: myregistry.adm13:443/local/molecule-tester:20260416
+        image: {{  kustom.images['molecule-tester'] }}
         etc_hosts:
           "molecule-instance": "127.0.0.1"
         pre_build_image: true
