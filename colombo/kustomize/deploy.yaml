@@ -67,7 +67,7 @@ spec:
               done
           env:
             - name: FRITZ_IP
-              value: "http://fritz.box"
+              value: "http://{{ lookup('community.general.dig', 'fritz.box') }}"
             - name: FRITZ_USER
               valueFrom:
                 secretKeyRef:
