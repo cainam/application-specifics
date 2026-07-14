@@ -37,7 +37,7 @@ spec:
           value: /py_env/bin:/bin:/usr/bin
         - name: T
           value: UTC
-        image: {{ kustom.image }}
+        image: {{ kustom.images['home-assistant'] }}
         livenessProbe:
           failureThreshold: 3
           periodSeconds: 10
