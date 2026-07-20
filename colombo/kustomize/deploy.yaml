@@ -96,7 +96,7 @@ spec:
               sort -u /data/suppress_sids.txt | awk '{print "suppress gen_id 1, sig_id " $1}' >> /data/threshold.conf
               while sleep 2; do
                 echo "Suricata listening to pipe..."
-                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/ --set threshold-file=/data/threshold.conf
+                suricata --pcap-file-continuous -r /data/pcaps/ -c /etc/suricata/suricata.yaml -l /var/log/suricata/ --set threshold-file=/data/threshold.conf --set stats.enabled=no
                 echo "Pipe closed or Suricata restarted. Reloading in 2 seconds..."
               done
           securityContext:
