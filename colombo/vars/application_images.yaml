@@ -5,7 +5,7 @@ images:
   requires:
   - base
   build:
-    packages: net-analyzer/suricata 
+    packages: net-analyzer/suricata app-misc/yq
     configure_builder: emerge dev-python/pyyaml
     configure_rootfs_build: |
       set -x
