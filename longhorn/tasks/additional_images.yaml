@@ -1,5 +1,8 @@
 - block:
   - name: template
+    vars:
+      kustom:
+        namespace: .
     template:
       src: "{{ kustomize_dir }}/kustomization.yaml"
       dest: /tmp/longhorn-kustomization.yaml
