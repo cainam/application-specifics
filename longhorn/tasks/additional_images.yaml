@@ -2,7 +2,7 @@
   - name: template
     vars:
       kustom:
-        namespace: .
+        namespace: "{{k8s_namespace.key}}"
     template:
       src: "{{ kustomize_dir }}/kustomization.yaml"
       dest: /tmp/longhorn-kustomization.yaml
