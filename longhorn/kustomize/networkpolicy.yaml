@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-allow-internal-flannel
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      longhorn.io/component: instance-manager
+  ingress:
+    # Match via Flannel Pod CIDR block instead of podSelector
+    - from:
+        - ipBlock:
+            cidr: {{ k8s.podSubnet }}
+      ports:
+        - protocol: TCP
+          port: 8500
+        - protocol: TCP
+          port: 8501
+        - protocol: TCP
+          port: 8502
+        - protocol: TCP
+          port: 8503

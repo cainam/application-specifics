@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: {{ kustom.namespace }}
 resources:
   - https://raw.githubusercontent.com/longhorn/longhorn/{{ software.longhorn.version }}/deploy/longhorn.yaml
+  - networkpolicy.yaml
 
 configMapGenerator:
   - name: registry-source
