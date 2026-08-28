@@ -48,14 +48,6 @@ replacements:
           index: 0
 patches:
   - target:
-      kind: ConfigMap
-      name: longhorn-default-setting
-    patch: |-
-      - op: replace
-        path: /data/default-setting.yaml
-        value: |
-          log-level: info
-  - target:
       kind: Deployment
       name: longhorn-driver-deployer
     patch: |-
@@ -68,6 +60,10 @@ patches:
       kind: ConfigMap
       name: longhorn-default-setting
     patch: |-
+      - op: replace
+        path: /data/default-setting.yaml
+        value: |
+          log-level: info
       - op: add
         path: /data/default-setting.yaml
         value: |
