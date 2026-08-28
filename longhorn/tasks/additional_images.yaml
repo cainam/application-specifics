@@ -31,28 +31,6 @@
     changed_when: false
   delegate_to: localhost
 
-- name: "set var {{ var_additional_images }}"
-  set_fact:
-    "{{ var_additional_images }}": >-
-      {% set results = [] %}
-      {% for img in source_images.stdout_lines %}
-        {% set _ = results.append({
-          'name': img.split('/')[-1].split(':')[0],
-          'tag': img.split(':')[-1],
-          'section': registry_path,
-          'type': 'fetch',
-          'source': img
-        }) %}
-      {% endfor %}
-      {{ results }}
-  when: false
-
-- name: "set var {{ var_additional_images }}"
-  when: false
-  set_fact:
-    "{{ var_additional_images }}": >-
-      {{ source_images.stdout_lines | map('regex_replace', '^(.*)/(.*):(.*)$', '{"name": "\\2", "tag": "\\3", "section": "' ~ registry_path ~ '", "type": "fetch", "source": "\\0"}') | map('from_json') | list }}
-
 - name: "Build image list for {{ var_additional_images }}"
   set_fact:
     temp_img_list: "{{ temp_img_list|default([])  + [ {
@@ -63,8 +41,6 @@
         'source': (item.rsplit(':', 1) | first)
       } ] }}"
   loop: "{{ source_images.stdout_lines }}"
-  failed_when: true
-
 
 - name: "set var {{ var_additional_images }}"
   set_fact:
