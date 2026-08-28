@@ -64,7 +64,6 @@ patches:
         value:
           name: KUBELET_ROOT_DIR
           value: /var/lib/kubelet/
-patches:
   - target:
       kind: ConfigMap
       name: longhorn-default-setting
