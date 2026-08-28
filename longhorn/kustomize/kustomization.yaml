@@ -71,6 +71,7 @@ patches:
           disable-revision-counter: "{\"v1\":\"true\"}"
           network-policies: |
             enabled: true
+            type: "standard"
             restrictInternalTraffic: true
             kubeAPIServerSourceCIDRs:
 {% for ip in _cluster_ips.stdout_lines if ip | trim != '' %}
