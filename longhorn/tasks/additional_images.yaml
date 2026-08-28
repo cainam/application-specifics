@@ -1,4 +1,8 @@
 - block:
+  - name: get IPs to grant access
+    shell: kubectl get svc kubernetes -n default -o jsonpath='{.spec.clusterIP}'; echo; kubectl get nodes -l node-role.kubernetes.io/control-plane -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}'
+    register: _cluster_ips
+
   - name: template
     vars:
       kustom:
@@ -59,6 +63,8 @@
         'source': (item.rsplit(':', 1) | first)
       } ] }}"
   loop: "{{ source_images.stdout_lines }}"
+  failed_when: true
+
 
 - name: "set var {{ var_additional_images }}"
   set_fact:

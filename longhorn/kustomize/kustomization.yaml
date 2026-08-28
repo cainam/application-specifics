@@ -64,3 +64,20 @@ patches:
         value:
           name: KUBELET_ROOT_DIR
           value: /var/lib/kubelet/
+patches:
+  - target:
+      kind: ConfigMap
+      name: longhorn-default-setting
+    patch: |-
+      - op: add
+        path: /data/default-setting.yaml
+        value: |
+          priority-class: "longhorn-critical"
+          disable-revision-counter: "{\"v1\":\"true\"}"
+          network-policies: |
+            enabled: true
+            restrictInternalTraffic: true
+            kubeAPIServerSourceCIDRs:
+{% for ip in _cluster_ips.stdout_lines if ip | trim != '' %}
+              - "{{ ip | trim }}/32"
+{% endfor %}
