@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: {{ kustom.namespace }}
 resources:
   - https://raw.githubusercontent.com/longhorn/longhorn/{{ software.longhorn.version }}/deploy/longhorn.yaml
-  - networkpolicy.yaml
+#  - networkpolicy.yaml # 
 
 configMapGenerator:
   - name: registry-source
@@ -73,7 +73,7 @@ patches:
           network-policies: |
             enabled: true
             type: "standard"
-            restrictInternalTraffic: true
+            restrictInternalTraffic: false
             kubeAPIServerSourceCIDRs:
 {% for ip in _cluster_ips.stdout_lines if ip | trim != '' %}
               - "{{ ip | trim }}"
