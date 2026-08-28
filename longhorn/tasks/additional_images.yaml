@@ -1,6 +1,10 @@
 - block:
   - name: get IPs to grant access
-    shell: kubectl get svc kubernetes -n default -o jsonpath='{.spec.clusterIP}'; echo; kubectl get nodes -l node-role.kubernetes.io/control-plane -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}'
+    shell: |
+      kubectl get svc kubernetes -n default -o jsonpath='{.spec.clusterIP}' | sed -e 's#$#/32#g'
+      echo
+      kubectl get nodes -l node-role.kubernetes.io/control-plane -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}'  | sed -e 's#$#/32#g'
+      kubectl get nodes -o jsonpath='{.items[*].spec.podCIDR}' | sed -e 's/ /\n/g'
     register: _cluster_ips
 
   - name: template
