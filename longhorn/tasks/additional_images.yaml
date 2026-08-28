@@ -27,7 +27,7 @@
       for i in ${I}; do
         sed -i -e "s#$i#{{ registry_path }}/"$(basename "$i")"#g" longhorn.yaml
       done
-      yq -iy '.resources=["longhorn.yaml"]' /tmp/longhorn-kustomization.yaml
+      yq -iy '.resources[0]="longhorn.yaml"' /tmp/longhorn-kustomization.yaml
       cp -dp /tmp/longhorn-kustomization.yaml kustomization.yaml
       echo "$I"
     register: source_images
