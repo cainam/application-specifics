@@ -10,6 +10,8 @@ images:
       mkdir -p /var/tmp/portage /var/db && chmod 755 /var/db
       env
       PORTAGE_TMPDIR="/var/tmp/portage" MAKEOPTS="-j3" emerge net-libs/nodejs dev-libs/icu 
+      npm install -g corepack
+      npx corepack enable
     configure_rootfs_build: |
       git clone --depth 1 --single-branch -b "{{ software.traefik.version }}" https://github.com/traefik/traefik.git
       set -x
