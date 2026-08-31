@@ -71,7 +71,7 @@ patches:
           priority-class: "longhorn-critical"
           disable-revision-counter: "{\"v1\":\"true\"}"
           network-policies: |
-            enabled: true
+            enabled: false
             type: "standard"
             restrictInternalTraffic: false
             kubeAPIServerSourceCIDRs:
