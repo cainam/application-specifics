@@ -42,10 +42,10 @@ spec:
         - port: 443
           protocol: TCP
 
-    # Longhorn internal communication
     - to:
-        - ipBlock:
-            cidr: 10.244.0.0/16
+        - podSelector:
+            matchLabels:
+              longhorn.io/component: instance-manager
       ports:
         - port: 8503
           protocol: TCP
