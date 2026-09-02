@@ -21,3 +21,21 @@ spec:
           port: 8502
         - protocol: TCP
           port: 8503
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-longhorn-api-and-dns-egress
+  namespace: longhorn-system
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  # Rule 1: Allow outbound HTTPS to Kubernetes API Server (10.96.0.1:443)
+  - to:
+    - ipBlock:
+        cidr: 10.96.0.1/32
+    ports:
+    - port: 443
+      protocol: TCP
