@@ -2,7 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: longhorn-allow-internal-flannel
-  namespace: longhorn-system
 spec:
   podSelector:
     matchLabels:
@@ -21,23 +20,32 @@ spec:
           port: 8502
         - protocol: TCP
           port: 8503
+        - protocol: TCP
+          port: 8504
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-longhorn-api-and-dns-egress
-  namespace: longhorn-system
 spec:
   podSelector: {}
   policyTypes:
-  - Egress
+    - Egress
   egress:
-  # Rule 1: Allow outbound HTTPS to Kubernetes API Server (10.96.0.1:443)
-  - to:
-    - ipBlock:
-        cidr: 10.96.0.1/32
-    - ipBlock:
-        cidr: 10.10.10.0/24
-    ports:
-    - port: 443
-      protocol: TCP
+    # Kubernetes API / DNS as you have today
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.1/32
+        - ipBlock:
+            cidr: 10.10.10.0/24
+      ports:
+        - port: 443
+          protocol: TCP
+
+    # Longhorn internal communication
+    - to:
+        - ipBlock:
+            cidr: 10.244.0.0/16
+      ports:
+        - port: 8503
+          protocol: TCP
