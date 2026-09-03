@@ -48,7 +48,6 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: longhorn-manager-to-instance-manager
-  namespace: longhorn-system
 spec:
   podSelector:
     matchLabels:
@@ -64,5 +63,26 @@ spec:
               longhorn.io/component: instance-manager
       ports:
         - port: 8503
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-to-webhook
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+
+  policyTypes:
+    - Egress
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              longhorn.io/admission-webhook: longhorn-admission-webhook
+      ports:
+        - port: 9502
           protocol: TCP
 
