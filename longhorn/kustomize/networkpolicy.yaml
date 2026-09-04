@@ -69,14 +69,13 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: longhorn-manager-to-webhook
+  namespace: longhorn-system
 spec:
   podSelector:
     matchLabels:
       app: longhorn-manager
-
   policyTypes:
     - Egress
-
   egress:
     - to:
         - podSelector:
@@ -86,3 +85,9 @@ spec:
         - port: 9502
           protocol: TCP
 
+    - to:
+        - ipBlock:
+            cidr: 10.101.5.141/32
+      ports:
+        - port: 9502
+          protocol: TCP
