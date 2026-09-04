@@ -1,74 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: longhorn-allow-internal-flannel
-spec:
-  podSelector:
-    matchLabels:
-      longhorn.io/component: instance-manager
-  ingress:
-    # Match via Flannel Pod CIDR block instead of podSelector
-    - from:
-        - ipBlock:
-            cidr: {{ k8s.podSubnet }}
-      ports:
-        - protocol: TCP
-          port: 8500
-        - protocol: TCP
-          port: 8501
-        - protocol: TCP
-          port: 8502
-        - protocol: TCP
-          port: 8503
-        - protocol: TCP
-          port: 8504
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-longhorn-api-and-dns-egress
-spec:
-  podSelector: {}
-  policyTypes:
-    - Egress
-  egress:
-    # Kubernetes API / DNS as you have today
-    - to:
-        - ipBlock:
-            cidr: 10.96.0.1/32
-        - ipBlock:
-            cidr: 10.10.10.0/24
-      ports:
-        - port: 443
-          protocol: TCP
-        - port: 6443
-          protocol: TCP
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: longhorn-manager-to-instance-manager
-spec:
-  podSelector:
-    matchLabels:
-      app: longhorn-manager
-
-  policyTypes:
-    - Egress
-
-  egress:
-    - to:
-        - podSelector:
-            matchLabels:
-              longhorn.io/component: instance-manager
-      ports:
-        - port: 8503
-          protocol: TCP
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: longhorn-manager-to-webhook
+  name: longhorn-manager-to-api
   namespace: longhorn-system
 spec:
   podSelector:
@@ -78,19 +11,15 @@ spec:
     - Egress
   egress:
     - to:
-        - podSelector:
-            matchLabels:
-              longhorn.io/admission-webhook: longhorn-admission-webhook
-      ports:
-        - port: 9502
-          protocol: TCP
-
-    - to:
         - ipBlock:
-            cidr: 10.101.5.141/32
+            cidr: 10.10.10.21/32
+        - ipBlock:
+            cidr: 10.10.10.22/32
+        - ipBlock:
+            cidr: 10.10.10.23/32
       ports:
-        - port: 9502
-          protocol: TCP
+        - protocol: TCP
+          port: 6443
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -120,7 +49,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: longhorn-manager-to-api
+  name: longhorn-manager-to-instance-manager
   namespace: longhorn-system
 spec:
   podSelector:
@@ -130,12 +59,92 @@ spec:
     - Egress
   egress:
     - to:
+        - podSelector:
+            matchLabels:
+              longhorn.io/component: instance-manager
+      ports:
+        - protocol: TCP
+          port: 8503
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-to-webhook
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              longhorn.io/admission-webhook: longhorn-admission-webhook
+      ports:
+        - protocol: TCP
+          port: 9502
+    - to:
+        - ipBlock:
+            cidr: 10.101.5.141/32
+      ports:
+        - protocol: TCP
+          port: 9502
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-api-to-manager
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
         - ipBlock:
             cidr: 10.10.10.21/32
         - ipBlock:
             cidr: 10.10.10.22/32
         - ipBlock:
             cidr: 10.10.10.23/32
-      ports:
-        - protocol: TCP
-          port: 6443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-dns-to-manager
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-instance-manager-to-manager
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              longhorn.io/component: instance-manager
