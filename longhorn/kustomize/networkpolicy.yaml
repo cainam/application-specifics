@@ -1,3 +1,5 @@
+```yaml
+---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -20,6 +22,7 @@ spec:
       ports:
         - protocol: TCP
           port: 6443
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -45,6 +48,7 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -65,6 +69,7 @@ spec:
       ports:
         - protocol: TCP
           port: 8503
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -91,6 +96,43 @@ spec:
       ports:
         - protocol: TCP
           port: 9502
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-to-manager
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: longhorn-manager
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-to-driver-deployer
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: longhorn-driver-deployer
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -111,6 +153,7 @@ spec:
             cidr: 10.10.10.22/32
         - ipBlock:
             cidr: 10.10.10.23/32
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -131,6 +174,7 @@ spec:
           podSelector:
             matchLabels:
               k8s-app: kube-dns
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -148,3 +192,19 @@ spec:
         - podSelector:
             matchLabels:
               longhorn.io/component: instance-manager
+
+---
+# Keep your existing Longhorn-generated policies:
+#
+#   backing-image-data-source
+#   backing-image-manager
+#   instance-manager
+#   longhorn-manager
+#   longhorn-recovery-backend
+#   longhorn-webhook
+#
+# Also keep:
+#
+#   longhorn-allow-internal-flannel
+```
+
