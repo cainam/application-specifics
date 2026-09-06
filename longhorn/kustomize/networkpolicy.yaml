@@ -192,18 +192,3 @@ spec:
             matchLabels:
               longhorn.io/component: instance-manager
 
----
-# Keep your existing Longhorn-generated policies:
-#
-#   backing-image-data-source
-#   backing-image-manager
-#   instance-manager
-#   longhorn-manager
-#   longhorn-recovery-backend
-#   longhorn-webhook
-#
-# Also keep:
-#
-#   longhorn-allow-internal-flannel
-```
-
