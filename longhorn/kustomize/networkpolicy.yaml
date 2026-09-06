@@ -67,6 +67,8 @@ spec:
               longhorn.io/component: instance-manager
       ports:
         - protocol: TCP
+          port: 8501
+        - protocol: TCP
           port: 8503
 
 ---
