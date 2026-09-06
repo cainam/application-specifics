@@ -65,6 +65,7 @@ patches:
         path: /data/default-setting.yaml
         value: |
           log-level: info
+          upgrade-checker: "false"
       - op: add
         path: /data/default-setting.yaml
         value: |
