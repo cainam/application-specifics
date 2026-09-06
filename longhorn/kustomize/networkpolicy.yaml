@@ -209,4 +209,5 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              longhorn.io/component: csi-plugin
+              app: longhorn-csi-plugin
+#              longhorn.io/component: csi-plugin
