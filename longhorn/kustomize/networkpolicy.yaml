@@ -193,4 +193,20 @@ spec:
         - podSelector:
             matchLabels:
               longhorn.io/component: instance-manager
-
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-to-csi-plugin
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              longhorn.io/component: csi-plugin
