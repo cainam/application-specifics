@@ -64,7 +64,8 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              longhorn.io/component: instance-manager
+              #longhorn.io/component: instance-manager
+              app: longhorn-csi-plugin
       ports:
         - protocol: TCP
           port: 8501
@@ -192,7 +193,8 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              longhorn.io/component: instance-manager
+              app: longhorn-csi-plugin
+              #longhorn.io/component: instance-manager
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
