@@ -241,7 +241,7 @@ spec:
     - Egress
   egress:
     - to:
-{% for ip in _pod_cidr_endpoints %}
+{% for ip in _pod_cidr_endpoints.stdout %}
       - ipBlock:
           cidr: "{{ ip }}"
 {% endfor %}
