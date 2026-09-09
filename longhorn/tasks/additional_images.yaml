@@ -7,6 +7,10 @@
       kubectl get nodes -o jsonpath='{.items[*].spec.podCIDR}' | sed -e 's/ /\n/g'
     register: _cluster_ips
 
+  - name: get _pod_cidr_endpoints
+    shell: kubectl get nodes -o jsonpath='{range .items[*]}{.spec.podCIDR}{"\n"}{end}' | sed -e 's#/[0-9]\+#/32#g'
+    register: _pod_cidr_endpoints
+
   - name: template
     vars:
       kustom:
