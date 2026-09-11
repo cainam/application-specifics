@@ -19,8 +19,8 @@ images:
       export JAVA_HOME=$ZULU_DIR
       export PATH=$JAVA_HOME/bin:$PATH
 
-      bazel_version=8.6.0
       bazel_version=7.7.1
+      bazel_version=8.7.0
 
       bazel_dist=bazel-$bazel_version-dist.zip
       mkdir /bazel && cd bazel
