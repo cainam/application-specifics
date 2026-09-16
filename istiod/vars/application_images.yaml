@@ -13,6 +13,7 @@ images:
     finish_rootfs_build: |
       # https://cdn.azul.com/zulu/bin/zulu25.32.17-ca-jdk25.0.2-linux_musl_aarch64.tar.gz
       zulu=zulu21.48.17-ca-jdk21.0.10-linux_musl_aarch64.tar.gz
+      zulu=zulu27.28.101-ca-jdk27.0.0-linux_musl_aarch64.tar.gz
       ZULU_DIR=/opt/zulu
       curl -O https://cdn.azul.com/zulu/bin/$zulu
       mkdir -p "${ZULU_DIR}" && tar --directory "${ZULU_DIR}" --extract --strip-components=1 --file $zulu
@@ -69,6 +70,8 @@ images:
   requires:
   - envoy-base
   type: gentoo-image-builder
+  # following is to turn yaml into shell scripts again for execution in interactive container env
+  # yq -r '.[] | .[] | select(type == "object" and .name == "envoy") | .build[]' ../application-specifics/istiod/vars/application_images.yaml | sed -e 's/{{\s*software.istio.version\s*}}/1.31.0/g' 
   build:
     configure_builder: |
       cd /var/tmp; rm -rf * /root/.cache
