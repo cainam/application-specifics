@@ -130,6 +130,9 @@ images:
       cat > add-pt2.txt <<'EOF'
           patch_cmds = [
       "sed -i 's/name = \"event\"/name = \"unused_event\"/' bazel/foreign_cc/BUILD",
+       "sed -i 's/load(\"@rules_java\\/\\/toolchains:default_java_toolchain.bzl\", \"default_java_toolchain\")/load(\"@rules_java\\/\\/toolchains:default_java_toolchain.bzl\", \"default_java_toolchain\", \"NONPREBUILT_TOOLCHAIN_CONFIGURATION\")/' bazel/BUILD",
+      "sed -i '/javabuilder_jvm_opts/d' bazel/BUILD",
+      "sed -i '/^default_java_toolchain(/a\\    configuration = NONPREBUILT_TOOLCHAIN_CONFIGURATION,' bazel/BUILD",
               """printf '\ncc_library(
           name = "event",
           includes = ["/usr/local/include"],
@@ -158,7 +161,7 @@ images:
         toolchain = ":gentoo_cmake_resource",
         toolchain_type = "@rules_foreign_cc//toolchains:cmake_toolchain",
       )' > tools/cmake/BUILD
-      bazel_options='--verbose_failures --strip=always --config=release --toolchain_resolution_debug=1 --java_runtime_version=local_jdk --tool_java_runtime_version=local_jdk --action_env=PATH='$PATH' --copt=-I/usr/local/include --copt=-Wno-sign-compare --copt=-Wno-error=deprecated-literal-operator --copt=-Wno-error=sign-compare --copt=-Wno-error=nullability-completeness --host_linkopt=-static --linkopt=-static --host_linkopt=-fuse-ld=lld --linkopt=-fuse-ld=lld --copt=-Wno-error --cxxopt=-Wno-error=unused-parameter --define=musl=true --host_linkopt=/usr/lib/libc.a  --linkopt=/usr/local/lib/libicui18n.a --linkopt=/usr/local/lib/libicuuc.a --linkopt=/usr/local/lib/libicudata.a --action_env=CMAKE=/usr/bin/cmake --repo_env=CMAKE=/usr/bin/cmake --extra_toolchains=//tools/cmake:my_cmake_toolchain --copt=-DFLATBUFFERS_LOCALE_INDEPENDENT=0 --copt=-Wno-error=nontrivial-memcall --stamp --subcommands --announce_rc --incompatible_enable_cc_toolchain_resolution=true --cxxopt=--stdlib=libc++ --host_cxxopt=--stdlib=libc++ --linkopt=-lc++ --linkopt=-lc++abi --host_cxxopt=--stdlib=libc++ --host_linkopt=-lc++ --host_linkopt=-lc++abi'
+      bazel_options='--verbose_failures --strip=always --config=release --toolchain_resolution_debug=1 --java_runtime_version=local_jdk --tool_java_runtime_version=local_jdk --action_env=PATH='$PATH' --copt=-I/usr/local/include --copt=-Wno-sign-compare --copt=-Wno-error=deprecated-literal-operator --copt=-Wno-error=sign-compare --copt=-Wno-error=nullability-completeness --host_linkopt=-static --linkopt=-static --host_linkopt=-fuse-ld=lld --linkopt=-fuse-ld=lld --copt=-Wno-error --cxxopt=-Wno-error=unused-parameter --define=musl=true --host_linkopt=/usr/lib/libc.a  --linkopt=/usr/local/lib/libicui18n.a --linkopt=/usr/local/lib/libicuuc.a --linkopt=/usr/local/lib/libicudata.a --action_env=CMAKE=/usr/bin/cmake --repo_env=CMAKE=/usr/bin/cmake --extra_toolchains=//tools/cmake:my_cmake_toolchain --copt=-DFLATBUFFERS_LOCALE_INDEPENDENT=0 --copt=-Wno-error=nontrivial-memcall --stamp --subcommands --announce_rc --incompatible_enable_cc_toolchain_resolution=true --cxxopt=--stdlib=libc++ --host_cxxopt=--stdlib=libc++ --linkopt=-lc++ --linkopt=-lc++abi --host_cxxopt=--stdlib=libc++ --host_linkopt=-lc++ --host_linkopt=-lc++abi --copt=-Wno-error=unused-private-field'
       until bazel --output_user_root=$PWD/../cache fetch ${bazel_options}   -- //:envoy; do echo "retry in some seconds..."; sleep 5; done
       bazel  --output_user_root=$PWD/../cache build ${bazel_options} -- //:envoy
     finish_rootfs_build: |
