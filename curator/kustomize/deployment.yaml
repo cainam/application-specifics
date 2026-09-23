@@ -23,7 +23,6 @@ spec:
         - run
         - /app/curator.py
         - --all-namespaces
-        workingDir: /app/backend
         env:
         - name: USER
           value: kopf
@@ -37,7 +36,6 @@ spec:
         #- name: tls-certs-volume
         #  mountPath: /certs
           # readOnly: true
-        workingDir: /app/
       serviceAccountName: {{ kustom.name }}
       volumes:
       #- configMap:
