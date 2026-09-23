@@ -13,12 +13,14 @@ images:
       echo "net-firewall/nftables json" >> /etc/portage/package.use/nftables
       echo 'ACCEPT_KEYWORDS="~arm64"' >> /etc/portage/make.conf
       emerge dev-libs/glib app-admin/ansible-core dev-lang/go
+      export USE="-caps $USE"
     configure_rootfs_build: |
       VIRTUAL_ENV=/py_env
       python -m venv --system-site-packages "$VIRTUAL_ENV" && . "$VIRTUAL_ENV"/bin/activate
       pip install --no-cache-dir molecule-plugins[podman]
       mv "$VIRTUAL_ENV" ${ROOT}/"$VIRTUAL_ENV"
       find ${ROOT}/etc
+      touch ${ROOT}/etc/shadow
       export LD_LIBRARY_PATH=$ROOT/usr/lib
       export USER=root
       for f in passwd group; do cp /etc/${f}  ${ROOT}/etc/; done
