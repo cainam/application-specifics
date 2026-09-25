@@ -20,7 +20,7 @@ secretGenerator:
 replacements:
   - source:
       kind: Secret
-      name: tls
+      name: tls-{{ kustom.name }}
       fieldPath: metadata.name     # We want the *generated name* of the Secret (with hash)
     targets:
       - select:
