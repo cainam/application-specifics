@@ -11,11 +11,11 @@ resources:
 - configmap-mutate.yaml
 
 secretGenerator:
-- name: tls
+- name: tls-{{ kustom.name }}
   files:
   - tls.crt=tls.crt
   - tls.key=tls.key
-  type: "kubernetes.io/tls"
+  type: kubernetes.io/tls
 
 replacements:
   - source:
