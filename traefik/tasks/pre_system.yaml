@@ -21,5 +21,10 @@
         alt_names: "{{ alt_names }}"
     include_role: 
       name: certificates
+
+  - name: store cert variable in application playbook vars
+    set_fact:
+      application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'cert': my_cert[cert_name],  }} }, recursive=True) }}"
+
   delegate_to: localhost
   run_once: true
