@@ -50,6 +50,8 @@
       } ] }}"
   loop: "{{ source_images.stdout_lines }}"
 
-- name: "set var {{ var_additional_images }}"
+- name: store images variable in application playbook vars
   set_fact:
-    "{{ var_additional_images }}": "{{ temp_img_list }}"
+    application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'images': temp_img_list  }} }, recursive=True) }}"
+
+
