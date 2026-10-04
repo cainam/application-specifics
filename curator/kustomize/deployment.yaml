@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: {{ kustom.name }}
-        image: {{ kustom.image }}
+        image: {{ kustom.images['python-operator'] }}
         command:
         - kopf
         - run
@@ -29,25 +29,10 @@ spec:
         ports:
         - containerPort: {{ container_port }}
         volumeMounts:
-        #- mountPath: /config
-        #  name: config
         - mountPath: /app
           name: {{ kustom.name }}
-        #- name: tls-certs-volume
-        #  mountPath: /certs
-          # readOnly: true
       serviceAccountName: {{ kustom.name }}
       volumes:
-      #- configMap:
-      #    defaultMode: 420
-      #    name: {{ kustom.name }}
-      #  name: config
       - name: {{ kustom.name }}
         persistentVolumeClaim:
           claimName: {{ kustom.name }}
-      #- name: tls-certs-volume
-      #  secret:
-      #    secretName: my-tls-secret
-      #    defaultMode: 0400
-
-
