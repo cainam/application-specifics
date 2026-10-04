@@ -26,7 +26,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: descheduler
-              image: {{ kustom.image }}
+              image: {{ kustom.images[kustom.name] }}
               command:
                 - /bin/descheduler
               args:
