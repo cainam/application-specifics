@@ -15,7 +15,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: checker
-            image: {{ kustom.image }}
+            image: {{ kustom.images['curl'] }}
             command:
             - /bin/sh
             - -c
