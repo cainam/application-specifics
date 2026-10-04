@@ -50,7 +50,7 @@ spec:
             secretKeyRef:
               name: {{ kustom.name }}
               key: etcd_client.key
-        image: {{ kustom.image }}
+        image: {{ kustom.images['fastapi'] }}
         workingDir: /app/backend
         livenessProbe:
           failureThreshold: 3
