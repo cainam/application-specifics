@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: {{ kustom.name }}
-        image: {{ kustom.image }}
+        image: {{ kustom.images['fastapi'] }}
         args:
         - valmut-webhook:app
         - --host
