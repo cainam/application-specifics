@@ -1,0 +1,72 @@
+- name: assert | image_builder_node
+  ansible.builtin.assert:
+    that:
+      - requirements is defined
+      - requirements.database is defined
+      - requirements.database is string
+      - requirements.username is defined
+      - requirements.username is string
+      - requirements.password is defined
+      - requirements.password is string
+    quiet: true
+
+- name: set app fact
+  set_fact:
+    __my_title_prefix: "{{ application.key }} - provider - database {{ requirements.database }} - "
+        
+- block: # start kubectl port-forward in async execute postgres commands and exist again
+  - name: "{{ __my_title_prefix }}tempfile for port_forwarder"
+    tempfile:
+      state: file
+      suffix: temp
+    register: pf_tmp
+
+  - name: "{{ __my_title_prefix }}map postgresql port to localhost" # hardcoded port to be replaced ! stdbuf to avoid buffering
+    shell: kubectl port-forward service/"{{ application_playbooks[application.key].vars.service_name }}" -n db :"{{ application_playbooks[application.key].vars.service_port }}" | stdbuf -o0 sed -e 's/^.*://g' -e 's/\s\+.*$//g' > "{{ pf_tmp.path }}"
+    async: 120
+    poll: 0
+    register: port_forwarder
+    
+  - name: "{{ __my_title_prefix }}read local port from file"
+    shell: (while sleep 2; do [ -s "{{ pf_tmp.path }}" ] && cat "{{ pf_tmp.path }}" && exit; done)
+    register: read_port
+
+  - name: "{{ __my_title_prefix }}debug port_forwarder"
+    debug:
+      msg: "port: {{ read_port.stdout }} loginpw: {{ service_secrets | selectattr('type', 'match', 'db') | selectattr('name', 'match', 'postgres') | map(attribute='values') | map(attribute='password') | first }} pf:{{ port_forwarder }}"
+      
+  - name: "{{ __my_title_prefix }}get port_forwarder results"
+    shell: cat "{{ port_forwarder.results_file }}"
+    register: pf_results
+
+  - name: "{{ __my_title_prefix }}port_forwarder.results"
+    debug:
+      msg: "{{ pf_results| to_yaml }}"
+      
+  - name: "{{ __my_title_prefix }}create database"
+    postgresql_db:
+      login_host: localhost
+      login_port: "{{ read_port.stdout|int }}"
+      login_password: "{{ service_secrets | selectattr('type', 'match', 'db') | selectattr('name', 'match', 'postgres') | map(attribute='values') | map(attribute='password') | first }}"
+      login_user: "{{ service_secrets | selectattr('type', 'match', 'db') | selectattr('name', 'match', 'postgres') | map(attribute='values') | map(attribute='username') | first }}"
+      name: "{{ requirements.database }}"
+      
+  - name: "{{ __my_title_prefix }}create user"
+    postgresql_user:
+      login_host: localhost
+      login_port: "{{ read_port.stdout }}"
+      login_password: "{{ service_secrets | selectattr('type', 'match', 'db') | selectattr('name', 'match', 'postgres') | map(attribute='values') | map(attribute='password') | first }}"
+      login_user: "{{ service_secrets | selectattr('type', 'match', 'db') | selectattr('name', 'match', 'postgres') | map(attribute='values') | map(attribute='username') | first }}"
+      name: "{{ requirements.username }}"
+      password: "{{ requirements.password }}"
+      login_db: "{{ requirements.database }}"
+      
+  - name: "{{ __my_title_prefix }}assign database owner"
+    postgresql_db:
+      login_host: localhost
+      login_port: "{{ read_port.stdout }}"
+      login_password: "{{ service_secrets | selectattr('type', 'match', 'db') | selectattr('name', 'match', 'postgres') | map(attribute='values') | map(attribute='password') | first }}"
+      login_user: "{{ service_secrets | selectattr('type', 'match', 'db') | selectattr('name', 'match', 'postgres') | map(attribute='values') | map(attribute='username') | first }}"
+      name: "{{ requirements.database }}"
+      owner: "{{ requirements.username }}"
+      
