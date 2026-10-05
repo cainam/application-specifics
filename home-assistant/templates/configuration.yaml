@@ -19,7 +19,7 @@ tts:
 recorder:
     auto_purge: true
     purge_keep_days: 5
-    db_url: postgresql://{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='config') | map(attribute='username') | first}}:{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='config') | map(attribute='password') | first}}@{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='name') | first}}.{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='namespace') | first}}.svc.cluster.local/{{ application.value.requires | selectattr('type', 'match', 'postgresql')| map(attribute='config') | map(attribute='database') | first}}
+    db_url: postgresql://{{ application.value.requires | selectattr('name', 'match', 'postgresql')| map(attribute='config') | map(attribute='username') | first}}:{{ application.value.requires | selectattr('name', 'match', 'postgresql')| map(attribute='config') | map(attribute='password') | first}}@{{ application.value.requires | selectattr('name', 'match', 'postgresql')| map(attribute='name') | first}}.{{ application.value.requires | selectattr('name', 'match', 'postgresql')| map(attribute='namespace') | first}}.svc.cluster.local/{{ application.value.requires | selectattr('name', 'match', 'postgresql')| map(attribute='config') | map(attribute='database') | first}}
     #db_url: !secret psql_string
     db_retry_wait: 15
     commit_interval: 20
