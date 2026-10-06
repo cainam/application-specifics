@@ -7,5 +7,5 @@ spec:
   selector:
     app: postgres
   ports:
-    - port: "{{ application_playbooks[application.key].vars.service_port }}"
-      targetPort: "{{ application_playbooks[application.key].vars.service_port }}"
+    - port: {{ application_playbooks[application.key].vars.service_port }}
+      targetPort: {{ application_playbooks[application.key].vars.service_port }}
