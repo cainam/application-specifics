@@ -8,6 +8,8 @@
       - requirements.username is string
       - requirements.password is defined
       - requirements.password is string
+      - provider is defined
+      - provider is string
     quiet: true
 
 - name: set app fact
@@ -22,7 +24,7 @@
     register: pf_tmp
 
   - name: "{{ __my_title_prefix }}map postgresql port to localhost" # hardcoded port to be replaced ! stdbuf to avoid buffering
-    shell: kubectl port-forward service/"{{ application_playbooks[application.key].vars.service_name }}" -n db :"{{ application_playbooks[application.key].vars.service_port }}" | stdbuf -o0 sed -e 's/^.*://g' -e 's/\s\+.*$//g' > "{{ pf_tmp.path }}"
+    shell: kubectl port-forward service/"{{ application_playbooks[provider].vars.service_name }}" -n db :"{{ application_playbooks[provider].vars.service_port }}" | stdbuf -o0 sed -e 's/^.*://g' -e 's/\s\+.*$//g' > "{{ pf_tmp.path }}"
     async: 120
     poll: 0
     register: port_forwarder
