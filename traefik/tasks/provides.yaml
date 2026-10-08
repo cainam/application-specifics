@@ -1,0 +1,50 @@
+- block:
+  - name: "{{ name_prefix }} Middleware stripprefix"
+    shell: |
+      kubectl apply -f - <<EOF
+      apiVersion: traefik.io/v1alpha1
+      kind: Middleware
+      metadata:
+        name: {{ application.key }}-stripprefix
+        namespace: gateway
+      spec:
+        stripPrefix:
+          prefixes:
+          - /{{ application.key }}
+      EOF
+    when: requirements.strip
+  - name: "{{ name_prefix }} ingressroute"
+    vars:
+      route: "{{ net.routes | selectattr('domain','equalto',application.value.network.domain)|first }}"
+    shell: |
+      kubectl apply -f - <<EOF
+      apiVersion: traefik.io/v1alpha1
+      kind: IngressRoute
+      metadata:
+        name: "{{ application.key }}-{{ item }}"
+        namespace: gateway
+      spec:
+        entryPoints:
+        - websecure
+        routes:
+        - kind: Rule
+          match: Host("{{ route.domain if item == 'int' else net.domain_external }}") && PathPrefix("{{ application.value.network.prefix | default('/'~application.key) }}")
+          middlewares:
+          {% if item  == 'ext' -%}
+          - name: redirect-rewriter
+          {% endif -%}
+          {% if application.key not in net.open_services -%}
+          - name: oauth2-proxy
+          {% endif -%}
+          {% if requirements.strip -%}
+          - name: {{ application.key }}-stripprefix
+          {% endif -%}
+          services:
+          - name: {{ application.value.network.svcName | default(application.key) }}
+            namespace: {{ k8s_namespace.key }}
+            port: {{ application.value.network.svcPort }}
+        tls:
+          secretName: tls-{{ kustom.name }}
+      EOF
+    loop: "{{ ['int','ext'] if 'external_port' in route else ['int'] }}"
+

@@ -1,0 +1,45 @@
+- block:
+  - name: "{{ name_prefix }} VirtualService(istio)"
+    vars:
+      kkgateway: "{{ application.value.network.domain|replace('.','-') }}"
+      gateway: "{{ net.routes | selectattr('domain','equalto',application.value.network.domain) | map(attribute='app_instance') | first }}"
+      gateway_namespace: "{{ net.routes | selectattr('domain','equalto',application.value.network.domain) | map(attribute='namespace') | first }}"
+    shell: | 
+      kubectl apply --force --grace-period=0 -f - <<EOF
+      apiVersion: networking.istio.io/v1
+      kind: VirtualService
+      metadata:
+        name: {{ application.key }}
+        namespace: {{ gateway_namespace }}
+      spec:
+        gateways:
+         - {{ gateway_namespace }}/{{ gateway }}
+        hosts:
+        {% for host in application.value.network.hosts %}
+        - {{ host }}
+        {% endfor -%}
+        http:
+        - directResponse:
+            status: 592
+          match:
+          - uri:
+              prefix: /dummy
+          name: dummy
+        - match:
+            - uri:
+                prefix: {{ application.value.network.prefix | regex_replace('//+', '/') }}
+          rewrite:
+            uriRegexRewrite:
+                match: ^{{ (application.value.network.prefix~'/') | regex_replace('//+', '/') }}?(.*)$
+                rewrite: {{ (application.value.network.rewrite~'/') | regex_replace('//+', '/') }}\1
+          name: {{ application.key }}
+          route:
+          - destination:
+              host: "{{ application.value.network.svcName | default(application.key) }}.{{ k8s_namespace.key }}.svc.cluster.local"
+              {% if application.value.network.svcPort is defined -%}
+              port:
+                number: {{ application.value.network.svcPort }} 
+              {% endif %}
+
+      EOF
+
