@@ -26,19 +26,19 @@ patches:
       - op: remove
         path: /spec/template/metadata/labels/k8s-app
 
-  - target:
-      kind: ConfigMap
-      name: kube-flannel-cfg
-    patch: |-
-      - op: replace
-        path: /data/net-conf.json
-        value: |
-          {
-            "Network": "10.244.0.0/16",
-            "IPv6Network": "fd42:9999:ffff::/48",
-            "EnableIPv6": true,
-            "Backend": {
-              "Type": "vxlan",
-              "V6Mode": "vxlan"
-            }
-          }
+#  - target:
+#      kind: ConfigMap
+#      name: kube-flannel-cfg
+#    patch: |-
+#      - op: replace
+#        path: /data/net-conf.json
+#        value: |
+#          {
+#            "Network": "10.244.0.0/16",
+#            "IPv6Network": "fd42:9999:ffff::/48",
+#            "EnableIPv6": true,
+#            "Backend": {
+#              "Type": "vxlan",
+#              "V6Mode": "vxlan"
+#            }
+#          }
