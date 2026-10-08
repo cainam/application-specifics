@@ -44,7 +44,7 @@
             namespace: {{ k8s_namespace.key }}
             port: {{ application.value.network.svcPort }}
         tls:
-          secretName: tls-{{ application.key }}
+          secretName: tls-{{ provider }}
       EOF
     loop: "{{ ['int','ext'] if 'external_port' in route else ['int'] }}"
 
