@@ -6,7 +6,7 @@ images:
   - base
   build:
     packages: net-analyzer/suricata app-misc/yq
-    configure_builder: emerge dev-python/pyyaml
+    configure_builder: emerge dev-python/pyyaml app-misc/yq
     configure_rootfs_build: |
       set -x
       echo -e "net-analyzer/suricata **\nnet-libs/libhtp ~arm64" > /etc/portage/package.accept_keywords/suricata
