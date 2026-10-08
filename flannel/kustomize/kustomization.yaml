@@ -36,6 +36,7 @@ patches:
           {
             "Network": "10.244.0.0/16",
             "IPv6Network": "fd42:9999:ffff::/48",
+            "EnableIPv6": true,
             "Backend": {
               "Type": "vxlan",
               "V6Mode": "vxlan"
