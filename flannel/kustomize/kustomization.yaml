@@ -31,7 +31,7 @@ patches:
       name: kube-flannel-cfg
     patch: |-
       - op: replace
-       path: /data/net-conf.json
+        path: /data/net-conf.json
         value: |
           {
             "Network": "10.244.0.0/16",
