@@ -40,7 +40,9 @@ spec:
               IFACE="1-lan" # LAN IFACE="2-0"  # WAN #IFACE="internet"?
               SID='0000000000000000'
               if echo "$FRITZ_IP" | grep -q ':'; then
-                FRITZ_IP="[${FRITZ_IP}]"
+                FRITZ_IP="http://[${FRITZ_IP}]"
+              else
+                FRITZ_IP="http://${FRITZ_IP}"
               fi
               valid_sid(){
                 sid="$1"
@@ -70,7 +72,7 @@ spec:
               done
           env:
             - name: FRITZ_IP
-              value: "http://{{ lookup('pipe', "getent hosts fritz.box | awk '{print $1}'") }}"
+              value: "{{ lookup('pipe', "getent hosts fritz.box | awk '{print $1}'") }}"
             - name: FRITZ_USER
               valueFrom:
                 secretKeyRef:
