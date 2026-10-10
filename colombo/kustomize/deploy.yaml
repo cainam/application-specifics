@@ -39,6 +39,7 @@ spec:
               set -x
               IFACE="1-lan" # LAN IFACE="2-0"  # WAN #IFACE="internet"?
               SID='0000000000000000'
+              CURL="curl --connect-timeout 10"
               if echo "$FRITZ_IP" | grep -q ':'; then
                 FRITZ_IP="http://[${FRITZ_IP}]"
               else
@@ -49,25 +50,25 @@ spec:
                 u="$2"
                 p="$3"
                 echo "Trying to login into $FRITZ_IP as user $u" >&2
-                sid_status=$(curl -s "$FRITZ_IP/login_sid.lua?sid=${sid}" | awk -F'</?SID>' 'NF>1{print $2}')
-                if [ ${sid_status} = '0000000000000000' ]; then
-                  CHALLENGE=$(curl -k -s $FRITZ_IP/login_sid.lua |  grep -o "<Challenge>[a-z0-9]\{8\}" | cut -d'>' -f 2)
+                sid_status=$($CURL -s "$FRITZ_IP/login_sid.lua?sid=${sid}" | awk -F'</?SID>' 'NF>1{print $2}')
+                if [ "${sid_status}" = '0000000000000000' ]; then
+                  CHALLENGE=$($CURL -k -s $FRITZ_IP/login_sid.lua |  grep -o "<Challenge>[a-z0-9]\{8\}" | cut -d'>' -f 2)
                   HASH=$(printf "%s-%s" "$CHALLENGE" "$p" | iconv -t UTF-16LE | md5sum | cut -d' ' -f1)
-                  sid=$(curl -k -s "$FRITZ_IP/login_sid.lua" -d "response=$CHALLENGE-$HASH" -d 'username='${u} | grep -o "<SID>[a-z0-9]\{16\}" | cut -d'>' -f 2)
+                  sid=$($CURL -k -s "$FRITZ_IP/login_sid.lua" -d "response=$CHALLENGE-$HASH" -d 'username='${u} | grep -o "<SID>[a-z0-9]\{16\}" | cut -d'>' -f 2)
                   echo "${sid}" | grep ^0+$ && echo "Login failed. Did you create & use explicit Fritz!Box users?" >&2 && exit 1
                 fi
                 echo "${sid}"
               }
               echo "Capturing traffic on Fritz!Box interface $IFACE ..." 1>&2
               SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
-              curl -X POST "$FRITZ_IP/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
+              $CURL -X POST "$FRITZ_IP/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
               umask 0002
               mkdir /data/pcaps
               while sleep 5; do
                 FILE="/data/pcaps/fritz-$(date +%s).pcap"
                 SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
                 URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
-                curl --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 20
+                $CURL --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 20
                 [ -f "$FILE" ] && [ ! -s "$FILE" ] && rm -fv "$FILE"
               done
           env:
