@@ -72,7 +72,7 @@ spec:
               done
           env:
             - name: FRITZ_IP
-              value: "{{ lookup('pipe', "getent hosts fritz.box | awk '{print $1}'") }}"
+              value: "{{ lookup('pipe', "getent hosts fritz.box | awk '/^fd/ {print $1}'") }}"
             - name: FRITZ_USER
               valueFrom:
                 secretKeyRef:
