@@ -41,7 +41,7 @@ spec:
               SID='0000000000000000'
               if echo "$IP" | grep -q ':'; then
                 FRITZ_IP="[${FRITZ_IP}]"
-              endif
+              fi
               valid_sid(){
                 sid="$1"
                 u="$2"
