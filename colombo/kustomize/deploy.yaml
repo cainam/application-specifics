@@ -39,6 +39,9 @@ spec:
               set -x
               IFACE="1-lan" # LAN IFACE="2-0"  # WAN #IFACE="internet"?
               SID='0000000000000000'
+              if echo "$IP" | grep -q ':'; then
+                FRITZ_IP="[${FRITZ_IP}]"
+              endif
               valid_sid(){
                 sid="$1"
                 u="$2"
