@@ -55,7 +55,7 @@ spec:
               # The response body goes to stdout, the log to stderr.
               fcurl() {
                 label=$1; shift
-                err=/data/tmp/curl-err.$$
+                err=/data/curl-err.$$
                 out=$(curl -sS -g --connect-timeout 10 --max-time 30 \
                       -w '\n%{http_code} %{local_ip} -> %{remote_ip}:%{remote_port} connect=%{time_connect}s total=%{time_total}s' \
                       "$@" 2>"$err")
