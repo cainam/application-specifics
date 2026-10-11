@@ -37,42 +37,99 @@ spec:
           args:
             - |
               set -x
-              IFACE="1-lan" # LAN IFACE="2-0"  # WAN #IFACE="internet"?
-              SID='0000000000000000'
-              CURL="curl --connect-timeout 60 -sS"
-              if echo "$FRITZ_IP" | grep -q ':'; then
-                FRITZ_IP="http://[${FRITZ_IP}]"
+              IFACE=${IFACE:-1-lan}
+              FRITZ_USER=${FRITZ_USER:-packages}
+              : "${FRITZ_ADDR:?FRITZ_ADDR not set}"
+              : "${FRITZ_PASS:?FRITZ_PASS not set}"
+
+              # IPv6 addresses need brackets in a URL
+              if echo "$FRITZ_ADDR" | grep -q :; then
+                FRITZ_IP="http://[$FRITZ_ADDR]"
               else
-                FRITZ_IP="http://${FRITZ_IP}"
+                FRITZ_IP="http://$FRITZ_ADDR"
               fi
-              valid_sid(){
-                sid="$1"
-                u="$2"
-                p="$3"
-                echo "Trying to login into $FRITZ_IP as user $u" >&2
-                sid_status=$($CURL "$FRITZ_IP/login_sid.lua?sid=${sid}" | awk -F'</?SID>' 'NF>1{print $2}')
-                if [ "${sid_status}" = '0000000000000000' ]; then
-                  CHALLENGE=$($CURL -k $FRITZ_IP/login_sid.lua |  grep -o "<Challenge>[a-z0-9]\{8\}" | cut -d'>' -f 2)
-                  HASH=$(printf "%s-%s" "$CHALLENGE" "$p" | iconv -t UTF-16LE | md5sum | cut -d' ' -f1)
-                  sid=$($CURL -k "$FRITZ_IP/login_sid.lua" -d "response=$CHALLENGE-$HASH" -d 'username='${u} | grep -o "<SID>[a-z0-9]\{16\}" | cut -d'>' -f 2)
-                  echo "${sid}" | grep ^0+$ && echo "Login failed. Did you create & use explicit Fritz!Box users?" >&2 && exit 1
-                fi
-                echo "${sid}"
+              
+              log() { echo "$(date '+%F %T') $*" >&2; }
+              
+              # curl wrapper: shows errors, exit code, source -> destination address and timings.
+              # The response body goes to stdout, the log to stderr.
+              fcurl() {
+                label=$1; shift
+                err=$(mktemp)
+                out=$(curl -sS -g --connect-timeout 10 --max-time 30 \
+                      -w '\n%{http_code} %{local_ip} -> %{remote_ip}:%{remote_port} connect=%{time_connect}s total=%{time_total}s' \
+                      "$@" 2>"$err")
+                rc=$?
+                meta=$(printf '%s\n' "$out" | tail -n1)
+                body=$(printf '%s\n' "$out" | sed '$d')
+                log "[$label] rc=$rc $meta"
+                [ -s "$err" ] && log "[$label] curl error: $(cat "$err")"
+                rm -f "$err"
+                printf '%s\n' "$body"
+                return $rc
               }
-              echo "Capturing traffic on Fritz!Box interface $IFACE ..." 1>&2
-              SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
-              $CURL -X POST "$FRITZ_IP/capture.lua" -d "sid=$SID" -d "capture=eth0" -d "stop=1"
+              
+              net_diag() {
+                log "--- net diag ---"
+                ip -6 addr show dev eth0 >&2
+                ip -6 route >&2
+                ip -6 route get "$FRITZ_ADDR" >&2 2>&1
+                ip -6 neigh >&2
+                log "--- end diag ---"
+              }
+              
+              # true if the SID is still valid
+              valid_sid() {
+                sid_status=$(fcurl check-sid "$FRITZ_IP/login_sid.lua?sid=$1" \
+                             | awk -F'</?SID>' 'NF>1{print $2}')
+                [ -n "$sid_status" ] && [ "$sid_status" != 0000000000000000 ]
+              }
+              
+              # challenge/response login, sets $SID
+              login() {
+                log "logging in as $FRITZ_USER"
+                challenge=$(fcurl get-challenge "$FRITZ_IP/login_sid.lua" \
+                            | grep -o '<Challenge>[a-z0-9]\{8\}' | cut -d'>' -f2)
+                [ -n "$challenge" ] || { log "no challenge received"; return 1; }
+                hash=$(printf '%s-%s' "$challenge" "$FRITZ_PASS" | iconv -t UTF-16LE | md5sum | cut -d' ' -f1)
+                SID=$(fcurl login "$FRITZ_IP/login_sid.lua" \
+                      -d "response=$challenge-$hash" -d "username=$FRITZ_USER" \
+                      | grep -o '<SID>[a-z0-9]\{16\}' | cut -d'>' -f2)
+                [ -n "$SID" ] && [ "$SID" != 0000000000000000 ] || { log "login failed (wrong user/password?)"; return 1; }
+                log "login ok"
+              }
+              
               umask 0002
-              mkdir /data/pcaps
-              while sleep 5; do
-                FILE="/data/pcaps/fritz-$(date +%s).pcap"
-                SID=$(valid_sid ${SID} $FRITZ_USER $FRITZ_PASS)
+              mkdir -p /data/pcaps
+              SID=0000000000000000
+              
+              while true; do
+                if ! valid_sid "$SID"; then
+                  if ! login; then
+                    net_diag
+                    log "retrying in 30s"
+                    sleep 30
+                    continue
+                  fi
+                  # stop a capture that may still be running from before
+                  fcurl stop-capture -X POST "$FRITZ_IP/capture.lua" \
+                    -d "sid=$SID" -d "capture=eth0" -d "stop=1" >/dev/null
+                fi
+              
+                FILE=/data/pcaps/fritz-$(date +%s).pcap
                 URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
-                $CURL --no-buffer -v "$URL" | tcpdump -r - -w "$FILE" -C 20
-                [ -f "$FILE" ] && [ ! -s "$FILE" ] && rm -fv "$FILE"
+                log "starting capture to $FILE"
+                {
+                  curl -sS -g --no-buffer --connect-timeout 10 "$URL"
+                  log "[capture] curl exited with rc=$?"
+                } | tee "$FILE" 
+                log "[capture] pipeline ended"
+              
+                [ -s "$FILE" ] || rm -f "$FILE"    # drop empty or truncated files
+                sleep 5
               done
           env:
-            - name: FRITZ_IP
+            - name: FRITZ_ADDR
               value: "{{ lookup('pipe', "getent hosts fritz.box | awk '/^fd/ {print $1}'") }}"
             - name: FRITZ_USER
               valueFrom:
