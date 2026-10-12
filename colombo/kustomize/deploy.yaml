@@ -120,7 +120,7 @@ spec:
                 URL="$FRITZ_IP/cgi-bin/capture_notimeout?ifaceorminor=$IFACE&snaplen=&capture=Start&sid=$SID"
                 log "starting capture to $FILE"
                 {
-                  curl -sS -g --no-buffer --connect-timeout 10 "$URL"
+                  curl -sS -g --no-buffer  "$URL"
                   log "[capture] curl exited with rc=$?"
                 } | tee "$FILE" 
                 log "[capture] pipeline ended"
