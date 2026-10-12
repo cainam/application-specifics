@@ -122,7 +122,8 @@ spec:
                 {
                   curl -sS -g --no-buffer  "$URL"
                   log "[capture] curl exited with rc=$?"
-                } | tee "$FILE" 
+                } | tcpdump -r - -w "$FILE" -C 20
+                ls -l /data/pcaps/
                 log "[capture] pipeline ended"
               
                 [ -s "$FILE" ] || rm -f "$FILE"    # drop empty or truncated files
