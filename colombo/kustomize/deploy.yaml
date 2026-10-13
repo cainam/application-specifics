@@ -36,7 +36,6 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              set -x
               IFACE=${IFACE:-1-lan}
               FRITZ_USER=${FRITZ_USER:-packages}
               : "${FRITZ_ADDR:?FRITZ_ADDR not set}"

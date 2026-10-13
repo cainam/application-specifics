@@ -8,6 +8,9 @@ data:
       standards:
         /spec/revisionHistoryLimit: 3
     pods:
+        colombo:
+          exemptions:
+          - hostNetwork
         tester:
             identifiedBy: label
             label: app.kubernetes.io/name
