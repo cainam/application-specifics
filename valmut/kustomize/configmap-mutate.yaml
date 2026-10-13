@@ -9,6 +9,8 @@ data:
         /spec/revisionHistoryLimit: 3
     pods:
         colombo:
+          identifiedBy: label
+          label: app
           exemptions:
           - hostNetwork
         tester:
