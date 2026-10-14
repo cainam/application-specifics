@@ -1,28 +1,6 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ kustom.name }}-api
-spec:
-  ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: tools
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: infopage
-      ports:
-        - port: api
-          protocol: TCP
-  podSelector:
-    matchLabels:
-      app: colombo
-  policyTypes:
-    - Ingress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
   name: {{ kustom.name }}-fritz
 spec:
   podSelector: { matchLabels: { app: colombo } }
