@@ -1,7 +1,7 @@
 - block:
   - name: store router ip
     set_fact:
-      application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'fritz_addr': lookup('pipe', "getent hosts fritz.box | awk '/^fd/ {print $1}'"),  }} }, recursive=True) }}"
+      application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'fritz_addr': lookup('pipe', 'getent hosts fritz.box | grep ^fd | cut -d \" \" -f 1'),  }} }, recursive=True) }}"
 
   delegate_to: localhost
   run_once: true
