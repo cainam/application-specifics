@@ -275,13 +275,14 @@ spec:
                 for flow in $(find "${SURICATA_FLOWS}/" -type f ! -newer "${ENRICHED_FLOWS}/ts"); do
                   [ -f "${flow}" ] || continue
                   base_flow=$(basename "${flow}")
+                  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) ... about ${base_flow}"
                   payload=$(jq -n --arg system_content "$(echo "$instructions"; cat "$flow")" '{"model": "openai/gpt-oss-20b", #"llama-3.1-8b-instant",
                     "messages": [{"role": "system", "content": $system_content}]
                   }')
                   curl https://api.groq.com/openai/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer ${GROQ}" \
                       -d "$payload" | jq .  > "${ENRICHED_FLOWS}/${base_flow%.json}.ai-2.json"
                   python3 /app/flow-information-collector.py "${flow}" "${ENRICHED_FLOWS}/${base_flow%.json}.enrichment.json"
-                  mv "${flow}" "${ENRICHED_FLOWS}/"
+                  mv -v "${flow}" "${ENRICHED_FLOWS}/"
                 done
               done
           volumeMounts:
