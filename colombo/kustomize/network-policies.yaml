@@ -7,38 +7,5 @@ spec:
   policyTypes: [Ingress]
   ingress:
   - from:
-    - ipBlock: { cidr: fd8f:1f5c:2459:0:4a5d:35ff:fe02:9c91/128 }
-
-#apiVersion: networking.k8s.io/v1
-#kind: NetworkPolicy
-#metadata:
-#  name: colombo-fritz
-#spec:
-#  egress:
-#    - ports:
-#        - port: 80
-#          protocol: TCP
-#      to:
-#        - ipBlock:
-#            cidr: fd8f:1f5c:2459:0:4a5d:35ff:fe02:9c91/128
-#  ingress:
-#    - from:
-#        - ipBlock:
-#            cidr: fd8f:1f5c:2459:0:4a5d:35ff:fe02:9c91/128
-#    - from:
-#        - namespaceSelector:
-#            matchLabels:
-#              kubernetes.io/metadata.name: tools
-#          podSelector:
-#            matchLabels:
-#              app.kubernetes.io/name: infopage
-#      ports:
-#        - port: api
-#          protocol: TCP
-#  podSelector:
-#    matchLabels:
-#      app: colombo
-#  policyTypes:
-#    - Egress
-#    - Ingress
+    - ipBlock: { cidr: {{ IPv6 }}/128 }
 

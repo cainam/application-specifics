@@ -136,8 +136,10 @@ spec:
                 sleep 5
               done
           env:
-            - name: FRITZ_ADDR
+            - name: FRITZ_ADDRX
               value: "{{ lookup('pipe', "getent hosts fritz.box | awk '/^fd/ {print $1}'") }}"
+            - name: FRITZ_ADDR
+              value: "{{ IPv6 }}"
             - name: FRITZ_USER
               valueFrom:
                 secretKeyRef:

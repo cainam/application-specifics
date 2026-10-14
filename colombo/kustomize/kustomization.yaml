@@ -1,3 +1,4 @@
+{% set IPv6 = lookup('pipe', "getent hosts fritz.box | awk '/^fd/ {print $1}'") -%}
 namespace: {{ kustom.namespace }}
 resources:
 - configmap_and_service.yaml
