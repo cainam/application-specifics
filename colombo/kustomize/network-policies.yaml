@@ -3,9 +3,9 @@ kind: NetworkPolicy
 metadata:
   name: {{ kustom.name }}-fritz
 spec:
-  podSelector: { matchLabels: { app: colombo } }
+  podSelector: { matchLabels: { app: {{ kustom.name }} } }
   policyTypes: [Ingress]
   ingress:
   - from:
-    - ipBlock: { cidr: {{ IPv6 }}/128 }
+    - ipBlock: { cidr: {{ application_playbooks[application.key].vars.fritz_addr }}/128 }
 

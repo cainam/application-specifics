@@ -139,7 +139,7 @@ spec:
             - name: FRITZ_ADDRX
               value: "{{ lookup('pipe', "getent hosts fritz.box | awk '/^fd/ {print $1}'") }}"
             - name: FRITZ_ADDR
-              value: "{{ IPv6 }}"
+              value: "{{ application_playbooks[application.key].vars.fritz_addr }}"
             - name: FRITZ_USER
               valueFrom:
                 secretKeyRef:
