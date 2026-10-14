@@ -16,6 +16,7 @@ spec:
         app: {{ kustom.name }}
     spec:
       shareProcessNamespace: true # this allows to access the process of suricata from another container
+      terminationGracePeriodSeconds: 30
       securityContext:
         fsGroup: {{ kustom.security.runAsGroup }}
       volumes:
@@ -49,6 +50,11 @@ spec:
               fi
               
               log() { echo "$(date '+%F %T') $*" >&2; }
+              cleanup() {
+                fcurl logout "$FRITZ_IP/login_sid.lua" -d "logout=1" -d "sid=$SID" >/dev/null
+                kill 0; exit 0
+              }
+              trap cleanup TERM INT
               
               # curl wrapper: shows errors, exit code, source -> destination address and timings.
               # The response body goes to stdout, the log to stderr.
@@ -112,7 +118,7 @@ spec:
                   fi
                   # stop a capture that may still be running from before
                   fcurl stop-capture -X POST "$FRITZ_IP/capture.lua" \
-                    -d "sid=$SID" -d "capture=eth0" -d "stop=1" >/dev/null
+                    -d "sid=$SID" -d "capture=1-lan" -d "stop=1" >/dev/null
                 fi
               
                 FILE=/data/pcaps/fritz-$(date +%s).pcap
@@ -121,7 +127,8 @@ spec:
                 {
                   curl -sS -g --no-buffer  "$URL"
                   log "[capture] curl exited with rc=$?"
-                } | tcpdump -r - -w "$FILE" -C 20
+                } | tcpdump -r - -w "$FILE" -C 20 &
+                wait $!
                 ls -l /data/pcaps/
                 log "[capture] pipeline ended"
               
