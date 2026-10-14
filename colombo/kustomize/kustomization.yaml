@@ -2,6 +2,7 @@ namespace: {{ kustom.namespace }}
 resources:
 - configmap_and_service.yaml
 - deploy.yaml
+- network-policies.yaml
 
 secretGenerator:
 - name: {{ kustom.name }}
