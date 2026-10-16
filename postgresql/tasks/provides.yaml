@@ -30,7 +30,7 @@
     register: port_forwarder
     
   - name: "{{ __my_title_prefix }}read local port from file"
-    shell: (while sleep 2; do [ -s "{{ pf_tmp.path }}" ] && cat "{{ pf_tmp.path }}" && exit; done)
+    shell: (while sleep 2; do [ -s "{{ pf_tmp.path }}" ] && head -n 1 "{{ pf_tmp.path }}" && exit; done)
     register: read_port
 
   - name: "{{ __my_title_prefix }}debug port_forwarder"
