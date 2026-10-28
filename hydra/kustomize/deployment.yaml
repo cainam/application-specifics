@@ -125,7 +125,7 @@ spec:
                         printf "POST %s HTTP/1.1\r\n" "$PATH_STR"
                         printf "Host: %s:%s\r\n" "$HOST" "$PORT"
                         printf "Content-Type: application/json\r\n"
-                        printf "Content-Length: %d\r\n" "${#PAYLOAD}"
+                        printf "Content-Length: %d\r\n" "${{{ '#' }}PAYLOAD}"
                         printf "Connection: close\r\n\r\n"
                         printf "%s" "$PAYLOAD"
                         sleep 2
