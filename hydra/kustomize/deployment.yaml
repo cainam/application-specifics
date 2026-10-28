@@ -69,6 +69,8 @@ spec:
             successThreshold: 1
             timeoutSeconds: 2
           env:
+            - name: REDIRECT_URL
+              value: "https://{{ net.base_domain }}/oauth2-hydra/callback https://{{ net.domain_external }}:44354/oauth2-hydra/callback"
             - name: URLS_SELF_ISSUER
               value: https://my-lb.adm13/hydra
             - name: DSN
@@ -86,28 +88,44 @@ spec:
                 secretKeyRef:
                   name: hydra
                   key: secretsCookie
+            - name: CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: hydra
+                  key: clientID
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: hydra
+                  key: clientSecret
           resources: {}
           securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            privileged: false
-            readOnlyRootFilesystem: true
             runAsGroup: 65534
-            runAsNonRoot: true
             runAsUser: 65534
             seLinuxOptions:
               level: s0:c123,c456
-            seccompProfile:
-              type: RuntimeDefault
-          lifecycle: {}
-      initContainers: null
+          lifecycle: 
+            postStart:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - |
+                  B=http://127.0.0.1:4445
+                  ok=0; i=0
+                  while sleep 2; do
+                    wget -q -O /dev/null "$B/health/ready" && break
+                  done
+  
+                  # 404 makes busybox wget exit non-zero, so this means "client is missing"
+                  if ! wget -q -O /dev/null "$B/clients/$CLIENT_ID"; then
+                    wget -q -O /dev/null \
+                      --header 'Content-Type: application/json' \
+                      --post-data "{\"client_id\":\"$CLIENT_ID\",\"client_name\":\"test\",\"client_secret\":\"$CLIENT_SECRET\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"redirect_uris\":[\"$REDIRECT_URL\"],\"response_types\":[\"code\",\"id_token\"],\"scope\":\"offline openid users.write users.read users.edit users.delete email\",\"token_endpoint_auth_method\":\"client_secret_post\"}" \
+                      "$B/clients" || exit 1
+                  fi
       securityContext:
         fsGroup: 65534
         fsGroupChangePolicy: OnRootMismatch
         runAsGroup: 65534
-        runAsNonRoot: true
         runAsUser: 65534
-        seccompProfile:
-          type: RuntimeDefault
