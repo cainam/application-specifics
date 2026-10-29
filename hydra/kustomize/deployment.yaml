@@ -122,13 +122,15 @@ spec:
                   if ! echo "$RESPONSE" | grep -q "HTTP/1.[01] 200"; then
                     PAYLOAD="{\"client_id\":\"$CLIENT_ID\",\"client_name\":\"test\",\"client_secret\":\"$CLIENT_SECRET\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"redirect_uris\":[\"$REDIRECT_URL\"],\"response_types\":[\"code\",\"id_token\"],\"scope\":\"offline openid users.write users.read users.edit users.delete email\",\"token_endpoint_auth_method\":\"client_secret_post\"}"
                     {
+                    {% raw %}
                         printf "POST %s HTTP/1.1\r\n" "$PATH_STR"
                         printf "Host: %s:%s\r\n" "$HOST" "$PORT"
                         printf "Content-Type: application/json\r\n"
-                        printf "Content-Length: %d\r\n" "${{{ '#' }}PAYLOAD}"
+                        printf "Content-Length: %d\r\n" "${#PAYLOAD}"
                         printf "Connection: close\r\n\r\n"
                         printf "%s" "$PAYLOAD"
                         sleep 2
+                    {% endraw %}
                     } | nc "$HOST" "$PORT"
                   fi
       securityContext:
