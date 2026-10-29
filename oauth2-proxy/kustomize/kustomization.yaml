@@ -1,7 +1,12 @@
+namespace: {{ kustom.namespace }}
 resources:
 - deploy.yaml
 - service.yaml
 - configmap.yaml
 - secret.yaml
   
-namespace: {{ kustom.namespace }}
+secretGenerator:
+  - name: oauth2-secret
+    type: Opaque
+    literals:
+      - cookie-secret={{ kustom.vars.cookie_secret }}

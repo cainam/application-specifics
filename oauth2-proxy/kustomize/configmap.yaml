@@ -8,7 +8,7 @@
 data:
   oauth2_proxy.cfg: |-
     email_domains = [ "*" ]        # Restrict to these E-Mail Domains, a wildcard "*" allows any email
-    cookie_secret = "{{ cookie_secret }}"
+    #cookie_secret = "{{ cookie_secret }}"
     ssl_insecure_skip_verify = true
     redirect_url = "https://{{net.base_domain }}{{ kustom.vars.oauth2_path }}/callback"
     cookie_domains = {{ '[' ~ domains | join(',') ~ ']' }}

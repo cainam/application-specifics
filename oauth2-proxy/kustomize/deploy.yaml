@@ -27,6 +27,12 @@ spec:
         - --standard-logging=true
         - --config=/etc/oauth2_proxy/oauth2_proxy.cfg
         image: {{ kustom.images[kustom.name] }}
+        env:
+        - name: OAUTH2_PROXY_COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-secret
+              key: cookie-secret
         livenessProbe:
           failureThreshold: 3
           httpGet:
