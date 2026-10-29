@@ -70,7 +70,7 @@ spec:
             timeoutSeconds: 2
           env:
             - name: REDIRECT_URL
-              value: "https://{{ kustom.network.domain }}{{ kustom.vars.oauth2_path }}/callback https://{{ net.domain_external }}:{{ net.routes | selectattr('domain','equalto',kustom.network.domain)|map(attribute='endpointIP')|first  }}{{ kustom.vars.oauth2_path }}/callback"
+              value: "https://{{ kustom.network.domain }}{{ kustom.vars.oauth2_path }}/callback https://{{ net.domain_external }}:{{ net.routes | selectattr('domain','equalto',kustom.network.domain)|map(attribute='external_port')|first  }}{{ kustom.vars.oauth2_path }}/callback"
             - name: URLS_SELF_ISSUER
               value: https://{{ net.base_domain }}/{{ kustom.name }}
             - name: DSN
@@ -120,7 +120,7 @@ spec:
 
                   RESPONSE=$( ( printf "GET %s HTTP/1.1\r\n" "$PATH_STR/$CLIENT_ID";printf "Host: %s:%s\r\n" "$HOST" "$PORT";printf "Connection: close\r\n\r\n"; sleep 1; ) | nc "$HOST" "$PORT" )
                   if ! echo "$RESPONSE" | grep -q "HTTP/1.[01] 200"; then
-                    PAYLOAD="{\"client_id\":\"$CLIENT_ID\",\"client_name\":\"test\",\"client_secret\":\"$CLIENT_SECRET\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"redirect_uris\":[\"$REDIRECT_URL\"],\"response_types\":[\"code\",\"id_token\"],\"scope\":\"offline openid users.write users.read users.edit users.delete email\",\"token_endpoint_auth_method\":\"client_secret_post\"}"
+                    PAYLOAD="{\"client_id\":\"$CLIENT_ID\",\"client_name\":\"test\",\"client_secret\":\"$CLIENT_SECRET\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"redirect_uris\":[$(echo "\"$REDIRECT_URL\"" | sed -e 's/ /","/g')],\"response_types\":[\"code\",\"id_token\"],\"scope\":\"offline openid users.write users.read users.edit users.delete email\",\"token_endpoint_auth_method\":\"client_secret_post\"}"
                     {
                     {% raw %}
                         printf "POST %s HTTP/1.1\r\n" "$PATH_STR"
