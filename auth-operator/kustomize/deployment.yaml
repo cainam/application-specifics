@@ -41,7 +41,7 @@ spec:
           value: app.kubernetes.io/instance
         - name: HYDRA_SEARCH_LABEL_VALUE
           value: hydra
-        image: {{ kustom.image }}
+        image: {{ kustom.images[kustom.name] }}
         name: {{ kustom.name }}
         volumeMounts:
         - mountPath: /app/{{ kustom.name }}.py

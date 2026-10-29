@@ -25,7 +25,7 @@ spec:
           value: noX
         - name: mount_path
           value: /x
-        image: {{ kustom.image }}
+        image: {{ kustom.images[kustom.name] }}
         name: {{ kustom.name }}
         ports:
         - containerPort: 3000

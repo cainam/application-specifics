@@ -26,7 +26,7 @@ spec:
         fsGroup: {{ kustom.security.fsGroup }}
       initContainers:
       - name: setup-passwd
-        image: {{ kustom.image }}
+        image: {{ kustom.images[kustom.name] }}
         securityContext:
           runAsUser: {{ kustom.security.runAsUser }}
           runAsGroup: {{ kustom.security.fsGroup }}
@@ -40,7 +40,7 @@ spec:
         - name: writable
           mountPath: /mnt
       containers:
-      - image: {{ kustom.image }}
+      - image: {{ kustom.images[kustom.name] }}
         command: 
         - sh
         - -c

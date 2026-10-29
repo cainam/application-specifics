@@ -27,7 +27,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: hydra
-          image: {{ kustom.image }}
+          image: {{ kustom.images[kustom.name] }}
           command:
             - hydra
           args:
@@ -115,10 +115,10 @@ spec:
                   PORT="4445"
                   PATH_STR="/clients"
                   while sleep 2; do
-                    ( printf "GET /health/alive HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n" | busybox nc "$HOST" "$PORT") && break
+                    ( printf "GET /health/alive HTTP/1.1\r\nHost: %s\r\n\r\n" "$HOST" | busybox nc "$HOST" "$PORT") && break
                   done
 
-                  RESPONSE=$( ( printf "GET %s HTTP/1.1\r\n" "/clients/$CLIENT_ID";printf "Host: %s:%s\r\n" "$HOST" "$PORT";printf "Connection: close\r\n\r\n"; sleep 1; ) | nc "$HOST" "$PORT" )
+                  RESPONSE=$( ( printf "GET %s HTTP/1.1\r\n" "$PATH_STR/$CLIENT_ID";printf "Host: %s:%s\r\n" "$HOST" "$PORT";printf "Connection: close\r\n\r\n"; sleep 1; ) | nc "$HOST" "$PORT" )
                   if ! echo "$RESPONSE" | grep -q "HTTP/1.[01] 200"; then
                     PAYLOAD="{\"client_id\":\"$CLIENT_ID\",\"client_name\":\"test\",\"client_secret\":\"$CLIENT_SECRET\",\"grant_types\":[\"authorization_code\",\"refresh_token\"],\"redirect_uris\":[\"$REDIRECT_URL\"],\"response_types\":[\"code\",\"id_token\"],\"scope\":\"offline openid users.write users.read users.edit users.delete email\",\"token_endpoint_auth_method\":\"client_secret_post\"}"
                     {

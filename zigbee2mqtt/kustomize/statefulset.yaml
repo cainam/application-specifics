@@ -26,7 +26,7 @@ spec:
         command:
         - /bin/sh
         - -c
-        image: {{ kustom.image }}
+        image: {{ kustom.images[kustom.name] }}
         workingDir: /app
         ports:
         - containerPort: 8080

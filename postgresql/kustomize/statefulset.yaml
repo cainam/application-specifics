@@ -17,7 +17,7 @@ spec:
     spec:
       initContainers:
       - name: init-chmod-data
-        image: {{ kustom.image }}
+        image: {{ kustom.images[kustom.name] }}
         command:
           - sh
           - -c
@@ -51,7 +51,7 @@ spec:
           mountPath: {{ kustom.dataPath }}
       containers:
       - name: postgres
-        image: {{ kustom.image }}
+        image: {{ kustom.images[kustom.name] }}
         args:
         - -c
         - config_file={{ kustom.confPath }}/postgresql.conf

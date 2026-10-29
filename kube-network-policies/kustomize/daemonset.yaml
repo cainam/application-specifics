@@ -15,7 +15,7 @@ spec:
       hostNetwork: true # Needs host network access to modify iptables
       containers:
       - name: controller
-        image: {{ kustom.image }}
+        image: {{ kustom.images[kustom.name] }}
         securityContext:
           privileged: true # Crucial for firewall access
         volumeMounts:

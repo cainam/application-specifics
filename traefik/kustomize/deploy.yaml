@@ -18,7 +18,7 @@ spec:
       serviceAccountName: traefik-ingress-controller
       containers:
         - name: traefik
-          image: {{ kustom.image }}
+          image: {{ kustom.images[kustom.name] }}
           command: ['/bin/traefik']
           args:
             - --api.dashboard=true
