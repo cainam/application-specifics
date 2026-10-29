@@ -41,15 +41,15 @@ spec:
               readOnly: true
           ports:
             - name: http-public
-              containerPort: 4444
+              containerPort: {{ kustom.vars.public_port }}
               protocol: TCP
             - name: http-admin
-              containerPort: 4445
+              containerPort: {{ kustom.vars.admin_port }}
               protocol: TCP
           readinessProbe:
             httpGet:
               path: /health/alive
-              port: 4445
+              port: {{ kustom.vars.admin_port }}
               httpHeaders:
                 - name: Host
                   value: 127.0.0.1
@@ -59,7 +59,7 @@ spec:
           startupProbe:
             httpGet:
               path: /health/ready
-              port: 4445
+              port: {{ kustom.vars.admin_port }}
               httpHeaders:
                 - name: Host
                   value: 127.0.0.1
@@ -72,7 +72,7 @@ spec:
             - name: REDIRECT_URL
               value: "https://{{ net.base_domain }}/oauth2-hydra/callback https://{{ net.domain_external }}:44354/oauth2-hydra/callback"
             - name: URLS_SELF_ISSUER
-              value: https://my-lb.adm13/hydra
+              value: https://{{ net.base_domain }}/{{ kustom.name }}
             - name: DSN
               valueFrom:
                 secretKeyRef:

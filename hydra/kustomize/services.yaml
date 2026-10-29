@@ -3,34 +3,34 @@ kind: Service
 metadata:
   name: hydra-admin
   labels:
-    app.kubernetes.io/name: hydra
-    app.kubernetes.io/instance: hydra
+    app.kubernetes.io/name: {{ kustom.name }}
+    app.kubernetes.io/instance: {{ kustom.name }}
     app.kubernetes.io/component: admin
 spec:
   type: ClusterIP
   ports:
-    - port: 4445
+    - port: {{ kustom.vars.admin_port }}
       targetPort: http-admin
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: hydra
-    app.kubernetes.io/instance: hydra
+    app.kubernetes.io/name: {{ kustom.name }}
+    app.kubernetes.io/instance: {{ kustom.name }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: hydra-public
   labels:
-    app.kubernetes.io/name: hydra
-    app.kubernetes.io/instance: hydra
+    app.kubernetes.io/name: {{ kustom.name }}
+    app.kubernetes.io/instance: {{ kustom.name }}
 spec:
   type: ClusterIP
   ports:
-    - port: 4444
+    - port: {{ kustom.vars.public_port }}
       targetPort: http-public
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: hydra
-    app.kubernetes.io/instance: hydra
+    app.kubernetes.io/name: {{ kustom.name }}
+    app.kubernetes.io/instance: {{ kustom.name }}
