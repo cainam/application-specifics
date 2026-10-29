@@ -39,7 +39,7 @@ spec:
               value: ~/.ansible_async
             - name: ANSIBLE_CALLBACK_PLUGINS
               value: ~/home-cluster-deployment/callback_plugins
-            image: {{ kustom.images[kustom.name] }}
+            image: {{ kustom.images['molecule'] }}
             command:
             - /bin/sh
             - -c
