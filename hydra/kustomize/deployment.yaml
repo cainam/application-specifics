@@ -70,7 +70,7 @@ spec:
             timeoutSeconds: 2
           env:
             - name: REDIRECT_URL
-              value: "https://{{ net.base_domain }}/oauth2-hydra/callback https://{{ net.domain_external }}:44354/oauth2-hydra/callback"
+              value: "https://{{ kustom.network.domain }}{{ kustom.vars.oauth2_path }}/callback https://{{ net.domain_external }}:{{ net.routes | selectattr('domain','equalto',kustom.network.domain)|map(attribute='endpointIP')|first  }}{{ kustom.vars.oauth2_path }}/callback"
             - name: URLS_SELF_ISSUER
               value: https://{{ net.base_domain }}/{{ kustom.name }}
             - name: DSN
