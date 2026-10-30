@@ -270,7 +270,6 @@ spec:
               Flows: "
               mkdir -p ${ENRICHED_FLOWS}
               while sleep "${INTERVAL}"; do
-                echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Asking AI..."
                 touch "${ENRICHED_FLOWS}/ts" && sleep 5
                 for flow in $(find "${SURICATA_FLOWS}/" -type f ! -newer "${ENRICHED_FLOWS}/ts"); do
                   [ -f "${flow}" ] || continue

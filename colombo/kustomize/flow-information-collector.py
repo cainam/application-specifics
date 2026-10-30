@@ -32,6 +32,11 @@ def http_get(url: str, headers: dict = {}, timeout: int = 10) -> dict | None:
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        # Read the error body sent by the API (often contains the exact JSON error message)
+        error_body = e.read().decode(errors="ignore")
+        print(f"  GET {url} failed with HTTP {e.code} {e.reason}: {error_body}", flush=True)
+        return None
     except (urllib.error.URLError, json.JSONDecodeError) as e:
         print(f"  GET {url} failed: {e}", flush=True)
         return None
@@ -43,6 +48,10 @@ def http_post(url: str, data: dict, headers: dict = {}, timeout: int = 10) -> di
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode(errors="ignore")
+        print(f"  POST {url} failed with HTTP {e.code} {e.reason}: {error_body}", flush=True)
+        return None
     except (urllib.error.URLError, json.JSONDecodeError) as e:
         print(f"  POST {url} failed: {e}", flush=True)
         return None
@@ -58,7 +67,7 @@ def lookup_abuseipdb(ip: str) -> dict:
         headers={"Key": ABUSEIPDB_KEY, "Accept": "application/json"},
     )
     if not result:
-        return {"error": "request failed"}
+        return {"error": "request to abuseipdb.com failed"}
     d = result.get("data", {})
     return {
         "abuse_confidence_score": d.get("abuseConfidenceScore"),
@@ -78,7 +87,7 @@ def lookup_urlhaus(domain: str) -> dict:
         headers={"Auth-Key": URLHAUS_KEY, "Content-Type": "application/x-www-form-urlencoded"},
     )
     if not result:
-        return {"error": "request failed"}
+        return {"error": "request to urlhaus-api.abuse.ch failed"}
     return {
         "query_status": result.get("query_status"),
         "blacklists":   result.get("blacklists"),

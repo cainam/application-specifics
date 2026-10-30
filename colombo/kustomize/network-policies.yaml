@@ -8,4 +8,22 @@ spec:
   ingress:
   - from:
     - ipBlock: { cidr: {{ application_playbooks[application.key].vars.fritz_addr }}/128 }
+---
+# the policy below is only needed for spider-collect container
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: colombo-allow-all-egress
+  namespace: tools
+spec:
+  podSelector:
+    matchLabels:
+      app: colombo
+  policyTypes:
+  - Egress
+  - Ingress
+  ingress:
+  - {} # This rule matches and allows all outbound traffic to any destination
+  egress:
+  - {} # This rule matches and allows all outbound traffic to any destination
 
