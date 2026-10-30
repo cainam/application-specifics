@@ -378,14 +378,10 @@ async def validate_webhook(request: Request):
         pod = k8s.V1Pod(**pod_dict)
         logger.debug("pod metadata: "+str(pod.metadata))
 
-        pod_metadata = pod.metadata if pod.metadata else {} # Sicherstellen, dass es ein dict ist
-        pod_name = pod_metadata.get('name', "unknown")
-        namespace = pod_metadata.get('namespace', "unknown")
-        
         allowed, messages = process_pod_object(req.object, False, mutating_config)
-        full_message = f"Pod {item_name} in namespace {namespace} violates restricted security policy: {'\n'.join(messages)}"
+        full_message = f"Pod {item_name} in namespace {req.namespace} violates restricted security policy: {'\n'.join(messages)}"
         if allowed:
-            logger.info(f"Pod {item_name} in namespace {namespace} conforms to restricted security policy. Allowing: {'\n'.join(messages)}")
+            logger.info(f"Pod {item_name} in namespace {req.namespace} conforms to restricted security policy. Allowing: {'\n'.join(messages)}")
         else:
             logger.warning(full_message)
     else:
