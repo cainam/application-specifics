@@ -375,8 +375,7 @@ async def validate_webhook(request: Request):
         logger.info(f"Validating Pod: {item_name} in namespace: {req.namespace}")
 
         pod_dict = valmut_helper.convert_keys_to_snake_case(req.object)
-        pod = k8s.V1Pod(**pod_dict)
-        logger.debug("pod metadata: "+str(pod.metadata))
+        logger.debug("pod metadata: "+str(pod_dict.get("metadata", {})))
 
         allowed, messages = process_pod_object(req.object, False, mutating_config)
         full_message = f"Pod {item_name} in namespace {req.namespace} violates restricted security policy: {'\n'.join(messages)}"
