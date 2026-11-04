@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: {{ kustom.namespace }}
 
 resources:
-  - https://raw.githubusercontent.com/traefik/traefik/v3.6/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
-  - https://raw.githubusercontent.com/traefik/traefik/v3.6/docs/content/reference/dynamic-configuration/kubernetes-crd-rbac.yml
+  - https://raw.githubusercontent.com/traefik/traefik/{{ software.traefik.version.split('.')[:2] | join('.') }}/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
+  - https://raw.githubusercontent.com/traefik/traefik/{{ software.traefik.version.split('.')[:2] | join('.') }}/docs/content/reference/dynamic-configuration/kubernetes-crd-rbac.yml
   - service.yaml
   - serviceaccount.yaml
   - dashboard-ingressroute.yaml
