@@ -40,16 +40,34 @@ except yaml.YAMLError as e:
     logger.error(f"Error parsing YAML: {e}")
 
 name='valmut-mutate'
-config_namespace = valmut_helper.get_current_namespace()
-mutating_config = valmut_helper.get_configmap_data(config_namespace, name, logger)
+#config_namespace = valmut_helper.get_current_namespace()
+#mutating_config = valmut_helper.get_configmap_data(config_namespace, name, logger)
 #first_key = next(iter(mutating_config)) # the name of the key doesn't matter, we only need the content
-mutating_config = yaml.safe_load(mutating_config['mutate'])
+#mutating_config = yaml.safe_load(mutating_config['mutate'])
+from contextlib import asynccontextmanager
+
+mutating_config = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global mutating_config
+    name = 'valmut-mutate'
+    config_namespace = valmut_helper.get_current_namespace()
+    raw_config = valmut_helper.get_configmap_data(config_namespace, name, logger)
+    if raw_config and 'mutate' in raw_config:
+        mutating_config = yaml.safe_load(raw_config['mutate'])
+        logger.info(f"found name: {name} mutating_config: {mutating_config}")
+    else:
+        logger.error(f"Failed to load or parse ConfigMap '{name}'")
+    yield
+
 logger.info('found name: '+name+' mutating_config: '+str(mutating_config))
 
 app = FastAPI(
     title="Kubernetes Admission WebHook Server",
     description="A FastAPI application serving as a Kubernetes Mutating and Validating Admission WebHook.",
     version="1.0.0",
+    lifespan=lifespan
 )
 
 def get_a_name_from_request(req):
