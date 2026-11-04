@@ -6,14 +6,16 @@ metadata:
     istio: {{ kustom.name }}
   name: {{ kustom.name }}
 spec:
-  externalIPs:
-  - {{ (net.routes | selectattr('domain','equalto',kustom.network.domain)|first).endpointIP }}
+#  externalIPs:
+#  - {{ (net.routes | selectattr('domain','equalto',kustom.network.domain)|first).endpointIP }}
   ports:
   - name: https
     port: 443
     protocol: TCP
     targetPort: 33443
+    nodePort: {{ (net.routes | selectattr('gateway','equalto','istio')|first).nodePorts.web_https }}
   selector:
     app: {{ kustom.name }}
     istio: {{ kustom.name }}
-  type: LoadBalancer
+#  type: LoadBalancer
+  type: NodePort
