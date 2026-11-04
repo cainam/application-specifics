@@ -6,9 +6,6 @@ metadata:
     app: traefik
 spec:
   type: NodePort
-#  type: LoadBalancer
-#  externalIPs:
-#  - {{ (net.routes | selectattr('gateway','equalto',kustom.name)|first).endpointIP }}
   selector:
     app: traefik
   ports:
@@ -22,11 +19,3 @@ spec:
       port: 443
       targetPort: websecure
       nodePort: {{ (net.routes | selectattr('gateway','equalto',kustom.name)|first).nodePorts.web443 }}
-#    - protocol: TCP
-#      name: traefik-api
-#      port: {{ kustom.network.svcPort }}
-#      targetPort: traefik # For the dashboard/API
-#    - protocol: TCP
-#      name: metrics
-#      port: 8082
-#      targetPort: metrics # For Prometheus metrics
