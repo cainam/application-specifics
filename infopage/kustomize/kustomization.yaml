@@ -1,10 +1,8 @@
 namespace: {{ kustom.namespace }}
 resources:
-- clusterrolebinding.yaml
-- clusterrole.yaml
 - deploy.yaml
 - service.yaml
-- serviceaccount.yaml
+- rbac.yaml
 
 secretGenerator:
 - name: {{ kustom.name }}

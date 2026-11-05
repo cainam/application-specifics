@@ -82,11 +82,16 @@ spec:
           name: infopage
         - name: ca-bundle
           mountPath: /certs
+        - name: system-information
+          mountPath: /sys-info
       serviceAccountName: {{ kustom.name }}
       volumes:
       - name: infopage
         persistentVolumeClaim:
           claimName: infopage
+      - name: system-information
+        persistentVolumeClaim:
+          claimName: system-information
       - name: ca-bundle
         configMap:
               name: {{ kustom.name }}
