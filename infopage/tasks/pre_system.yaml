@@ -10,7 +10,7 @@
   vars:
     ca_bundle: |
       {% for file in my_certs.local_ca_files %}
-      {{ lookup('file', my_certs.cert_path ~'/'~ file) }}
+      {{ lookup('file', my_certs.conf.cert_path ~'/'~ file) }}
       {% endfor %}
   set_fact:
     application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'ca_bundle': ca_bundle, 'uid': (2**31-1)|random(65536), 'gid': (2**31-1)|random(65536)  }} }, recursive=True) }}"
