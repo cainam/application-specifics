@@ -12,7 +12,7 @@
           regex: ^{{ application.value.network.prefix }}(?:/(.*)|$)
           replacement: {{ application.value.network.rewrite }}$1
       EOF
-    when: requirements.strip
+    # when: requirements.strip
   - name: "{{ name_prefix }} ingressroute"
     vars:
       route: "{{ net.routes | selectattr('domain','equalto',application.value.network.domain)|first }}"
