@@ -11,9 +11,6 @@
         replacePathRegex:
           regex: ^{{ application.value.network.prefix }}(?:/(.*)|$)
           replacement: {{ application.value.network.rewrite }}$1
-        stripPrefix:
-          prefixes:
-          - /{{ application.key }}
       EOF
     when: requirements.strip
   - name: "{{ name_prefix }} ingressroute"
