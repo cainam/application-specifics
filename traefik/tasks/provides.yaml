@@ -9,7 +9,7 @@
         namespace: gateway
       spec:
         replacePathRegex:
-          regex: ^{{ application.value.network.prefix }}(?:/(.*)|$)
+          regex: ^{{ application.value.network.prefix }}(/.*)?$
           replacement: {{ application.value.network.rewrite }}$1
       EOF
     # when: requirements.strip
