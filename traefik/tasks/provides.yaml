@@ -1,5 +1,5 @@
 - block:
-  - name: "{{ name_prefix }} Middleware stripprefix"
+  - name: "{{ name_prefix }} Middleware for prefix mapping"
     shell: |
       kubectl apply -f - <<"EOF"
       apiVersion: traefik.io/v1alpha1
@@ -12,6 +12,7 @@
           regex: ^{{ application.value.network.prefix }}(/.*)?$
           replacement: {{ application.value.network.rewrite }}$1
       EOF
+
   - name: "{{ name_prefix }} ingressroute"
     vars:
       route: "{{ net.routes | selectattr('domain','equalto',application.value.network.domain)|first }}"

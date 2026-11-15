@@ -15,10 +15,8 @@ spec:
     spec:
       containers:
       - env:
-        - name: HYDRA_ADMIN_URL
+        - name: HYDXXXXRA_ADMIN_URL
           value: http://hydra-admin.auth:4445
-        - name: HYDRA_PUBLIC_URL
-          value: http://hydra-public.auth:4444
         - name: BASE_URL
           value: /idp/
         - name: MOCK_TLS_TERMINATION

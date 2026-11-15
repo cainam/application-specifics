@@ -112,7 +112,7 @@ spec:
                 - -c
                 - |
                   HOST="127.0.0.1"
-                  PORT="4445"
+                  PORT="{{ kustom.vars.admin_port }}"
                   PATH_STR="/clients"
                   while sleep 2; do
                     ( printf "GET /health/alive HTTP/1.1\r\nHost: %s\r\n\r\n" "$HOST" | busybox nc "$HOST" "$PORT") && break
