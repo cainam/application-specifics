@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - env:
-        - name: HYDXXXXRA_ADMIN_URL
+        - name: HYDRA_ADMIN_URL
           value: http://hydra-admin.auth:4445
         - name: BASE_URL
           value: /idp/
