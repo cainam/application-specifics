@@ -25,8 +25,8 @@ serve:
     - 172.16.0.0/12
     - 192.168.0.0/16
 urls:
-  consent: https://{{ net.base_domain }}/idp/consent
-  login: https://{{ net.base_domain }}/idp/login
+  consent: {{ kustom.vars.providers.idp.base_url }}/consent
+  login: {{ kustom.vars.providers.idp.base_url }}/login
   self:
     admin: http://{{ kustom.name }}-admin.auth:{{ kustom.vars.admin_port }}
     issuer: https://{{ net.base_domain }}/{{ kustom.name }}

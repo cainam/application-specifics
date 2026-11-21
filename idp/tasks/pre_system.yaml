@@ -1,0 +1,20 @@
+- name: read certificate and set uid and gid for kustomize
+  vars:
+    admin_service: "{{ application.value.vars.admin_service | default('hydra-admin') }}"
+    admin_port: "{{ application.value.vars.admin_port | default('4445') }}"
+  set_fact:
+    applications: >-
+        {{ applications | combine({
+             k8s_namespace.key: {
+               application.key: {
+                 'vars': {application.value.vars.
+                   'admin_service': admin_service,
+                   'admin_port': admin_port,
+                   'expose': {'base_url': 'https://' ~ net.base_domain ~ application.value.network.prefix }}
+                 }
+               }
+             }
+           }, recursive=True) }}
+
+    
+ 
