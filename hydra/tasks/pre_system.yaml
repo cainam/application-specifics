@@ -1,0 +1,13 @@
+- name: read certificate and set uid and gid for kustomize
+  vars:
+    ca_bundle: |
+      {% for file in my_certs.local_ca_files %}
+      {{ lookup('file', my_certs.conf.cert_path ~'/'~ file) }}
+      {% endfor %}
+    ca_ssh: "{{ lookup('file', my_certs.conf.cert_path ~ '/ssh_ca.pub') }}"
+    admin_service: "{{ application.value.vars.admin_service | default('hydra-admin') }}"
+    admin_port: "{{ application.value.vars.admin_port | default('4445') }}"
+  set_fact:
+    application_playbooks: "{{ application_playbooks | default({}) | combine({application.key:{'vars':{'admin_service': admin_service, 'admin_port': admin_port, 'admin_url': 'http://'~admin_service~'.'~k8s_namespace.key~':'~admin_port }} }, recursive=True) }}"
+    
+ 
