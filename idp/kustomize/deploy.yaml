@@ -16,7 +16,7 @@ spec:
       containers:
       - env:
         - name: HYDRA_ADMIN_URL
-          value: http://hydra-admin.auth:4445
+          value: {{ kustom.vars.providers.hydra.admin_url }}
         - name: BASE_URL
           value: /idp/
         - name: MOCK_TLS_TERMINATION
