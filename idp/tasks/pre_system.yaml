@@ -10,7 +10,7 @@
                  'vars': {application.value.vars.
                    'admin_service': admin_service,
                    'admin_port': admin_port,
-                   'expose': {'base_url': 'https://' ~ net.base_domain ~ application.value.network.prefix }}
+                   'expose': {'base_url': 'https://' ~ net.base_domain ~ application.value.network.prefix }
                  }
                }
              }
