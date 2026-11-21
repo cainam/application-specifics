@@ -4,7 +4,7 @@
         {{ applications | combine({
              k8s_namespace.key: {
                application.key: {
-                 'vars': {application.value.vars.
+                 'vars': {
                    'expose': {'base_url': 'https://' ~ net.base_domain ~ application.value.network.prefix }
                  }
                }
