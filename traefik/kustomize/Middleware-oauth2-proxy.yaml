@@ -7,7 +7,7 @@ spec:
     addAuthCookiesToResponse:
     - _csrf
     - _oauth2_proxy
-    address: http://oauth2-proxy.auth.svc.cluster.local:80/oauth2/auth
+    address: {{ kustom.vars.providers["oauth2-proxy"].auth_url }}
     authRequestHeaders:
     - X-Forwarded-Uri
     - Origin
