@@ -14,7 +14,7 @@
                    'expose': {
                      'admin_url': 'http://' ~ admin_service ~ '.' ~ k8s_namespace.key ~ ':' ~ admin_port,
                      'profile_url': 'http://' ~ application.value.network.svcName ~ '.' ~ k8s_namespace ~ ':' ~  application.value.vars.public_port ~ '/userinfo',
-                     'issuer_url': 'https://' ~ net.base_domain ~ application.value.vars.network.prefix,
+                     'issuer_url': 'https://' ~ net.base_domain ~ application.value.network.prefix,
                      'jwks_url': 'http://' ~ application.key ~ '.' ~ k8s_namespace ~ ':1121/'
                    }
                  }
