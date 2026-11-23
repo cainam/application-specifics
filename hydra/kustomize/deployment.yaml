@@ -46,6 +46,9 @@ spec:
             - name: http-admin
               containerPort: {{ kustom.vars.admin_port }}
               protocol: TCP
+          env:
+          - name: SERVE_ADMIN_PORT
+            value: {{ kustom.vars.admin_port }}
           readinessProbe:
             httpGet:
               path: /health/alive

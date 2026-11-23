@@ -1,7 +1,7 @@
 - name: read certificate and set uid and gid for kustomize
   vars:
     admin_service: "{{ application.value.vars.admin_service | default('hydra-admin') }}"
-    admin_port: "{{ application.value.vars.admin_port | default(65536|random(1024) }}"
+    admin_port: "{{ application.value.vars.admin_port | default(65536|random(1024)) }}"
   set_fact:
     applications: >-
         {{ applications | combine({
