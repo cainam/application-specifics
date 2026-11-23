@@ -50,7 +50,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /health/alive
-              port: {{ kustom.vars.admin_port }}
+              port: {{ internal_admin_port }}
               httpHeaders:
                 - name: Host
                   value: 127.0.0.1
@@ -60,7 +60,7 @@ spec:
           startupProbe:
             httpGet:
               path: /health/ready
-              port: {{ kustom.vars.admin_port }}
+              port: {{ internal_admin_port }}
               httpHeaders:
                 - name: Host
                   value: 127.0.0.1
