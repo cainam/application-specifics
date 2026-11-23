@@ -2,6 +2,7 @@
   vars:
     admin_service: "{{ application.value.vars.admin_service | default('hydra-admin') }}"
     admin_port: "{{ application.value.vars.admin_port | default(65536|random(1024)) }}"
+    public_port: "{{ application.value.vars.public_port | default(65536|random(1024)) }}"
   set_fact:
     applications: >-
         {{ applications | combine({
@@ -11,9 +12,10 @@
                  'vars': {
                    'admin_service': admin_service,
                    'admin_port': admin_port,
+                   'public_port': public_port,
                    'expose': {
                      'admin_url': 'http://' ~ admin_service ~ '.' ~ k8s_namespace.key ~ ':' ~ admin_port,
-                     'profile_url': 'http://' ~ application.value.network.svcName ~ '.' ~ k8s_namespace.key ~ ':' ~  application.value.vars.public_port ~ '/userinfo',
+                     'profile_url': 'http://' ~ application.value.network.svcName ~ '.' ~ k8s_namespace.key ~ ':' ~  public_port ~ '/userinfo',
                      'issuer_url': 'https://' ~ net.base_domain ~ application.value.network.prefix,
                      'jwks_url': 'http://' ~ application.key ~ '.' ~ k8s_namespace.key ~ ':1121/'
                    }

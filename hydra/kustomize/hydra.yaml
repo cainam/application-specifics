@@ -5,8 +5,6 @@ oauth2:
   allowed_top_level_claims:
   - email
 serve:
-  admin:
-    port: {{ kustom.vars.admin_port }}
   cookies:
     same_site_mode: None
     secure: false
@@ -16,7 +14,6 @@ serve:
       - '*'
       debug: true
       enabled: true
-    port: {{ kustom.vars.public_port }}
     request_log:
       disable_for_health: true
   tls:
