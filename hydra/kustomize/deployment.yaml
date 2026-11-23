@@ -46,9 +46,6 @@ spec:
             - name: http-admin
               containerPort: {{ kustom.vars.admin_port }}
               protocol: TCP
-          env:
-          - name: SERVE_ADMIN_PORT
-            value: {{ kustom.vars.admin_port }}
           readinessProbe:
             httpGet:
               path: /health/alive
@@ -72,6 +69,8 @@ spec:
             successThreshold: 1
             timeoutSeconds: 2
           env:
+            - name: SERVE_ADMIN_PORT
+              value: {{ kustom.vars.admin_port }}
             - name: REDIRECT_URL
               value: "{{ kustom.vars.providers['oauth2-proxy'].redirect_url }}"
             - name: URLS_SELF_ISSUER
