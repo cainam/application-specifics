@@ -1,3 +1,4 @@
+{% set internal_admin_port = 65536|random(1024) -%}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,7 +45,7 @@ spec:
               containerPort: {{ kustom.vars.public_port }}
               protocol: TCP
             - name: http-admin
-              containerPort: {{ kustom.vars.admin_port }}
+              containerPort: {{ internal_admin_port }}
               protocol: TCP
           readinessProbe:
             httpGet:
@@ -70,7 +71,7 @@ spec:
             timeoutSeconds: 2
           env:
             - name: SERVE_ADMIN_PORT
-              value: {{ kustom.vars.admin_port }}
+              value: "{{ internal_admin_port }}"
             - name: REDIRECT_URL
               value: "{{ kustom.vars.providers['oauth2-proxy'].redirect_url }}"
             - name: URLS_SELF_ISSUER
