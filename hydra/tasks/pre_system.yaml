@@ -8,7 +8,7 @@
         {{ applications | combine({
              k8s_namespace.key: {
                application.key: {
-                 'network': { 'svcPort': application.value.vars.public_port },
+                 'network': { 'svcPort': public_port },
                  'vars': {
                    'admin_service': admin_service,
                    'admin_port': admin_port,
