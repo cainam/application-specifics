@@ -48,7 +48,7 @@ images:
   build:
     packages: app-arch/zip
     configure_builder: |
-      emerge llvm-core/clang llvm-runtimes/libcxx llvm-core/lld
+      emerge llvm-core/clang llvm-runtimes/libcxx llvm-core/lld dev-util/claude-code app-misc/jq app-shells/bash dev-python/pip
       export PATH=$(stat --printf="%n" /usr/lib/llvm/*/bin):$PATH
       export CC=clang
       export CXX=clang++
