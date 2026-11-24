@@ -4,7 +4,7 @@ images:
   requires:
   - base
   type: gentoo-image-builder
-  tag: 9.3.2
+  tag: 8.8.1
   env:
     JAVA_HOME: /opt/zulu
     USER: root
@@ -24,6 +24,7 @@ images:
       bazel_version=7.7.1
       bazel_version=8.7.0
       bazel_version=9.3.2
+      bazel_version=8.8.1
 
       bazel_dist=bazel-$bazel_version-dist.zip
       mkdir /bazel && cd bazel
