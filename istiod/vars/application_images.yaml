@@ -15,7 +15,7 @@ images:
       # https://cdn.azul.com/zulu/bin/zulu25.32.17-ca-jdk25.0.2-linux_musl_aarch64.tar.gz
       zulu=zulu21.48.17-ca-jdk21.0.10-linux_musl_aarch64.tar.gz
       Xzulu=zulu27.28.101-ca-jdk27.0.0-linux_musl_aarch64.tar.gz
-      zulu=zulu25.38.201-ca-jdk25.0.5.1-linux_aarch64.tar.gz
+      zulu=zulu25.38.201-ca-jdk25.0.5.1-linux_musl_aarch64.tar.gz
       ZULU_DIR=/opt/zulu
       curl -O https://cdn.azul.com/zulu/bin/$zulu
       mkdir -p "${ZULU_DIR}" && tar --directory "${ZULU_DIR}" --extract --strip-components=1 --file $zulu
